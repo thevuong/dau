@@ -46,7 +46,13 @@ struct HeaderActions {
 /// toolbar, in the title-bar row next to the traffic lights (mockup header, 15 bold);
 /// `actions` go on the trailing edge. Every page has the title item, so the toolbar
 /// keeps the same height and the title the same place in every section.
-/// The scroll content has a fixed width, so a legacy scroll bar never narrows it.
+/// Scrolling: the content scrolls under the toolbar, which covers it with the
+/// system's hard scroll-edge effect on macOS 26+ (a solid material edge, so the title
+/// stays readable) and with the toolbar's own material and separator on macOS 14–15.
+/// The scroll content width never depends on the page: with overlay scroll bars it
+/// is the full column; with legacy (always shown) scroll bars it always leaves the
+/// scroll bar's width free, on every page, so the scroll bar has its column inside
+/// the window and nothing moves between pages that scroll and pages that do not.
 ///
 /// On macOS 26 and later the toolbar groups adjacent items on one glass background; a
 /// fixed spacer splits the search field and the + button into two controls, as in
@@ -63,6 +69,12 @@ struct SettingsPage<Content: View>: View {
         self.content = content()
     }
 
+    @State private var legacyScrollers = NSScroller.preferredScrollerStyle == .legacy
+
+    private var scrollerAllowance: CGFloat {
+        legacyScrollers ? NSScroller.scrollerWidth(for: .regular, scrollerStyle: .legacy) : 0
+    }
+
     var body: some View {
         GeometryReader { outer in
             ScrollView(.vertical) {
@@ -73,11 +85,15 @@ struct SettingsPage<Content: View>: View {
                 .padding(.top, 20)
                 .padding(.horizontal, 28)
                 .padding(.bottom, 24)
-                .frame(width: outer.size.width, alignment: .leading)
+                .frame(width: max(outer.size.width - scrollerAllowance, 0), alignment: .leading)
                 .layoutProbe("content")
             }
+            .modifier(HardTopScrollEdge())
         }
         .background(SettingsColors.page)
+        .onReceive(NotificationCenter.default.publisher(for: NSScroller.preferredScrollerStyleDidChangeNotification)) { _ in
+            legacyScrollers = NSScroller.preferredScrollerStyle == .legacy
+        }
         .toolbar {
             if #available(macOS 26, *) {
                 ToolbarItem(placement: .navigation) { PageTitle(title: title) }
@@ -100,6 +116,18 @@ struct SettingsPage<Content: View>: View {
                     }
                 }
             }
+        }
+    }
+}
+
+/// macOS 26+: the hard scroll-edge effect under the toolbar (system material and
+/// edge), so content scrolled under the header never shows through the title.
+struct HardTopScrollEdge: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(macOS 26, *) {
+            content.scrollEdgeEffectStyle(.hard, for: .top)
+        } else {
+            content
         }
     }
 }

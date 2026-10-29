@@ -54,6 +54,17 @@ enum DebugCapture {
                     frames = [:]
                     NotificationCenter.default.post(name: selectSection, object: section.rawValue)
                     try? await Task.sleep(for: .milliseconds(900))
+                    var scrollInfo: [String: [Double]] = [:]
+                    if let offset = scrollOffset, let scrollView = pageScrollView(in: window) {
+                        // `--scroll <pt>`: scroll the page down, flash the scroll bars
+                        // (overlay style hides them otherwise), then capture.
+                        let clip = scrollView.contentView
+                        clip.scroll(to: NSPoint(x: clip.bounds.origin.x, y: clip.bounds.origin.y + offset))
+                        scrollView.reflectScrolledClipView(clip)
+                        scrollView.flashScrollers()
+                        try? await Task.sleep(for: .milliseconds(150))
+                        scrollInfo = describe(scrollView, in: window)
+                    }
                     capture(window, to: directory.appendingPathComponent("\(section.rawValue)-\(mode).png"))
                     var entry = frames.mapValues { [Double($0.minX), Double($0.minY), Double($0.width), Double($0.height)] }
                     for (key, kind) in [("close", NSWindow.ButtonType.closeButton), ("zoom", .zoomButton)] {
@@ -62,6 +73,7 @@ enum DebugCapture {
                             entry[key] = [Double(r.minX), Double(window.frame.height - r.maxY), Double(r.width), Double(r.height)]
                         }
                     }
+                    entry.merge(scrollInfo) { a, _ in a }
                     report["\(section.rawValue)-\(mode)"] = entry
                 }
                 report["colors-\(mode)"] = colors(window.effectiveAppearance)
@@ -74,7 +86,64 @@ enum DebugCapture {
         }
     }
 
+    /// `--scroll <pt>`.
+    static let scrollOffset: CGFloat? = {
+        let args = CommandLine.arguments
+        guard let i = args.firstIndex(of: "--scroll"), i + 1 < args.count, let v = Double(args[i + 1]) else { return nil }
+        return CGFloat(v)
+    }()
+
+    /// The page's scroll view: the scroll view in the detail column with the tallest
+    /// document (the sidebar's list is narrower than 300 pt).
+    private static func pageScrollView(in window: NSWindow) -> NSScrollView? {
+        var found: [NSScrollView] = []
+        func walk(_ view: NSView) {
+            if let s = view as? NSScrollView, s.frame.width > 300 { found.append(s) }
+            view.subviews.forEach(walk)
+        }
+        if let root = window.contentView?.superview { walk(root) }
+        return found.max { ($0.documentView?.frame.height ?? 0) < ($1.documentView?.frame.height ?? 0) }
+    }
+
+    /// Scroll view, clip and scroller frames (top-left window points), scroller style
+    /// and visibility.
+    private static func describe(_ scrollView: NSScrollView, in window: NSWindow) -> [String: [Double]] {
+        let h = Double(window.frame.height)
+        func r(_ v: NSView) -> [Double] {
+            let f = v.convert(v.bounds, to: nil)
+            return [Double(f.minX), h - Double(f.maxY), Double(f.width), Double(f.height)]
+        }
+        var out: [String: [Double]] = ["scrollView": r(scrollView), "clip": r(scrollView.contentView)]
+        if let doc = scrollView.documentView { out["document"] = r(doc) }
+        if let s = scrollView.verticalScroller {
+            out["scroller"] = r(s)
+            out["scrollerState"] = [s.isHidden ? 1 : 0, Double(s.alphaValue),
+                                    scrollView.scrollerStyle == .overlay ? 1 : 0,
+                                    scrollView.hasVerticalScroller ? 1 : 0]
+        }
+        out["insets"] = [Double(scrollView.contentInsets.top), Double(scrollView.contentView.bounds.origin.y)]
+        return out
+    }
+
+    /// The window as the window server composites it (materials, scroll edge effects),
+    /// through `CGWindowListCreateImage`, which needs no permission for the app's own
+    /// windows. The function is unavailable to Swift in the macOS 15+ SDK, so it is
+    /// looked up at run time; nil if it is gone.
+    private static func compositedImage(_ window: NSWindow) -> CGImage? {
+        typealias Create = @convention(c) (CGRect, UInt32, UInt32, UInt32) -> Unmanaged<CGImage>?
+        guard let handle = dlopen(nil, RTLD_NOW), let sym = dlsym(handle, "CGWindowListCreateImage") else { return nil }
+        let create = unsafeBitCast(sym, to: Create.self)
+        // kCGWindowListOptionIncludingWindow = 8; kCGWindowImageBoundsIgnoreFraming = 1,
+        // kCGWindowImageBestResolution = 8.
+        return create(.null, 8, UInt32(window.windowNumber), 1 | 8)?.takeRetainedValue()
+    }
+
     private static func capture(_ window: NSWindow, to url: URL) {
+        if let image = compositedImage(window) {
+            let rep = NSBitmapImageRep(cgImage: image)
+            try? rep.representation(using: .png, properties: [:])?.write(to: url)
+            return
+        }
         guard let frameView = window.contentView?.superview else { return }
         frameView.display()
         let bounds = frameView.bounds
