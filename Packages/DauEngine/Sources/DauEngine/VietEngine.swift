@@ -189,9 +189,13 @@ public struct VietEngine: Sendable {
     mutating func handleLetter(_ v: UInt32, _ info: LetterInfo) -> Action {
         let seeded = seedPending
         seedPending = false
-        let isPlainAscii = v < 0x80 && !isDigit(info.base)
+        // Transform keys: ASCII letters in Telex, ASCII digits in VNI. Digits have no
+        // case; transforms never change a letter's case (D34).
+        let isTransformKey = options.inputMethod == .vni
+            ? (v < 0x80 && isDigit(info.base))
+            : (v < 0x80 && !isDigit(info.base))
 
-        if !isLocked && isPlainAscii {
+        if !isLocked && isTransformKey {
             var w = word
             let mode: SpellMode = seeded ? .seeded : .prefix
             switch transform(&w, key: info.base, upper: info.upper, mode: mode) {
@@ -257,8 +261,9 @@ public struct VietEngine: Sendable {
         return commit(typed: v)
     }
 
-    /// Applies a Telex key to `w` if it is a transform there.
+    /// Applies a Telex or VNI key to `w` if it is a transform there.
     func transform(_ w: inout Word, key: UInt8, upper: Bool, mode: SpellMode) -> Outcome {
+        if options.inputMethod == .vni { return vniTransform(&w, key: key, mode: mode) }
         switch key {
         case Ch.s: return toneKey(&w, Tone.acute)
         case Ch.f: return toneKey(&w, Tone.grave)
@@ -272,10 +277,63 @@ public struct VietEngine: Sendable {
             w.tonePos = -1
             return .applied
         case Ch.a, Ch.e, Ch.o: return hatKey(&w, key)
-        case Ch.w: return wKey(&w, mode: mode)
+        case Ch.w:
+            return hookKey(&w, mode: mode, onA: true, onOU: true, loneU: options.inputMethod == .telex)
         case Ch.d: return dKey(&w)
         default: return .none
         }
+    }
+
+    /// VNI: 1–5 tones, 0 removes the tone, 6 circumflex, 7 horn, 8 breve, 9 đ.
+    /// Letters are never transforms. A digit that does nothing here is an ordinary
+    /// character of the word (it then makes the word invalid, D30), so the engine and
+    /// the screen never disagree (OPENKEY-NOTES B13).
+    func vniTransform(_ w: inout Word, key: UInt8, mode: SpellMode) -> Outcome {
+        switch key {
+        case UInt8(ascii: "1"): return toneKey(&w, Tone.acute)
+        case UInt8(ascii: "2"): return toneKey(&w, Tone.grave)
+        case UInt8(ascii: "3"): return toneKey(&w, Tone.hook)
+        case UInt8(ascii: "4"): return toneKey(&w, Tone.tilde)
+        case UInt8(ascii: "5"): return toneKey(&w, Tone.dot)
+        case UInt8(ascii: "0"):
+            if w.tone == Tone.none { return .none }
+            w.tone = Tone.none
+            w.tonePos = -1
+            return .applied
+        case UInt8(ascii: "6"): return hatAnyKey(&w, mode: mode)
+        case UInt8(ascii: "7"): return hookKey(&w, mode: mode, onA: false, onOU: true, loneU: false)
+        case UInt8(ascii: "8"): return hookKey(&w, mode: mode, onA: true, onOU: false, loneU: false)
+        case UInt8(ascii: "9"): return dKey(&w)
+        default: return .none
+        }
+    }
+
+    /// VNI 6: circumflex on a, e or o of the cluster, trying the last one first
+    /// ("toi6" → "tôi", "uo6" → "uô", "tua6n" → "tuân"). Again undoes it and locks
+    /// (D26 "a66" → "a6"). VNI needs no "ooo" exception: "xoong" has no 6 in it.
+    func hatAnyKey(_ w: inout Word, mode: SpellMode) -> Outcome {
+        let (s, e) = w.nucleus()
+        var i = e - 1
+        while i >= s {
+            let b = w.base[i]
+            if (b == Ch.a || b == Ch.e || b == Ch.o) && w.mod[i] == Mod.hat {
+                w.mod[i] = Mod.none
+                return .doubled(appendKey: true, lock: true)
+            }
+            i -= 1
+        }
+        i = e - 1
+        while i >= s {
+            let b = w.base[i]
+            if b == Ch.a || b == Ch.e || b == Ch.o {
+                let saved = w.mod[i]
+                w.mod[i] = Mod.hat
+                if isValid(w, mode) { return .applied }
+                w.mod[i] = saved
+            }
+            i -= 1
+        }
+        return .none
     }
 
     /// s f r x j. With free marking (D28) anywhere after the first vowel; without it
@@ -313,15 +371,16 @@ public struct VietEngine: Sendable {
         return .applied
     }
 
-    /// w: breve/horn on a, o, u of the cluster (aw ow uw, "uo" + w → "ươ"/"uơ").
-    /// With no a, o, u in the word: Telex appends "ư" (D23); Telex đơn giản keeps the
-    /// letter w (D29).
-    func wKey(_ w: inout Word, mode: SpellMode) -> Outcome {
+    /// Breve/horn key: Telex w (a, o, u), VNI 7 (o, u) and VNI 8 (a).
+    /// "uo" gets the horn on both, except an open "uơ" (thuở, huơ). With no target in
+    /// the word, Telex w appends "ư" (`loneU`, D23); Telex đơn giản keeps the letter w
+    /// (D29); VNI keeps the digit.
+    func hookKey(_ w: inout Word, mode: SpellMode, onA: Bool, onOU: Bool, loneU: Bool) -> Outcome {
         let (s, e) = w.nucleus()
         if s < e {
             // "uo" pair: both get the horn, except an open "uơ" (thuở, huơ).
             var i = s
-            while i + 1 < e {
+            while onOU && i + 1 < e {
                 if w.base[i] == Ch.u && w.base[i + 1] == Ch.o {
                     let uHook = w.mod[i] == Mod.hook
                     let oHook = w.mod[i + 1] == Mod.hook
@@ -347,7 +406,7 @@ public struct VietEngine: Sendable {
             i = e - 1
             while i >= s {
                 let b = w.base[i]
-                if b == Ch.a || b == Ch.o || b == Ch.u {
+                if (onA && b == Ch.a) || (onOU && (b == Ch.o || b == Ch.u)) {
                     targets += 1
                     if w.mod[i] == Mod.hook {
                         if hooked < 0 { hooked = i }
@@ -365,7 +424,9 @@ public struct VietEngine: Sendable {
                 i = s
                 while i < e {
                     let b = w.base[i]
-                    if (b == Ch.a || b == Ch.o || b == Ch.u) && w.mod[i] != Mod.hook { unhooked += 1 }
+                    if ((onA && b == Ch.a) || (onOU && (b == Ch.o || b == Ch.u))) && w.mod[i] != Mod.hook {
+                        unhooked += 1
+                    }
                     i += 1
                 }
                 if unhooked == 0 {
@@ -382,12 +443,13 @@ public struct VietEngine: Sendable {
             }
             return .none
         }
-        if options.inputMethod == .telex && !w.hasVowel { return .appendHornedU }
+        if loneU && !w.hasVowel { return .appendHornedU }
         return .none
     }
 
-    /// d → đ on the initial d: right after it ("dd"), or anywhere after a vowel with
-    /// free marking (D28: "did" → "đi"). Again undoes it ("ddd" → "dd").
+    /// Telex d / VNI 9 → đ on the initial d: right after it ("dd", "d9"), or anywhere
+    /// after a vowel with free marking (D28: "did" → "đi", "duo7c59" → "được"). Again
+    /// undoes it ("ddd" → "dd", "d99" → "d9").
     func dKey(_ w: inout Word) -> Outcome {
         guard w.count >= 1, w.base[0] == Ch.d else { return .none }
         let eligible = w.count == 1 || (options.freeMarking && w.hasVowel)
@@ -411,7 +473,7 @@ public struct VietEngine: Sendable {
         let allowZFWJ = options.advanced == .allowZFWJ
         var expandedWord = false
         if options.advanced == .consonantShortcuts {
-            let (expanded, changed) = word.expandedShortcuts()
+            let (expanded, changed) = word.expandedShortcuts(vni: options.inputMethod == .vni)
             if changed {
                 expandedWord = true
                 var e = expanded
@@ -465,7 +527,7 @@ public struct VietEngine: Sendable {
         case .consonantShortcuts:
             // D21: while typing, f/j at the start and g/h/k at the end count as the
             // consonants they stand for.
-            return Spelling.check(w.expandedShortcuts().word, mode, allowZFWJ: false)
+            return Spelling.check(w.expandedShortcuts(vni: options.inputMethod == .vni).word, mode, allowZFWJ: false)
         case .allowZFWJ:
             return Spelling.check(w, mode, allowZFWJ: true)
         case .off:

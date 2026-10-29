@@ -124,22 +124,27 @@ struct Word: Sendable, Equatable {
     }
 
     /// The word with consonant shortcuts applied (D21): f → ph, j → gi (j → g before
-    /// i) at the start; g → ng, h → nh, k → ch at the end after a vowel.
+    /// i) and, in VNI only, w → qu (D23) at the start; g → ng, h → nh, k → ch at the
+    /// end after a vowel.
     /// Case: the added letter is uppercase only if the shortcut letter and the next
     /// letter are both uppercase ("Fan" → "Phan", "FAN" → "PHAN"); a final shortcut
     /// copies its own case. Returns `changed == false` when nothing applies.
-    func expandedShortcuts() -> (word: Word, changed: Bool) {
+    func expandedShortcuts(vni: Bool) -> (word: Word, changed: Bool) {
         var out = Word()
         out.tone = tone
         var changed = false
         var shift = 0
         var i = 0
-        if count > 0 && mod[0] == Mod.none && (base[0] == Ch.f || base[0] == Ch.j) {
+        if count > 0 && mod[0] == Mod.none && (base[0] == Ch.f || base[0] == Ch.j || (vni && base[0] == Ch.w)) {
             let up = upper[0] == 1
             let secondUp = up && (count > 1 ? upper[1] == 1 : true)
             if base[0] == Ch.f {
                 out.append(base: Ch.p, mod: Mod.none, upper: up)
                 out.append(base: Ch.h, mod: Mod.none, upper: secondUp)
+                shift = 1
+            } else if base[0] == Ch.w {
+                out.append(base: Ch.q, mod: Mod.none, upper: up)
+                out.append(base: Ch.u, mod: Mod.none, upper: secondUp)
                 shift = 1
             } else if count > 1 && base[1] == Ch.i {
                 out.append(base: Ch.g, mod: Mod.none, upper: up)

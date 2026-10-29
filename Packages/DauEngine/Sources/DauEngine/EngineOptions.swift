@@ -6,7 +6,9 @@ public struct EngineOptions: Sendable, Equatable {
         case telex
         /// Telex without the lone-`w` rule and without `[ ]` (D29).
         case simpleTelex
-        // `vni` is added in M1c.
+        /// VNI: 1–5 tones, 0 removes the tone, 6 â ê ô, 7 ơ ư, 8 ă, 9 đ. Letters are
+        /// plain letters; w → qu exists only here, with consonant shortcuts (D23).
+        case vni
     }
 
     public enum TonePlacement: Sendable, Equatable {
@@ -24,7 +26,8 @@ public struct EngineOptions: Sendable, Equatable {
         /// k → ch at the end, applied only at a word boundary and only when the result
         /// is a valid syllable.
         case consonantShortcuts
-        /// Accept z, f, w, j as initial consonants (D22).
+        /// Accept z, f, w, j as initial consonants (D22). In Telex a leading w is
+        /// always ư (D23), so only z, f, j matter there.
         case allowZFWJ
     }
 
