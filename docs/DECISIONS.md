@@ -6,7 +6,7 @@ Nguồn chuẩn duy nhất cho mọi quyết định của dự án. Mỗi quy�
 
 - **N1. Hệ thống đã có thì không tự làm lại.** Ngoại lệ phải có lý do đo được (xem D4).
 - **N2. Tiến trình bộ gõ không có quyền mạng.** Mọi kết nối nằm ở app chủ (cập nhật, danh sách tương thích).
-- **N3. Không hỏi ngược ứng dụng đích khi đang gõ liên tục.** Mỗi phím tối đa một lần gọi `insertText`.
+- **N3. Tối thiểu lời gọi vào ứng dụng đích khi đang gõ.** Mỗi phím tối đa một lần gọi `insertText`; chỉ hỏi vị trí con trỏ (`selectedRange`) ở phím có thay chữ, không hỏi ở phím đi thẳng. (Sửa 29/10/2026 theo số đo M2, xem câu hỏi A/B; bản trước: "Không hỏi ngược ứng dụng đích khi đang gõ liên tục".)
 - **N4. Không tự ý đổi cài đặt hệ thống của người dùng.** Chỉ hướng dẫn hoặc mở đúng màn hình Cài đặt.
 - **N5. Chữ hiển thị cho người dùng phải là lời hứa đã kiểm chứng được.**
 
@@ -59,7 +59,9 @@ Rust/WASM và đa nền tảng; thử gõ trên trang web; Mac App Store; event 
   - **A.** Hỏi `selectedRange` ở mỗi phím có xử lý dấu: đơn giản, an toàn khi app tự sửa chữ (autocorrect, autocomplete), nhưng thêm một lần gọi đồng bộ mỗi phím (trái N3).
   - **B.** Hỏi một lần khi bắt đầu phiên hoặc sau khi lệch, rồi tự cộng dồn vị trí từ mọi phím đi qua bộ gõ: không gọi thêm, nhưng nếu app tự sửa chữ mà bộ gõ không biết thì sẽ thay **sai vùng** — lỗi nặng hơn chậm.
   - Hướng xử lý: bắt đầu với A để đúng trước; mốc M2 đo chi phí của A trên các app phổ biến khi máy tải nặng. Nếu A đủ nhanh thì sửa N3 thành "tối thiểu lần gọi"; nếu không thì làm B kèm cơ chế phát hiện lệch. Ghi kết quả đo vào đây.
+  - **Đã chốt (29/10/2026): cách A.** Số đo M2 (bản Debug, `scripts/selftest-typing`, `docs/PROGRESS.md`): `selectedRange` p50 ~0,17–0,62 ms, chiếm khoảng 6–8% thời gian một phím có thay chữ (phần lớn là `insertText`). TextEdit, Safari đúng ở mọi tốc độ; Chrome, VS Code, Terminal đúng khi phím cách nhau ≥ 20 ms nhưng sai khi phím dồn (< 10–20 ms) vì các app này áp phím bất đồng bộ nên `selectedRange` là ảnh chụp cũ — cách B cũng không cứu được (vị trí gốc cũng là ảnh chụp cũ; VS Code đổi gốc toạ độ). Hướng cho app bất đồng bộ: M3 thử gạch chân (D13) theo bundle ID, đo ở 0 ms rồi chốt. Máy tải nặng: đo ở M6.
 
+- App Group với bản ký ad-hoc (không Team ID) trên macOS 27: **bị từ chối im lặng** (containermanagerd REJECTED, cfprefsd từ chối ghi), không có hộp thoại; cần Team ID (29/10/2026, `scripts/selftest-app-group.sh`). Bản có Team ID: chưa kiểm chứng.
 - `TISRegisterInputSource` / `TISEnableInputSource` trên macOS 14–27: có cần người dùng xác nhận không? Ảnh hưởng tới bước 2 onboarding.
 - App chủ có sandbox được không khi phải chép bundle bộ gõ vào `~/Library/Input Methods`? Truy cập App Group giữa app chủ và bộ gõ có phát sinh hộp thoại hệ thống không?
 - Ngưỡng hiệu năng (độ trễ p99, bộ nhớ) — chốt sau khi đo, so với gõ bằng ABC.
