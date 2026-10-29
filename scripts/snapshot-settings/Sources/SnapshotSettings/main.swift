@@ -127,6 +127,8 @@ let failed: Bool = MainActor.assumeIsolated {
             "title": "(() => { const r = document.createRange(); r.selectNodeContents(document.querySelector('main header h1')); return r.getBoundingClientRect(); })()",
             "header": "document.querySelector('main header').getBoundingClientRect()",
             "sidebar": "document.querySelector('nav').getBoundingClientRect()",
+            "headerSearch": "document.querySelector('main header label') && document.querySelector('main header label').getBoundingClientRect()",
+            "headerAdd": "document.querySelector('main header .btn') && document.querySelector('main header .btn').getBoundingClientRect()",
         ]
         var rows: [String] = []
         for board in boards {
@@ -135,6 +137,21 @@ let failed: Bool = MainActor.assumeIsolated {
                                            size: board.size, crop: crop, measure: measure),
                   let shot = app["\(board.page)-\(board.mode)"] else { print("cannot render \(board.file)"); continue }
             let real = realCapture("\(board.page)-\(board.mode)")
+            if board.page == "apps", let realShot = real?.0 {
+                // The Apps header (title, search field, +), 3×, against the real window.
+                let header = CGRect(x: 220, y: 0, width: 600, height: 56)
+                if let a = Snapshot.crop(mock.image, header, scale: 3), let b = Snapshot.crop(realShot, header, scale: 3) {
+                    Snapshot.sideBySide([a, b], to: outDir.appendingPathComponent("apps-header-compare-\(board.mode).png"))
+                }
+                // No dark artboard exists for this page: the light mockup beside the dark app.
+                if let dark = realCapture("apps-dark")?.0,
+                   let a = Snapshot.crop(mock.image, header, scale: 3), let b = Snapshot.crop(dark, header, scale: 3) {
+                    Snapshot.sideBySide([a, b], to: outDir.appendingPathComponent("apps-header-compare-dark.png"))
+                }
+                for key in ["headerSearch", "headerAdd"] {
+                    rows.append("apps-\(board.mode) | \(key) | \(f(mock.frames[key])) | \(f(real?.1[key]))")
+                }
+            }
             if board.page == "typing" {
                 // Sidebar only, 4×: the real-window capture does not draw the sidebar's
                 // vibrant content, so the app side is this tool's window.
