@@ -3,7 +3,7 @@
 Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị nén) tiếp tục đúng chỗ. Phiên chính cập nhật file này sau mỗi bước.
 
 ## Trạng thái hiện tại
-- Mốc đang làm: M2 chờ người dùng gõ thử. M1 đã đóng (kiểm toán lần 2 ĐẠT). Ghi chú cũ về M1: — M1b Telex xong (cf5c2bb, ebfce9a, 50 test xanh); M1c VNI xong; engine 70 test xanh (HEAD a59c44f/ba6a2b8). Kiểm toán M1 lần 1: CHƯA ĐẠT chỉ vì 2 tài liệu lệch — đã sửa (7d28fb2). Siết D31 + test bổ sung (19fd8f1, 48c839c): 72 test xanh. Người dùng đã chốt 3 câu (D28, D31 nới địa danh, D36); engine-dev đang làm D31 + đo ảnh hưởng, sau đó kiểm toán lại. M2 bắt đầu song song (imk-dev).
+- Mốc đang làm: M2 — TextEdit, Safari đạt (người dùng gõ thử); còn đo Chrome, Slack, VS Code, Terminal rồi chốt A/B và kiểm toán M2. M4 đang làm song song (app-ui-dev). Phiên fork "Bắt đầu làm (fork)" đã bàn giao lại cho phiên này. M1 đã đóng (kiểm toán lần 2 ĐẠT). Ghi chú cũ về M1: — M1b Telex xong (cf5c2bb, ebfce9a, 50 test xanh); M1c VNI xong; engine 70 test xanh (HEAD a59c44f/ba6a2b8). Kiểm toán M1 lần 1: CHƯA ĐẠT chỉ vì 2 tài liệu lệch — đã sửa (7d28fb2). Siết D31 + test bổ sung (19fd8f1, 48c839c): 72 test xanh. Người dùng đã chốt 3 câu (D28, D31 nới địa danh, D36); engine-dev đang làm D31 + đo ảnh hưởng, sau đó kiểm toán lại. M2 bắt đầu song song (imk-dev).
 - Việc đang chờ người dùng: Bundle ID / Team ID (placeholder `com.example.dau`, Team ID trống — người dùng sẽ gửi sau)
 - M1a xong: `docs/OPENKEY-NOTES.md` (commit b0739c7).
 - M0: khung xong (commit b2a331d, 06f0dcb, 6fe660b), phiên chính đã kiểm chứng lại: xcodegen + build Debug 2 target với `-destination 'generic/platform=macOS'` ra `x86_64 arm64`, swift test 2 package xanh, bộ gõ không có network.client. Tên hiển thị "Dấu" cho locale `en` đã sửa (0b188dd). **Kiểm toán M0: ĐẠT.**
@@ -24,7 +24,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 |---|---|---|---|
 | M0 Khung dự án | xong | ĐẠT (29/10) | build Debug universal cần `-destination generic/platform=macOS` |
 | M1 Engine | xong | ĐẠT (29/10, lần 2) | Telex, Telex đơn giản, VNI, 75 test; release ~0,15 µs/phím; 0 từ sai / 474 từ, 0 khôi phục nhầm / 15.796 âm tiết, fuzz 800k thao tác không crash |
-| M2 Bộ gõ tối thiểu | đang làm | — | mã xong (9999122…d5f0123), 14 test IMK xanh; chờ người dùng cài và gõ thử theo `docs/M2-TESTING.md` để đo A/B |
+| M2 Bộ gõ tối thiểu | đang làm | — | TextEdit + Safari đạt; selectedRange p50 ~0,3 ms ≈ 6–7% thời gian phím có thay (insertText chiếm chủ yếu); còn 4 app |
 | M3 Độ tin cậy | chưa | — | |
 | M4 App Cài đặt | đang làm | — | app-ui-dev: DauShared settings model + cửa sổ Cài đặt 4 mục (song song, chờ M2) |
 | M5 Onboarding, cài, gỡ | chưa | — | |
