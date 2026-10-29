@@ -42,10 +42,11 @@ struct VNITests {
     ])
     func freeMarking(_ c: Case) { expectTyped(c.keys, c.expected, vni) }
 
-    /// D28 off: tone digits only right after a vowel; 9 only right after d.
+    /// D28 off: tone digits only right after a vowel; 9 only right after d; 6/7/8 still
+    /// reach their vowel from a distance.
     @Test(arguments: [
         Case("d9uo75c", "được"), Case("duo7c59", "dươc59"), Case("di9", "di9"), Case("d9i", "đi"),
-        Case("hoa2", "hoà"), Case("hoc5", "hoc5"),
+        Case("hoa2", "hoà"), Case("hoc5", "hoc5"), Case("tuong7", "tương"), Case("tien6", "tiên"),
     ])
     func freeMarkingOff(_ c: Case) { expectTyped(c.keys, c.expected, vniNoFreeMarking) }
 
@@ -97,8 +98,9 @@ struct VNITests {
     /// D34: case follows the letters; digits have none.
     @Test(arguments: [
         Case("VIE6T5", "VIỆT"), Case("Vie6t5", "Việt"), Case("D9", "Đ"), Case("A6", "Â"),
-        Case("NGUOI72", "NGƯỜI"), Case("DUO7C59", "ĐƯỢC"), Case("U23", "Ủ"), Case("A4", "Ã"),
-        Case("U223", "U23"),   // D26: the doubled 2 undoes and locks; D4 keeps it
+        Case("NGUOI72", "NGƯỜI"), Case("DUO7C59", "ĐƯỢC"),
+        Case("U23", "Ủ"), Case("A4", "Ã"),   // D36: a digit after a valid syllable is a mark
+        Case("U223", "U23"),   // D36, D26: double the digit to keep it
     ])
     func letterCase(_ c: Case) { expectTyped(c.keys, c.expected, vni) }
 

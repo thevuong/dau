@@ -61,7 +61,9 @@ struct TonePlacementTests {
     func freeMarkingOn(_ c: Case) { expectTyped(c.keys, c.expected) }
 
     /// D28 off: tone keys only work right after a vowel; d → đ only for two adjacent d;
-    /// a tone already placed still moves when a vowel is added ("hofa" → "hoà").
+    /// a tone already placed still moves when a vowel is added ("hofa" → "hoà"); the
+    /// transform keys w, aa, ee, oo still reach their vowel from a distance
+    /// ("tuongw" → "tương").
     @Test(arguments: [
         Case("hoaf", "hoà"), Case("hocj", "hocj"), Case("vieejt", "việt"),
         Case("vieetj", "viêtj"), Case("did", "did"), Case("did ", "did "), Case("ddi", "đi"),
