@@ -66,11 +66,10 @@ enum SettingsSection: String, CaseIterable, Identifiable, Hashable {
 }
 
 /// Sidebar icon, drawn after the mockup's SVG (canvas artboards "Settings…"): a 22 pt
-/// tile with radius 6 in the mockup's color, and a 14 pt line glyph (viewBox 24,
-/// white stroke 2, round caps and joins, no fill). It is an illustration, like the
-/// icons of System Settings, so it uses the mockup's exact colors. Drawn into a
-/// non-template image so the sidebar's vibrancy does not wash it out. Decorative; the
-/// label beside it carries the meaning.
+/// tile with radius 6 in a system color, and a 14 pt line glyph (viewBox 24, white
+/// stroke 2, round caps and joins, no fill). Drawn into a non-template image so the
+/// sidebar's vibrancy does not wash it out. Decorative; the label beside it carries
+/// the meaning.
 struct SectionIcon: View {
     let section: SettingsSection
 
@@ -105,13 +104,13 @@ struct SectionIcon: View {
 }
 
 extension SettingsSection {
-    /// Tile colors from the mockup (#0A64D8, #7A3FD1, #C2410C, #1F7A4D).
+    /// Tile colors: the system colors of the mockup's hues (D9: no custom colors).
     var tileColor: NSColor {
         switch self {
-        case .typing: NSColor(srgbRed: 0x0A / 255, green: 0x64 / 255, blue: 0xD8 / 255, alpha: 1)
-        case .smart: NSColor(srgbRed: 0x7A / 255, green: 0x3F / 255, blue: 0xD1 / 255, alpha: 1)
-        case .apps: NSColor(srgbRed: 0xC2 / 255, green: 0x41 / 255, blue: 0x0C / 255, alpha: 1)
-        case .updates: NSColor(srgbRed: 0x1F / 255, green: 0x7A / 255, blue: 0x4D / 255, alpha: 1)
+        case .typing: .systemBlue
+        case .smart: .systemPurple
+        case .apps: .systemOrange
+        case .updates: .systemGreen
         }
     }
 

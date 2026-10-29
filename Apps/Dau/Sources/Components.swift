@@ -12,10 +12,10 @@ import DauShared
 /// Page and card backgrounds, chosen among system colors (no blending, no opacity) so
 /// the card is lighter than the page in both appearances, as in the mockup. Resolved
 /// in the real Settings window on macOS 27 (`--capture-window`):
-/// - light: page `underPageBackgroundColor` (#f6f6f6), card `controlBackgroundColor`
-///   (#ffffff) — mockup #f5f5f7 / #ffffff;
-/// - dark: page `controlBackgroundColor` (#1e1e1e), card `underPageBackgroundColor`
-///   (#282828) — mockup #1e1e20 / #2c2c2e.
+/// - light: page `underPageBackgroundColor` (light gray), card `controlBackgroundColor`
+///   (white), as the mockup's light gray page and white cards;
+/// - dark: page `controlBackgroundColor` (near black), card `underPageBackgroundColor`
+///   (dark gray), as the mockup's dark page and lighter cards.
 /// Both are dynamic system colors, so they follow Increase Contrast too.
 enum SettingsColors {
     static let page = Color(nsColor: NSColor(name: "DauSettingsPage") { appearance in
@@ -410,21 +410,26 @@ struct WrappingHStack: Layout {
 
 /// "Dấu chưa được bật" banner (docs/UI.md, "Các trạng thái bổ sung", mockup
 /// "SettingsNotEnabled"), first on every page while Dấu is not among the enabled
-/// input sources: multicolor warning symbol, title, subtitle, prominent button.
+/// input sources: orange tile with a white warning symbol, title, subtitle,
+/// prominent button, on a system-orange tint.
 struct NotEnabledBanner: View {
     @Environment(InputSourceStatus.self) private var status
 
     var body: some View {
         if status.isEnabled == false {
             HStack(alignment: .center, spacing: 12) {
+                // Mockup "SettingsNotEnabled": a 28 pt orange tile, radius 8, white
+                // warning symbol; an orange-tinted banner. System orange only (D9).
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .symbolRenderingMode(.multicolor)
-                    .font(.system(size: 22))
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
                     .frame(width: 28, height: 28)
+                    .background(Color.orange, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Dấu chưa được bật trong Nguồn nhập liệu")
                         .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.primary)
                     Hint(Text("Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt."))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -437,10 +442,10 @@ struct NotEnabledBanner: View {
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 14)
-            .background(SettingsColors.card, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .background(Color.orange.quaternary, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .strokeBorder(SettingsColors.separator, lineWidth: 1)
+                    .strokeBorder(Color.orange.tertiary, lineWidth: 1)
             }
             .accessibilityElement(children: .contain)
         }
