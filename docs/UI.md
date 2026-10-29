@@ -20,9 +20,9 @@ Sidebar có icon màu: Gõ phím (xanh dương), Thông minh (tím), Ứng dụn
 - Chuyển Tiếng Việt ↔ Tiếng Anh: hiện phím tắt hệ thống hiện tại dạng keycap, nút "Đổi…" mở Cài đặt Bàn phím (N4). Không có phím chuyển riêng (D2).
 
 **Thông minh**
-- Gõ lẫn từ nước ngoài: một công tắc "Tự khôi phục từ không phải tiếng Việt" (khi nhấn Space, từ không phải âm tiết tiếng Việt hợp lệ trở về đúng như đã gõ); ví dụ windows → windows, Hasaki → Hasaki, vieetj → việt; ghi chú: từ trùng thì tiếng Việt thắng (car → cả), gõ đúp phím dấu để giữ chữ gốc (carr → car).
-- Sửa từ đã gõ: "Thêm dấu cho từ đã gõ", nhãn "Mới", ghi rõ chưa ổn định trên một số trang web; ví dụ hoc + j → học. Lưu ý: "dep" + j ra "dẹp", không phải "đẹp" — ví dụ phải đúng quy tắc Telex.
-- "Nâng cao" thu gọn (có artboard trạng thái mở): "Gõ tắt phụ âm" — đầu từ f → ph, j → gi (VNI thêm w → qu), cuối từ g → ng, h → nh, k → ch, áp dụng khi nhấn Space và chỉ khi ra từ hợp lệ (D21, D23); "Cho phép phụ âm z, f, w, j" — ghi chú "Bật mục này sẽ tắt Gõ tắt phụ âm" (D22). Cả hai mặc định tắt. Tóm tắt bên phải tiêu đề: "2 tuỳ chọn, đang tắt".
+- Gõ lẫn từ nước ngoài: một công tắc "Tự khôi phục từ không phải tiếng Việt" (khi kết thúc từ, từ không phải âm tiết tiếng Việt hợp lệ trở về đúng như đã gõ); ví dụ windows → windows, Hasaki → Hasaki, vieetj → việt; ghi chú: từ trùng thì tiếng Việt thắng (car → cả), gõ đúp phím dấu để giữ chữ gốc (carr → car).
+- Sửa từ đã gõ: "Thêm dấu cho từ đã gõ", nhãn "Mới", dòng ghi chú về độ ổn định trên web editor để ô trống `[Kết quả kiểm chứng trên Google Docs, Notion…]` cho tới khi đo (N5, câu hỏi mở trong DECISIONS.md); ví dụ hoc + j → học. Lưu ý: "dep" + j ra "dẹp", không phải "đẹp" — ví dụ phải đúng quy tắc Telex.
+- "Nâng cao" thu gọn (có artboard trạng thái mở): "Gõ tắt phụ âm" — đầu từ f → ph, j → gi (VNI thêm w → qu), cuối từ g → ng, h → nh, k → ch, áp dụng khi kết thúc từ và chỉ khi ra từ hợp lệ (D21, D23); "Cho phép phụ âm z, f, w, j" — ghi chú "Bật mục này sẽ tắt Gõ tắt phụ âm" (D22). Cả hai mặc định tắt. Tóm tắt bên phải tiêu đề: "2 tuỳ chọn, đang tắt".
 
 **Ứng dụng**
 - Thanh tiêu đề: ô tìm ứng dụng, nút +.

@@ -47,7 +47,7 @@ dau/
 3. Ký tự → `engine.handle(scalar)`:
    - `passThrough` → trả `false`.
    - `replace(n, s)` → `client.insertText(s, replacementRange: vùng n ký tự trước con trỏ)`, trả `true`.
-4. Space/dấu câu → nếu từ không phải âm tiết tiếng Việt hợp lệ thì khôi phục phím gốc (D4), commit, reset.
+4. Ký tự kết thúc từ (Space, dấu câu, Enter, Tab — D4) → nếu từ không phải âm tiết tiếng Việt hợp lệ thì khôi phục phím gốc (D4), commit, reset.
 
 ## Đo lường
 

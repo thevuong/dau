@@ -4,7 +4,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 
 ## Trạng thái hiện tại
 - Mốc đang làm: M0 (release-eng) song song M1 bước nghiên cứu (researcher)
-- Việc đang chờ người dùng: Bundle ID / Team ID (M0 dùng placeholder `com.example.dau`, Team ID trống); xác nhận các điểm mơ hồ nêu ở lượt khởi động
+- Việc đang chờ người dùng: Bundle ID / Team ID (M0 dùng placeholder `com.example.dau`, Team ID trống — người dùng sẽ gửi sau); chốt định nghĩa "Telex đơn giản" khi có OPENKEY-NOTES
 - Môi trường: Xcode 27.1 ở `/Applications/Xcode.app` nhưng `xcode-select` đang trỏ CommandLineTools → mọi lệnh build dùng `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`. Swift 6.4.
 
 ## Kế hoạch M0 + M1
@@ -34,3 +34,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 
 ## Nhật ký
 (ngày — việc — agent — kết quả — commit)
+- 29/10/2026 — người dùng duyệt đề xuất khởi động: ranh giới từ (D4, D21), D26 gõ đúp phím dấu, D27 bỏ `[` `]`, ô trống cho nhãn web editor (UI.md, N5), đưa D18 về đúng thứ tự — phiên chính — xong
