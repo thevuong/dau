@@ -17,6 +17,9 @@ struct DauApp: App {
             SettingsWindow()
                 .environment(model)
                 .environment(inputSource)
+                #if DEBUG
+                .environment(\.layoutProbe, DebugCapture.probe)
+                #endif
         }
         .defaultSize(width: 820, height: 600)
         .windowResizability(.contentMinSize)
@@ -43,6 +46,12 @@ struct SettingsCommands: Commands {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        #if DEBUG
+        DebugCapture.start()
+        #endif
+    }
+
     /// Dấu has no other window; closing Settings quits, like System Settings.
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         true

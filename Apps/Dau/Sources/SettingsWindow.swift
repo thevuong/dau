@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// The Settings window (mockup "SettingsTyping" and siblings): a 220 pt sidebar with
-/// search, the four sections and "Dấu <version>" at the bottom; each page has its own
-/// fixed header with the section name.
+/// search, the four sections and "Dấu <version>" at the bottom; each page's title is
+/// in the toolbar row, next to the traffic lights.
 struct SettingsWindow: View {
     @State private var selection: SettingsSection?
     @State private var query = ""
@@ -23,6 +23,8 @@ struct SettingsWindow: View {
                 } icon: {
                     SectionIcon(section: section)
                 }
+                .frame(minHeight: 28)
+                .layoutProbe("sidebarRow-\(section.rawValue)")
                 .tag(section)
             }
             .searchable(text: $query, placement: .sidebar, prompt: Text("Tìm kiếm"))
@@ -42,16 +44,21 @@ struct SettingsWindow: View {
             .toolbar(removing: .sidebarToggle)
             .layoutProbe("sidebar")
             // Must stay the last modifier of the column to take effect.
-            .navigationSplitViewColumnWidth(min: 220, ideal: 220, max: 260)
+            .navigationSplitViewColumnWidth(220)
         } detail: {
             SettingsDetail(section: selection ?? .typing)
         }
-        // No toolbar: the page header plays its role, so nothing in the title bar
-        // changes from one section to another.
-        .toolbar(.hidden, for: .windowToolbar)
+        // The window title text is hidden; each page puts its title as a leading
+        // toolbar item instead, so it sits in the title-bar row next to the traffic
+        // lights and at the same place in every section.
         .background(HiddenWindowTitle())
-        .frame(minWidth: 820, minHeight: 560)
+        .frame(minWidth: 760, minHeight: 520)
         .layoutProbe("window")
+        #if DEBUG
+        .onReceive(NotificationCenter.default.publisher(for: DebugCapture.selectSection)) { note in
+            if let raw = note.object as? String { selection = SettingsSection(rawValue: raw) }
+        }
+        #endif
     }
 }
 
@@ -69,5 +76,18 @@ struct SettingsDetail: View {
             }
         }
         .navigationTitle(section.title)
+        .modifier(RemoveToolbarTitle())
+    }
+}
+
+/// The page title is a toolbar item already (`SettingsPage`); remove the system title
+/// so it is not drawn twice. The navigation title still names the window.
+struct RemoveToolbarTitle: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(macOS 15, *) {
+            content.toolbar(removing: .title)
+        } else {
+            content
+        }
     }
 }

@@ -531,6 +531,16 @@
         }
       }
     },
+    "Mở rộng" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mở rộng"
+          }
+        }
+      }
+    },
     "Nhớ chế độ theo từng ứng dụng" : {
       "localizations" : {
         "vi" : {
@@ -657,6 +667,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Telex đơn giản"
+          }
+        }
+      }
+    },
+    "Thu gọn" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thu gọn"
           }
         }
       }

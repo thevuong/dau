@@ -2,15 +2,42 @@ import AppKit
 import SwiftUI
 import DauShared
 
-// Page structure shared by the four Settings sections. The system draws every
-// background, card, separator and material (`Form` with `.grouped` style, D9); this
-// file only arranges content inside the rows the way the mockup does. Text uses
-// semantic colors only (.primary / .secondary), accents follow the user's accent color.
+// Layout primitives for the Settings pages, sized after the mockup's CSS (docs/UI.md,
+// canvas artboards "Settings…"): content inset 20 top / 28 sides, 18 between sections,
+// section titles 13 semibold outside the card and 8 above it, cards with radius 14 and
+// a 1 pt separator border, rows at least 48 tall with 16/10 padding, 13 pt labels,
+// 12 pt secondary hints, separators inset 16. Controls are standard SwiftUI controls
+// (D9); backgrounds use system colors only.
 
-/// A Settings page: a fixed header (section title on the left, optional controls on the
-/// right, separator below — mockup header, 52 pt, title 15 bold), then a grouped form
-/// that fills the rest of the window and starts at the top. The header never moves
-/// between sections, whatever the page contains (banner, search field, scroll bar).
+/// Page and card backgrounds, chosen among system colors (no blending, no opacity) so
+/// the card is lighter than the page in both appearances, as in the mockup. Resolved
+/// in the real Settings window on macOS 27 (`--capture-window`):
+/// - light: page `underPageBackgroundColor` (#f6f6f6), card `controlBackgroundColor`
+///   (#ffffff) — mockup #f5f5f7 / #ffffff;
+/// - dark: page `controlBackgroundColor` (#1e1e1e), card `underPageBackgroundColor`
+///   (#282828) — mockup #1e1e20 / #2c2c2e.
+/// Both are dynamic system colors, so they follow Increase Contrast too.
+enum SettingsColors {
+    static let page = Color(nsColor: NSColor(name: "DauSettingsPage") { appearance in
+        appearance.isDark ? .controlBackgroundColor : .underPageBackgroundColor
+    })
+
+    static let card = Color(nsColor: NSColor(name: "DauSettingsCard") { appearance in
+        appearance.isDark ? .underPageBackgroundColor : .controlBackgroundColor
+    })
+
+    static let separator = Color(nsColor: .separatorColor)
+}
+
+extension NSAppearance {
+    var isDark: Bool { bestMatch(from: [.aqua, .darkAqua]) == .darkAqua }
+}
+
+/// A Settings page. Its title is a toolbar item on the leading edge of the window's
+/// toolbar, in the title-bar row next to the traffic lights (mockup header, 15 bold);
+/// `accessory` goes on the trailing edge. Every page has the title item, so the
+/// toolbar keeps the same height and the title the same place in every section.
+/// The scroll content has a fixed width, so a legacy scroll bar never narrows it.
 struct SettingsPage<Accessory: View, Content: View>: View {
     let title: String
     @ViewBuilder var accessory: Accessory
@@ -24,71 +51,182 @@ struct SettingsPage<Accessory: View, Content: View>: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 10) {
-                Text(verbatim: title)
-                    .font(.system(size: 15, weight: .bold))
-                    .accessibilityAddTraits(.isHeader)
-                    .layoutProbe("title")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                accessory
+        GeometryReader { outer in
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: 18) {
+                    NotEnabledBanner()
+                    content
+                }
+                .padding(.top, 20)
+                .padding(.horizontal, 28)
+                .padding(.bottom, 24)
+                .frame(width: outer.size.width, alignment: .leading)
+                .layoutProbe("content")
             }
-            .padding(.horizontal, 24)
-            .frame(height: 52)
-            .layoutProbe("header")
-            Divider()
-            Form {
-                NotEnabledBanner()
-                content
-            }
-            .formStyle(.grouped)
-            .layoutProbe("form")
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(SettingsColors.page)
+        .toolbar {
+            if #available(macOS 26, *) {
+                ToolbarItem(placement: .navigation) { PageTitle(title: title) }
+                    .sharedBackgroundVisibility(.hidden)
+            } else {
+                ToolbarItem(placement: .navigation) { PageTitle(title: title) }
+            }
+            if Accessory.self != EmptyView.self {
+                ToolbarItem(placement: .primaryAction) {
+                    HStack(spacing: 10) { accessory }
+                }
+            }
+        }
     }
 }
 
-/// Row label with a hint below it (13 pt / 12 pt secondary), for Toggle, Picker and
-/// LabeledContent labels.
-struct RowLabel: View {
-    let title: Text
-    var hint: Text?
+/// The page title in the toolbar: 15 pt bold, primary.
+struct PageTitle: View {
+    let title: String
 
-    init(_ title: Text, hint: Text? = nil) {
+    var body: some View {
+        Text(verbatim: title)
+            .font(.system(size: 15, weight: .bold))
+            .foregroundStyle(.primary)
+            .fixedSize()
+            .accessibilityAddTraits(.isHeader)
+            .layoutProbe("title")
+            // Fixed item width: the item, and so the title, never moves with the text.
+            // The leading inset puts the title 24 pt from the sidebar, as in the mockup.
+            .padding(.leading, 17)
+            .frame(width: 320, alignment: .leading)
+    }
+}
+
+/// Section title (13 semibold, outside the card) and its content, 8 apart.
+struct SettingsGroup<Content: View, Footer: View>: View {
+    let title: Text?
+    @ViewBuilder var content: Content
+    @ViewBuilder var footer: Footer
+
+    init(_ title: Text? = nil, @ViewBuilder content: () -> Content,
+         @ViewBuilder footer: () -> Footer = { EmptyView() }) {
         self.title = title
-        self.hint = hint
+        self.content = content()
+        self.footer = footer()
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            title
-            if let hint {
-                hint
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: 8) {
+            if let title {
+                title
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.primary)
+                    .padding(.horizontal, 4)
+                    .accessibilityAddTraits(.isHeader)
             }
+            content
+            footer
         }
     }
 }
 
-/// A row with a label (and hint) on the left and controls on the right.
-struct SettingsRow<Trailing: View>: View {
-    let label: RowLabel
+/// A rounded card holding rows: radius 14, 1 pt separator border.
+struct SettingsCard<Content: View>: View {
+    var padding: CGFloat = 0
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            content
+        }
+        .padding(padding)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(SettingsColors.card, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(SettingsColors.separator, lineWidth: 1)
+        }
+    }
+}
+
+/// Separator between rows, inset 16 from the leading edge.
+struct RowDivider: View {
+    var body: some View {
+        Divider().padding(.leading, 16)
+    }
+}
+
+/// A row: label with an optional hint below it, and trailing controls.
+struct SettingsRow<Label: View, Trailing: View>: View {
+    var minHeight: CGFloat = 48
+    @ViewBuilder var label: Label
     @ViewBuilder var trailing: Trailing
 
-    init(_ title: Text, hint: Text? = nil, @ViewBuilder trailing: () -> Trailing) {
-        self.label = RowLabel(title, hint: hint)
+    var body: some View {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) { label }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            trailing
+        }
+        .font(.system(size: 13))
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .frame(minHeight: minHeight)
+    }
+}
+
+extension SettingsRow where Label == RowLabel {
+    init(_ title: Text, hint: Text? = nil, minHeight: CGFloat = 48,
+         @ViewBuilder trailing: () -> Trailing) {
+        self.minHeight = minHeight
+        self.label = RowLabel(title: title, hint: hint)
         self.trailing = trailing()
     }
+}
+
+/// Row title (13, primary) and hint (12, secondary).
+struct RowLabel: View {
+    let title: Text
+    let hint: Text?
 
     var body: some View {
-        LabeledContent {
-            HStack(spacing: 8) { trailing }
-        } label: {
-            label
+        title.foregroundStyle(.primary)
+        if let hint {
+            Hint(hint)
         }
     }
+}
+
+/// 12 pt secondary text.
+struct Hint: View {
+    let text: Text
+    init(_ text: Text) { self.text = text }
+
+    var body: some View {
+        text
+            .font(.system(size: 12))
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+/// A switch whose label is only read by VoiceOver (the row shows the visible label).
+struct RowSwitch: View {
+    let label: Text
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Toggle(isOn: $isOn) { label }
+            .toggleStyle(.switch)
+            .labelsHidden()
+            .layoutProbe("switch")
+    }
+}
+
+extension View {
+    /// Buttons as in the mockup: capsule, about 30 pt tall.
+    func settingsButton() -> some View {
+        self.controlSize(.large).buttonBorderShape(.capsule)
+    }
+
 }
 
 /// Capsule label: configuration chips, "Đề xuất", example keys. A label, not a control.
@@ -194,31 +332,41 @@ struct WrappingHStack: Layout {
     }
 }
 
-/// "Dấu chưa được bật" banner (docs/UI.md, "Các trạng thái bổ sung"): the first group
-/// of every page while Dấu is not among the enabled input sources. A system card with
-/// the multicolor warning symbol and a prominent button.
+/// "Dấu chưa được bật" banner (docs/UI.md, "Các trạng thái bổ sung", mockup
+/// "SettingsNotEnabled"), first on every page while Dấu is not among the enabled
+/// input sources: multicolor warning symbol, title, subtitle, prominent button.
 struct NotEnabledBanner: View {
     @Environment(InputSourceStatus.self) private var status
 
     var body: some View {
         if status.isEnabled == false {
-            Section {
-                HStack(alignment: .center, spacing: 12) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .symbolRenderingMode(.multicolor)
-                        .font(.system(size: 22))
-                        .accessibilityHidden(true)
-                    RowLabel(Text("Dấu chưa được bật trong Nguồn nhập liệu").fontWeight(.semibold),
-                             hint: Text("Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt."))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    // TODO(M5): register and enable the input source here (D14 step 2,
-                    // with undo). Until then the button opens Keyboard settings, where
-                    // the user adds Dấu back (N4).
-                    Button("Bật lại") { SystemSettings.openKeyboard() }
-                        .buttonStyle(.borderedProminent)
+            HStack(alignment: .center, spacing: 12) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .symbolRenderingMode(.multicolor)
+                    .font(.system(size: 22))
+                    .frame(width: 28, height: 28)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Dấu chưa được bật trong Nguồn nhập liệu")
+                        .font(.system(size: 13, weight: .semibold))
+                    Hint(Text("Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt."))
                 }
-                .accessibilityElement(children: .contain)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                // TODO(M5): register and enable the input source here (D14 step 2,
+                // with undo). Until then the button opens Keyboard settings, where the
+                // user adds Dấu back (N4).
+                Button("Bật lại") { SystemSettings.openKeyboard() }
+                    .buttonStyle(.borderedProminent)
+                    .settingsButton()
             }
+            .padding(.vertical, 12)
+            .padding(.horizontal, 14)
+            .background(SettingsColors.card, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(SettingsColors.separator, lineWidth: 1)
+            }
+            .accessibilityElement(children: .contain)
         }
     }
 }

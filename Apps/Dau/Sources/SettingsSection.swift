@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// The four sections of the Settings window (docs/UI.md).
@@ -24,16 +25,6 @@ enum SettingsSection: String, CaseIterable, Identifiable, Hashable {
         case .smart: "wand.and.stars"
         case .apps: "square.grid.2x2"
         case .updates: "arrow.triangle.2.circlepath"
-        }
-    }
-
-    /// Sidebar icon colors from UI.md, as system colors (D9).
-    var color: Color {
-        switch self {
-        case .typing: .blue
-        case .smart: .purple
-        case .apps: .orange
-        case .updates: .green
         }
     }
 
@@ -74,17 +65,50 @@ enum SettingsSection: String, CaseIterable, Identifiable, Hashable {
     }
 }
 
-/// Sidebar icon: white SF Symbol on a rounded square of the section color, like System
-/// Settings. Decorative; the label beside it carries the meaning.
+/// Sidebar icon as in System Settings: a white SF Symbol (14 pt) on a solid rounded
+/// tile (22 pt, radius 6) in a system color. Drawn into a non-template image so the
+/// sidebar's vibrancy does not wash the color out. Decorative; the label beside it
+/// carries the meaning.
 struct SectionIcon: View {
     let section: SettingsSection
 
     var body: some View {
-        Image(systemName: section.symbol)
-            .font(.system(size: 12, weight: .semibold))
-            .foregroundStyle(.white)
-            .frame(width: 22, height: 22)
-            .background(section.color, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+        Image(nsImage: SectionIcon.tile(section))
             .accessibilityHidden(true)
+    }
+
+    @MainActor private static var cache: [SettingsSection: NSImage] = [:]
+
+    @MainActor static func tile(_ section: SettingsSection) -> NSImage {
+        if let image = cache[section] { return image }
+        let size = NSSize(width: 22, height: 22)
+        let image = NSImage(size: size, flipped: false) { rect in
+            section.nsColor.setFill()
+            NSBezierPath(roundedRect: rect, xRadius: 6, yRadius: 6).fill()
+            let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
+                .applying(.init(paletteColors: [.white]))
+            if let symbol = NSImage(systemSymbolName: section.symbol, accessibilityDescription: nil)?
+                .withSymbolConfiguration(config) {
+                let s = symbol.size
+                symbol.draw(in: NSRect(x: (rect.width - s.width) / 2, y: (rect.height - s.height) / 2,
+                                       width: s.width, height: s.height))
+            }
+            return true
+        }
+        image.isTemplate = false
+        cache[section] = image
+        return image
+    }
+}
+
+extension SettingsSection {
+    /// The tile color as a system NSColor.
+    var nsColor: NSColor {
+        switch self {
+        case .typing: .systemBlue
+        case .smart: .systemPurple
+        case .apps: .systemOrange
+        case .updates: .systemGreen
+        }
     }
 }

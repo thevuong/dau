@@ -33,60 +33,61 @@ struct AddAppRuleSheet: View {
 
             SearchField(text: $query, prompt: String(localized: "Tìm trong Ứng dụng"))
 
-            List(visibleCandidates, selection: $selection) { candidate in
-                HStack(spacing: 10) {
-                    Image(nsImage: candidate.icon)
-                        .resizable()
-                        .frame(width: 24, height: 24)
-                        .accessibilityHidden(true)
-                    Text(verbatim: candidate.name)
-                        .lineLimit(1)
+            SettingsCard {
+                List(visibleCandidates, selection: $selection) { candidate in
+                    HStack(spacing: 10) {
+                        Image(nsImage: candidate.icon)
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .accessibilityHidden(true)
+                        Text(verbatim: candidate.name)
+                            .font(.system(size: 13))
+                            .lineLimit(1)
+                    }
+                    .frame(height: 40)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 1, leading: 4, bottom: 1, trailing: 4))
+                    .tag(candidate.id)
                 }
-                .frame(height: 32)
-                .tag(candidate.id)
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .frame(height: 188)
+                .padding(6)
+                .accessibilityLabel(Text("Ứng dụng"))
             }
-            .listStyle(.bordered)
-            .frame(height: 196)
-            .accessibilityLabel(Text("Ứng dụng"))
 
-            GroupBox {
-                VStack(spacing: 0) {
-                    SettingsRow(Text("Khi mở app")) {
-                        Picker("Khi mở app", selection: $mode) {
-                            ForEach(AppRule.Mode.allCases, id: \.self) { Text($0.title).tag($0) }
-                        }
-                        .pickerStyle(.segmented)
-                        .labelsHidden()
+            SettingsCard {
+                SettingsRow(Text("Khi mở app")) {
+                    SegmentedPicker(String(localized: "Khi mở app"), selection: $mode,
+                                    options: AppRule.Mode.allCases.map { ($0, $0.title) })
                         .frame(width: 220)
-                    }
-                    .padding(.vertical, 8)
-                    Divider()
-                    SettingsRow(Text("Khi đang gõ")) {
-                        Picker("Khi đang gõ", selection: $underline) {
-                            Text("Không gạch chân").tag(false)
-                            Text("Có gạch chân").tag(true)
-                        }
-                        .pickerStyle(.segmented)
-                        .labelsHidden()
-                        .frame(width: 240)
-                    }
-                    .padding(.vertical, 8)
                 }
-                .padding(.horizontal, 6)
+                RowDivider()
+                SettingsRow(Text("Khi đang gõ")) {
+                    SegmentedPicker(String(localized: "Khi đang gõ"), selection: $underline,
+                                    options: [(false, String(localized: "Không gạch chân")),
+                                              (true, String(localized: "Có gạch chân"))])
+                        .frame(width: 240)
+                }
             }
 
             HStack(spacing: 8) {
                 Button("Chọn ứng dụng khác…", action: chooseApp)
+                    .buttonStyle(.link)
+                    .font(.system(size: 12))
                 Spacer()
                 Button("Huỷ", role: .cancel) { dismiss() }
+                    .settingsButton()
                     .keyboardShortcut(.cancelAction)
                 Button("Thêm", action: add)
+                    .settingsButton()
                     .keyboardShortcut(.defaultAction)
                     .disabled(selection == nil)
             }
         }
         .padding(22)
         .frame(width: 460)
+        .background(SettingsColors.page)
         .task { await loadApps() }
     }
 
