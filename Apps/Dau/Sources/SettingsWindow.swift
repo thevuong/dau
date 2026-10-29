@@ -18,14 +18,19 @@ struct SettingsWindow: View {
     var body: some View {
         NavigationSplitView {
             List(visibleSections, selection: $selection) { section in
-                Label {
-                    Text(section.title)
-                } icon: {
+                // Mockup row: 32 tall (the list adds 4 above and below the content),
+                // tile then text 9 apart, 13 pt, medium when selected.
+                HStack(spacing: 9) {
                     SectionIcon(section: section)
+                    Text(section.title)
+                        .font(.system(size: 13, weight: selection == section ? .medium : .regular))
+                        .lineLimit(1)
                 }
-                .frame(minHeight: 28)
+                .frame(height: 24)
+                .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8))
                 .layoutProbe("sidebarRow-\(section.rawValue)")
                 .tag(section)
+                .accessibilityElement(children: .combine)
             }
             .searchable(text: $query, placement: .sidebar, prompt: Text("Tìm kiếm"))
             .onChange(of: query) {
