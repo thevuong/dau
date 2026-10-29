@@ -29,7 +29,7 @@ settings:
     BUNDLE_ID_PREFIX: com.example.dau
     # App Group shared by the host app and the input method (settings, compatibility list).
     # TeamIdentifierPrefix is "TEAMID." once DEVELOPMENT_TEAM is set, empty for ad-hoc builds.
-    APP_GROUP_ID: $(TeamIdentifierPrefix)$(BUNDLE_ID_PREFIX)
+    APP_GROUP_ID: $(TeamIdentifierPrefix)$(BUNDLE_ID_PREFIX).shared
     DEVELOPMENT_TEAM: ""
     CODE_SIGN_STYLE: Manual
     CODE_SIGN_IDENTITY: "-"

@@ -11,7 +11,7 @@ dau/
 │  ├─ DauEngine/               # Swift package thuần, không Foundation/AppKit
 │  │  ├─ Sources/DauEngine/    # VietEngine, bảng nguyên âm/dấu, quy tắc chính tả
 │  │  └─ Tests/                # Swift Testing: ca Telex/VNI theo quy tắc chính tả, ca biên, test hiệu năng
-│  └─ DauShared/               # khoá cài đặt, model danh sách tương thích + kiểm chữ ký
+│  └─ DauShared/               # model cài đặt chung (phụ thuộc DauEngine), lưu trữ App Group + Darwin notification, xem trước bằng engine thật; sau này: danh sách tương thích + kiểm chữ ký
 ├─ Apps/
 │  ├─ DauInputMethod/          # bundle input method (IMK), sandbox, KHÔNG có quyền mạng (N2)
 │  └─ Dau/                     # app chủ SwiftUI: Cài đặt, onboarding, cập nhật (Sparkle), báo lỗi
@@ -29,6 +29,12 @@ dau/
 - `Action` = `.passThrough` (IMK trả `false`) | `.replace(deleteCount:insert: TextBuffer)`: xoá `deleteCount` **scalar** trước con trỏ và chèn `insert` trong một lần `insertText` (N3). Chữ Việt dựng sẵn đều nằm trong BMP nên số scalar bằng độ dài UTF-16, trừ khi từ được seed từ NFD — khi đó IMK tự đo chuỗi đã seed.
 - Tuỳ chọn `EngineOptions`: kiểu gõ (`telex`, `simpleTelex`, `vni`), vị trí dấu (`modern`/`classic`), bỏ dấu tự do (D28), tự khôi phục (D4/D30/D33), `advanced: .off | .consonantShortcuts | .allowZFWJ` (một enum nên hai mục loại trừ nhau — D22).
 - Đường nóng không dùng `String`, `any Protocol`, closure, không import Foundation. Engine dựng thẳng ký tự NFC từ bảng (D3), không chuẩn hoá lúc chạy.
+
+### DauShared
+- Phụ thuộc DauEngine (để đổi cài đặt sang `EngineOptions` và chạy engine thật cho phần xem trước); không dùng trong đường nóng của engine.
+- `DauSettings` (Sendable, Codable, mặc định D15; `advanced` là một enum nên D22 không thể bật cả hai), `AppRule` (D5, D13), `startMode(for:remembered:)` theo D5.
+- `SettingsStore`: lưu cả cài đặt thành một JSON dưới khoá `settings` trong UserDefaults suite = App Group (`DauAppGroupIdentifier` trong Info.plist, giá trị `$(TeamIdentifierPrefix)$(BUNDLE_ID_PREFIX).shared`); sau mỗi lần lưu phát Darwin notification `<suite>.settingsDidChange`; `observeChanges` cho bộ gõ áp dụng ngay.
+- `TypingPreview`/`SettingsExamples`: mọi ví dụ "phím → kết quả" trên giao diện đều do engine tính (N5).
 
 ### DauInputMethod (input method)
 - Lớp con `IMKInputController`, mỗi client một instance và một `VietEngine` riêng (không có trạng thái toàn cục — khác OpenKey).
