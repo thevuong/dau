@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// The Settings window (mockup "SettingsTyping" and siblings): a 220 pt sidebar with
-/// search, the four sections and "Dấu <version>" at the bottom; the toolbar shows the
-/// selected section's name.
+/// search, the four sections and "Dấu <version>" at the bottom; each page has its own
+/// fixed header with the section name.
 struct SettingsWindow: View {
     @State private var selection: SettingsSection?
     @State private var query = ""
@@ -20,7 +20,6 @@ struct SettingsWindow: View {
             List(visibleSections, selection: $selection) { section in
                 Label {
                     Text(section.title)
-                        .font(.system(size: 13))
                 } icon: {
                     SectionIcon(section: section)
                 }
@@ -41,16 +40,22 @@ struct SettingsWindow: View {
                     .padding(.bottom, 14)
             }
             .toolbar(removing: .sidebarToggle)
+            .layoutProbe("sidebar")
             // Must stay the last modifier of the column to take effect.
             .navigationSplitViewColumnWidth(min: 220, ideal: 220, max: 260)
         } detail: {
             SettingsDetail(section: selection ?? .typing)
         }
+        // No toolbar: the page header plays its role, so nothing in the title bar
+        // changes from one section to another.
+        .toolbar(.hidden, for: .windowToolbar)
+        .background(HiddenWindowTitle())
         .frame(minWidth: 820, minHeight: 560)
+        .layoutProbe("window")
     }
 }
 
-/// One section page, titled in the toolbar.
+/// One section page; its title also names the window (Window menu, VoiceOver).
 struct SettingsDetail: View {
     let section: SettingsSection
 
