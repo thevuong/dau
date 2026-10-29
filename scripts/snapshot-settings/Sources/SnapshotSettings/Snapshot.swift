@@ -61,6 +61,13 @@ enum Snapshot {
         }
         // Traffic lights, in the same top-left window coordinates as the probes.
         var frames = log.frames
+        // Width taken by a legacy scroll bar on the page's scroll view (0 if none).
+        var scrollViews: [NSScrollView] = []
+        func walk(_ v: NSView) { if let s = v as? NSScrollView, s.frame.width > 300 { scrollViews.append(s) }; v.subviews.forEach(walk) }
+        walk(host)
+        if let page = scrollViews.max(by: { ($0.documentView?.frame.height ?? 0) < ($1.documentView?.frame.height ?? 0) }) {
+            frames["scrollRoom"] = CGRect(x: 0, y: 0, width: page.frame.width - page.contentView.frame.width, height: 0)
+        }
         for (name, kind) in [("close", NSWindow.ButtonType.closeButton), ("zoom", .zoomButton)] {
             if let button = window.standardWindowButton(kind), let superview = button.superview {
                 let r = superview.convert(button.frame, to: nil)

@@ -101,9 +101,23 @@ let failed: Bool = MainActor.assumeIsolated {
         if measured.contains(where: { $0.1[key] == nil }) { moved = true; print("MISSING: \(key)") }
     }
     for key in same { check(key) { "\($0)" } }
-    check("content") { "\($0.minX),\($0.minY),\($0.width)" }  // height is the page's
+    // Positions must match; widths may differ only by a legacy scroll bar, and only on
+    // a page that shows one.
+    let legacyWidth = NSScroller.scrollerWidth(for: .regular, scrollerStyle: .legacy)
+    for (section, frames) in measured {
+        let r = frames["scrollRoom"]?.width ?? 0
+        if abs(r) > 0.5 && abs(r - legacyWidth) > 0.5 { moved = true; print("SCROLL BAR: \(section) takes \(r) pt") }
+    }
+    func checkWidth(_ key: String, y: Bool) {
+        let values = Set(measured.compactMap { item -> String? in
+            guard let r = item.1[key] else { return nil }
+            return "\(r.minX),\(y ? r.minY : 0),\(r.width + (item.1["scrollRoom"]?.width ?? 0))"
+        })
+        if values.count > 1 { moved = true; print("MOVED: \(key) \(values.sorted())") }
+    }
+    checkWidth("content", y: true)                         // height is the page's
     check("title") { "\($0.minX),\($0.minY)" }            // width is the text's
-    check("firstCard") { "\($0.minX),\($0.width)" }       // y depends on a group title
+    checkWidth("firstCard", y: false)                      // y depends on a group title
     print(moved ? "Layout: MOVES between sections" : "Layout: identical in all sections")
 
     // Mockup against app.

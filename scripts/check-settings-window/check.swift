@@ -52,16 +52,35 @@ for style in styles {
             var checks: [String: Bool] = ["a": true, "b": true, "c": true, "d": true, "e": true]
             func bad(_ check: String, _ message: String) { checks[check] = false; fail("\(run) \(mode) (\(check)) \(message)") }
 
-            // (a) Same frames in every section.
-            func same(_ name: String, _ value: (CGRect) -> String) {
-                let values = sections.compactMap { frames["\($0)-\(mode)"]?[name] }.map(value)
-                if values.count != sections.count { bad("a", "\(name) missing"); return }
-                if Set(values).count > 1 { bad("a", "\(name) differs: \(values)") }
+            // (a) Same frames in every section. Positions (x, y) must be equal; widths
+            // may differ only by the legacy scroll bar's width, and only on a section
+            // that shows one (its clip view is narrower than its scroll view).
+            let legacyWidth = NSScroller.scrollerWidth(for: .regular, scrollerStyle: .legacy)
+            func room(_ section: String) -> CGFloat? {
+                guard let f = frames["\(section)-\(mode)"], let sv = f["scrollView"], let clip = f["clip"] else { return nil }
+                return sv.width - clip.width
             }
-            same("content") { "\($0.minX),\($0.width)" }
-            same("firstCard") { "\($0.minX),\($0.width)" }
-            same("title") { "\($0.minX),\($0.minY)" }
-            same("close") { "\($0)" }
+            for section in sections {
+                if let r = room(section), abs(r) > 0.5, abs(r - legacyWidth) > 0.5 {
+                    bad("a", "\(section) scroll bar takes \(r) pt, not the legacy width \(legacyWidth)")
+                }
+            }
+            func same(_ name: String, width: Bool, y: Bool = true) {
+                var values: [String] = []
+                for section in sections {
+                    guard let r = frames["\(section)-\(mode)"]?[name] else { continue }
+                    let w = width ? r.width + (room(section) ?? 0) : 0
+                    values.append("\(r.minX),\(y ? r.minY : 0),\(w)")
+                }
+                if values.count != sections.count { bad("a", "\(name) missing"); return }
+                if Set(values).count > 1 { bad("a", "\(name) differs (x, y, width + scroll bar): \(values)") }
+            }
+            same("content", width: true)
+            // The first card's y depends on whether the page starts with a group title.
+            same("firstCard", width: true, y: false)
+            same("title", width: false)
+            same("close", width: false)
+            if Set(sections.compactMap { frames["\($0)-\(mode)"]?["close"] }).count > 1 { bad("a", "close size differs") }
 
             for section in sections {
                 let key = "\(section)-\(mode)"

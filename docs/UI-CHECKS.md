@@ -25,7 +25,7 @@ Toạ độ tính bằng pt, gốc ở góc trên-trái cửa sổ 820×600.
 | # | Lỗi đã gặp | Cách kiểm | Đạt khi |
 |---|---|---|---|
 | 1 | Nội dung co thành cột hẹp, căn giữa (do `Form(.grouped)`) | run.sh, khung `content`, `firstCard` | `content` x 220, rộng = độ rộng cột (600 với thanh cuộn overlay); `firstCard` x 248 |
-| 2 | Nhảy bố cục khi đổi mục (toolbar đổi cao, tiêu đề đổi chỗ) | run.sh (a); snapshot-settings "Layout" | (a) `content`, `firstCard` (x, rộng), `title`, `close` bằng nhau ở 4 mục, lệch 0 pt |
+| 2 | Nhảy bố cục khi đổi mục (toolbar đổi cao, tiêu đề đổi chỗ) | run.sh (a); snapshot-settings "Layout" | (a) x, y của `content`, `title`, `close` và x của `firstCard` bằng nhau ở 4 mục, lệch 0 pt. Độ rộng của `content` và `firstCard` chỉ được lệch đúng bằng độ rộng thanh cuộn legacy của hệ thống (`NSScroller.scrollerWidth`, 17 pt), và chỉ ở mục đang hiện thanh cuộn (clip view hẹp hơn scroll view). Tọa độ y của `firstCard` không so, vì phụ thuộc mục có tiêu đề nhóm đầu trang hay không. |
 | 3 | Màu không theo HIG (tự pha nền, chữ cố định) | `grep -nE "Color\(red\|#[0-9a-fA-F]{6}\|\.opacity\(\|gradient\|blended" Apps/Dau/Sources` | Không có kết quả, trừ màu ô icon sidebar (hình minh hoạ, D9) |
 | 4 | Mất đèn giao thông | run.sh (e) | `close` = 19,19 14×14 ở mọi ảnh |
 | 5 | Icon sidebar sai (glyph, màu, cỡ, sát chữ) | `sidebar-compare-*.png`; khung `sidebarRow-*` | Ô 22, bo 6, màu #0A64D8 / #7A3FD1 / #C2410C / #1F7A4D, glyph theo SVG mockup; hàng cao 24 + 8 của list (vệt chọn 32), cách nhau 32 |
@@ -36,10 +36,10 @@ Toạ độ tính bằng pt, gốc ở góc trên-trái cửa sổ 820×600.
 | 10 | Thiếu thanh cuộn (nằm ngoài cửa sổ) | run.sh (b), (d); khung `scroller` | Mục có cuộn: `scroller` x ≥ 700, mép phải ≤ 820, y ≥ 51 |
 | 11 | Dải hở ở mép phải (cột thanh cuộn chừa sẵn) | run.sh (b), (c) | (b) màu nền trang ở mép phải (hoặc sát trái thanh cuộn) trùng màu nền trang bên trái, lệch ≤ 6/255; vạch dưới header có ở x 600 và x 817 cùng hàng. (c) dải 24 pt ở mép phải không có điểm nào khác màu nền trang, trừ thanh cuộn |
 
-## Đã biết, chưa đạt
+## Quy tắc thanh cuộn (chốt 29/10/2026)
 
-- **(a) với thanh cuộn legacy** (`Always`, hoặc `Automatic` khi có chuột): trên mục cuộn được (Cập nhật & hỗ trợ), hệ thống hiện thanh cuộn và trừ độ rộng của nó, nên nội dung hẹp hơn 17 pt so với các mục không cuộn (`content` 583 so với 600, `firstCard` 527 so với 544).
-  - `.scrollIndicators(.visible)` không giữ thanh cuộn ở các mục không cuộn.
-  - Tắt `autohidesScrollers` của `NSScrollView` thì rãnh luôn hiện, nhưng SwiftUI vẫn dàn nội dung rộng 600 ở mục không cuộn.
-  - Cách chừa sẵn 17 pt đã bị bỏ vì sinh lỗi 11.
-  - Đang chờ quyết định.
+Hệ thống quyết định cách hiện thanh cuộn.
+
+- **Overlay:** không chiếm chỗ.
+- **Legacy** (`Always`, hoặc `Automatic` khi có chuột): chỉ mục thực sự cần cuộn mới có rãnh thanh cuộn ở mép phải, và mục đó hẹp hơn đúng 17 pt. Vị trí x, y của mọi thứ giữ nguyên.
+- Không chừa sẵn khoảng trống cho thanh cuộn: cách đó sinh lỗi 11.
