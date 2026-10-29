@@ -124,6 +124,9 @@ struct HeaderAddButton: View {
         Button(action: actions.onAdd) {
             Image(systemName: "plus")
                 .font(.system(size: 15, weight: .regular))
+                // The toolbar fixes the bezel height; widen the label so the bezel
+                // comes out as wide as it is tall (a circle, not an oval).
+                .frame(width: 26, height: 18)
         }
         .controlSize(.large)
         .buttonBorderShape(.circle)
