@@ -43,7 +43,8 @@ dau/
 ## Luồng một phím (chế độ Tiếng Việt)
 
 1. IMK gọi `handle(event, client)` trên main thread. Bỏ qua event nil/bất thường (D18).
-2. Phím điều khiển (mũi tên, ⌘-tổ hợp, Esc…) → reset engine, trả `false` cho hệ thống xử lý.
+2. Phím điều khiển (mũi tên, ⌘-tổ hợp, Esc…) → reset engine, trả `false` cho hệ thống xử lý Không khôi phục từ ở bước này (D4).
+   Backspace → engine bỏ chữ cuối đang hiển thị và đặt lại dấu (D32); bộ đệm rỗng thì trả `false`.
 3. Ký tự → `engine.handle(scalar)`:
    - `passThrough` → trả `false`.
    - `replace(n, s)` → `client.insertText(s, replacementRange: vùng n ký tự trước con trỏ)`, trả `true`.
