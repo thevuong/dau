@@ -2,20 +2,39 @@ import AppKit
 import SwiftUI
 import DauShared
 
-// Usage: SnapshotSettings <output-dir>
-// Writes every page in light, dark and increased-contrast appearance, the 2×2 grid of
-// the four sections, and prints the layout measurements and hint contrast. Exits 1 if
-// the layout moves between sections.
+// Usage: SnapshotSettings <output-dir> [<artboard-dir>]
+// - Renders every page in light, dark and high-contrast appearance, the 2×2 grids of
+//   the four sections, and checks that the layout does not move between sections
+//   (exit 1 if it does).
+// - With <artboard-dir> (the canvas export holding Settings*.dc.html), also renders
+//   each artboard and writes "<page>-compare-<mode>.png" (mockup | app) plus a table
+//   of measurements, mockup against app.
+// - With <real-capture-dir> (written by the Debug app: Dau --capture-window <dir>),
+//   the app side of the comparisons uses those captures of the real SwiftUI scene and
+//   its frames.json: this hand-made window does not reproduce the scene's chrome,
+//   system colors and control sizes exactly.
 
-// Positional arguments only: skip "-Key value" pairs such as -AppleShowScrollBars Always.
 var arguments: [String] = []
 var skipNext = false
 for arg in CommandLine.arguments.dropFirst() {
     if skipNext { skipNext = false; continue }
-    if arg.hasPrefix("-") { skipNext = true; continue }
+    if arg.hasPrefix("-") { skipNext = true; continue }   // -Key value pairs
     arguments.append(arg)
 }
 let outDir = URL(fileURLWithPath: arguments.first ?? FileManager.default.currentDirectoryPath, isDirectory: true)
+let artboards = arguments.count > 1 ? URL(fileURLWithPath: arguments[1], isDirectory: true) : nil
+let realDir = arguments.count > 2 ? URL(fileURLWithPath: arguments[2], isDirectory: true) : nil
+
+/// A real-window capture and its probe frames, if present.
+func realCapture(_ key: String) -> (NSBitmapImageRep, [String: CGRect])? {
+    guard let realDir,
+          let rep = NSBitmapImageRep(data: (try? Data(contentsOf: realDir.appendingPathComponent("\(key).png"))) ?? Data()),
+          let json = try? JSONSerialization.jsonObject(with: Data(contentsOf: realDir.appendingPathComponent("frames.json"))) as? [String: [String: [Double]]]
+    else { return nil }
+    var frames: [String: CGRect] = [:]
+    for (name, v) in json[key] ?? [:] where v.count == 4 { frames[name] = CGRect(x: v[0], y: v[1], width: v[2], height: v[3]) }
+    return (rep, frames)
+}
 try? FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
 
 NSApplication.shared.setActivationPolicy(.accessory)
@@ -29,6 +48,7 @@ let failed: Bool = MainActor.assumeIsolated {
     let model = SettingsModel(store: store)
     let enabled = InputSourceStatus(fixed: true)
     let notEnabled = InputSourceStatus(fixed: false)
+    let window820 = CGSize(width: 820, height: 600)
 
     @MainActor func window(_ section: SettingsSection, _ status: InputSourceStatus) -> some View {
         SettingsWindow(initialSection: section).environment(model).environment(status)
@@ -40,30 +60,22 @@ let failed: Bool = MainActor.assumeIsolated {
         ("dark-high-contrast", .accessibilityHighContrastDarkAqua),
     ]
     var measured: [(String, [String: CGRect])] = []
-    var contrast: [(String, Double, Double)] = []
+    var app: [String: Snapshot.Result] = [:]
 
     for (mode, appearance) in appearances {
         func file(_ name: String) -> URL { outDir.appendingPathComponent("\(name)-\(mode).png") }
         for section in SettingsSection.allCases {
             let result = Snapshot.render(window(section, enabled), to: file(section.rawValue), appearance: appearance)
             if let result {
+                app["\(section.rawValue)-\(mode)"] = result
                 if mode == "light" { measured.append((section.rawValue, result.frames)) }
-                if section == .typing, let row = result.frames["firstRow"] {
-                    // Card background just left of the first row's content, inside the card.
-                    let bg = Snapshot.pixel(result, at: CGPoint(x: row.minX - 6, y: row.midY))
-                    let secondary = composite(.secondaryLabelColor, over: bg, appearance: appearance)
-                    let primary = composite(.labelColor, over: bg, appearance: appearance)
-                    contrast.append((mode, contrastRatio(secondary, bg), contrastRatio(primary, bg)))
-                }
             }
         }
-        Snapshot.render(window(.typing, notEnabled), to: file("typing-not-enabled"), appearance: appearance)
-        Snapshot.render(
+        app["not-enabled-\(mode)"] = Snapshot.render(window(.typing, notEnabled), to: file("typing-not-enabled"),
+                                                       appearance: appearance)
+        app["smart-advanced-\(mode)"] = Snapshot.render(
             window(.smart, enabled).environment(\.smartAdvancedExpanded, true),
             to: file("smart-advanced"), appearance: appearance, size: CGSize(width: 820, height: 680))
-        Snapshot.render(AddAppRuleSheet().environment(model).frame(width: 460, height: 520),
-                        to: file("apps-add-sheet"), appearance: appearance,
-                        size: CGSize(width: 460, height: 520), settle: 60)
     }
 
     Snapshot.grid(SettingsSection.allCases.map { outDir.appendingPathComponent("\($0.rawValue)-light.png") },
@@ -74,34 +86,85 @@ let failed: Bool = MainActor.assumeIsolated {
     // Layout: the same in every section, to the point.
     func f(_ r: CGRect?) -> String {
         guard let r else { return "—" }
-        return String(format: "x %.0f y %.0f w %.0f h %.0f", r.minX, r.minY, r.width, r.height)
+        return String(format: "%.0f,%.0f %.0f×%.0f", r.minX, r.minY, r.width, r.height)
     }
-    let keys = ["window", "sidebar", "header", "title", "form", "firstRow"]
-    print("\nLayout (points, window 820×600, light):")
-    print(([("section", "")] + keys.map { ($0, "") }).map(\.0).joined(separator: " | "))
+    let same = ["window", "sidebar", "close", "zoom"]
+    print("\nLayout (points, top-left origin, window 820×600, light):")
+    print((["section"] + same + ["title", "firstCard"]).joined(separator: " | "))
     for (section, frames) in measured {
-        print(([section] + keys.map { f(frames[$0]) }).joined(separator: " | "))
+        print(([section] + (same + ["title", "firstCard"]).map { f(frames[$0]) }).joined(separator: " | "))
     }
     var moved = false
-    for key in keys where key != "firstRow" && key != "title" {
-        let values = Set(measured.compactMap { $0.1[key] }.map { "\($0)" })
-        if values.count > 1 { moved = true; print("MOVED: \(key) \(values)") }
+    func check(_ key: String, _ value: (CGRect) -> String) {
+        let values = Set(measured.compactMap { $0.1[key] }.map(value))
+        if values.count > 1 { moved = true; print("MOVED: \(key) \(values.sorted())") }
+        if measured.contains(where: { $0.1[key] == nil }) { moved = true; print("MISSING: \(key)") }
     }
-    // Title and first row: same origin and width; height may differ with content.
-    for key in ["title", "firstRow"] {
-        // Title: same origin (its width is the text's). First row: same x and width
-        // (its y depends on whether the first group has a header).
-        let values = Set(measured.compactMap { $0.1[key] }.map {
-            key == "title" ? "\($0.minX),\($0.minY)" : "\($0.minX),\($0.width)"
-        })
-        if values.count > 1 { moved = true; print("MOVED: \(key) \(values)") }
-    }
+    for key in same { check(key) { "\($0)" } }
+    check("content") { "\($0.minX),\($0.minY),\($0.width)" }  // height is the page's
+    check("title") { "\($0.minX),\($0.minY)" }            // width is the text's
+    check("firstCard") { "\($0.minX),\($0.width)" }       // y depends on a group title
     print(moved ? "Layout: MOVES between sections" : "Layout: identical in all sections")
 
-    print("\nHint contrast on the card (WCAG):")
-    for (mode, secondary, primary) in contrast {
-        print(String(format: "%@: secondary %.2f:1, primary %.2f:1", mode, secondary, primary))
+    // Mockup against app.
+    if let artboards {
+        struct Board { let page: String; let file: String; let size: CGSize; let mode: String }
+        let boards = [
+            Board(page: "typing", file: "SettingsTyping", size: CGSize(width: 900, height: 680), mode: "light"),
+            Board(page: "typing", file: "SettingsDark", size: CGSize(width: 900, height: 680), mode: "dark"),
+            Board(page: "smart", file: "SettingsSmart", size: CGSize(width: 900, height: 680), mode: "light"),
+            Board(page: "smart-advanced", file: "SettingsSmartAdvanced", size: CGSize(width: 900, height: 760), mode: "light"),
+            Board(page: "apps", file: "SettingsApps", size: CGSize(width: 900, height: 680), mode: "light"),
+            Board(page: "updates", file: "SettingsAbout", size: CGSize(width: 900, height: 680), mode: "light"),
+            Board(page: "not-enabled", file: "SettingsNotEnabled", size: CGSize(width: 900, height: 680), mode: "light"),
+        ]
+        let measure = [
+            "firstCard": "document.querySelector('main [role=status], main .card').getBoundingClientRect()",
+            "segmented": "document.querySelector('main .seg') && document.querySelector('main .seg').getBoundingClientRect()",
+            "switch": "document.querySelector('main .sw') && document.querySelector('main .sw').getBoundingClientRect()",
+            "button": "document.querySelector('main .btn') && document.querySelector('main .btn').getBoundingClientRect()",
+            "close": "document.querySelector('nav [aria-hidden=true] span').getBoundingClientRect()",
+            "title": "(() => { const r = document.createRange(); r.selectNodeContents(document.querySelector('main header h1')); return r.getBoundingClientRect(); })()",
+            "header": "document.querySelector('main header').getBoundingClientRect()",
+            "sidebar": "document.querySelector('nav').getBoundingClientRect()",
+        ]
+        var rows: [String] = []
+        for board in boards {
+            let crop = CGRect(x: 40, y: 40, width: board.size.width - 80, height: board.size.height - 80)
+            guard let mock = Mockup.render(artboards.appendingPathComponent("\(board.file).dc.html"),
+                                           size: board.size, crop: crop, measure: measure),
+                  let shot = app["\(board.page)-\(board.mode)"] else { print("cannot render \(board.file)"); continue }
+            let real = realCapture("\(board.page)-\(board.mode)")
+            Snapshot.sideBySide([mock.image, real?.0 ?? shot.rep],
+                                to: outDir.appendingPathComponent("\(board.page)-compare-\(board.mode).png"))
+            for key in ["close", "title", "firstCard", "segmented", "switch", "button"] {
+                rows.append("\(board.page)-\(board.mode) | \(key) | \(f(mock.frames[key])) | \(f((real?.1 ?? shot.frames)[key]))")
+            }
+        }
+        // The add-rule sheet: the dialog only.
+        if let full = Mockup.render(artboards.appendingPathComponent("SettingsAppsAdd.dc.html"),
+                                    size: CGSize(width: 900, height: 680), crop: .zero,
+                                    measure: ["dialog": "document.querySelector('[role=dialog]').getBoundingClientRect()"]),
+           let dialog = full.frames["dialog"] {
+            let crop = dialog.integral
+            for (mode, appearance) in [("light", NSAppearance.Name.aqua), ("dark", .darkAqua)] {
+                let sheet = Snapshot.render(AddAppRuleSheet().environment(model).fixedSize(),
+                                            to: outDir.appendingPathComponent("apps-add-sheet-\(mode).png"),
+                                            appearance: appearance, size: CGSize(width: 460, height: crop.height),
+                                            settle: 60)
+                if mode == "light", let mock = Mockup.render(
+                    artboards.appendingPathComponent("SettingsAppsAdd.dc.html"),
+                    size: CGSize(width: 900, height: 680), crop: crop, measure: [:]), let sheet {
+                    Snapshot.sideBySide([mock.image, sheet.rep],
+                                        to: outDir.appendingPathComponent("apps-add-compare-light.png"))
+                }
+            }
+        }
+        print("\nMockup | app (points, window origin top-left):")
+        print("page | element | mockup | app" + (realDir == nil ? " (snapshot window)" : " (real window)"))
+        rows.forEach { print($0) }
     }
+    _ = window820
     return moved
 }
 exit(failed ? 1 : 0)

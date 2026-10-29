@@ -8,6 +8,13 @@ final class ProbeLog {
     var frames: [String: CGRect] = [:]
 }
 
+/// An off-screen window that draws as the key, main window, so controls and the
+/// sidebar selection show their active look (accent colors) as in the mockup.
+final class ActiveLookWindow: NSWindow {
+    override var isKeyWindow: Bool { true }
+    override var isMainWindow: Bool { true }
+}
+
 /// Renders SwiftUI views in an off-screen window and writes PNGs.
 @MainActor
 enum Snapshot {
@@ -21,12 +28,14 @@ enum Snapshot {
     static func render<V: View>(_ view: V, to url: URL?, appearance: NSAppearance.Name,
                                 size: CGSize = CGSize(width: 820, height: 600), settle: Int = 30) -> Result? {
         let log = ProbeLog()
-        let window = NSWindow(contentRect: CGRect(origin: CGPoint(x: -6000, y: -6000), size: size),
+        let window = ActiveLookWindow(contentRect: CGRect(origin: CGPoint(x: -6000, y: -6000), size: size),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                               backing: .buffered, defer: false)
         window.toolbarStyle = .unified
         window.appearance = NSAppearance(named: appearance)
-        let root = view.environment(\.layoutProbe) { name, frame in log.frames[name] = frame }
+        let root = view
+            .environment(\.layoutProbe) { name, frame in log.frames[name] = frame }
+            .environment(\.appearsActive, true)
         let host = NSHostingView(rootView: root)
         host.appearance = window.appearance
         host.frame = CGRect(origin: .zero, size: size)
@@ -50,8 +59,16 @@ enum Snapshot {
                 print("cannot write \(url.path): \(error)")
             }
         }
+        // Traffic lights, in the same top-left window coordinates as the probes.
+        var frames = log.frames
+        for (name, kind) in [("close", NSWindow.ButtonType.closeButton), ("zoom", .zoomButton)] {
+            if let button = window.standardWindowButton(kind), let superview = button.superview {
+                let r = superview.convert(button.frame, to: nil)
+                frames[name] = CGRect(x: r.minX, y: size.height - r.maxY, width: r.width, height: r.height)
+            }
+        }
         window.orderOut(nil)
-        return Result(rep: rep, frames: log.frames, scale: CGFloat(rep.pixelsWide) / size.width)
+        return Result(rep: rep, frames: frames, scale: CGFloat(rep.pixelsWide) / size.width)
     }
 
     /// Raw sRGB bytes of one pixel (the capture's bytes are sRGB values even though the
@@ -62,6 +79,30 @@ enum Snapshot {
         let y = min(max(Int(point.y * result.scale), 0), result.rep.pixelsHigh - 1)
         result.rep.getPixel(&p, atX: x, y: y)
         return (Double(p[0]) / 255, Double(p[1]) / 255, Double(p[2]) / 255)
+    }
+
+    /// Writes bitmaps side by side, top-aligned, with a gap.
+    static func sideBySide(_ reps: [NSBitmapImageRep], to url: URL) {
+        let gap = 40
+        let w = reps.map(\.pixelsWide).reduce(0, +) + gap * (reps.count - 1)
+        let h = reps.map(\.pixelsHigh).max() ?? 0
+        guard let out = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: w, pixelsHigh: h,
+                                         bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+                                         colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0) else { return }
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: out)
+        NSColor.gray.setFill()
+        CGRect(x: 0, y: 0, width: w, height: h).fill()
+        var x = 0
+        for rep in reps {
+            rep.draw(in: CGRect(x: x, y: h - rep.pixelsHigh, width: rep.pixelsWide, height: rep.pixelsHigh))
+            x += rep.pixelsWide + gap
+        }
+        NSGraphicsContext.restoreGraphicsState()
+        if let data = out.representation(using: .png, properties: [:]) {
+            try? data.write(to: url)
+            print(url.path)
+        }
     }
 
     /// Writes images side by side in a grid.
