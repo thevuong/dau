@@ -34,7 +34,7 @@ dau/
 - Phụ thuộc DauEngine (để đổi cài đặt sang `EngineOptions` và chạy engine thật cho phần xem trước); không dùng trong đường nóng của engine.
 - `DauSettings` (Sendable, Codable, mặc định D15; `advanced` là một enum nên D22 không thể bật cả hai), `AppRule` (D5, D13), `startMode(for:remembered:)` theo D5.
 - `SettingsStore`: lưu cả cài đặt thành một JSON dưới khoá `settings` trong UserDefaults suite = App Group (`DauAppGroupIdentifier` trong Info.plist, giá trị `$(TeamIdentifierPrefix)$(BUNDLE_ID_PREFIX).shared`); sau mỗi lần lưu phát Darwin notification `<suite>.settingsDidChange`; `observeChanges` cho bộ gõ áp dụng ngay.
-- `TypingPreview`/`SettingsExamples`: mọi ví dụ "phím → kết quả" trên giao diện đều do engine tính (N5).
+- `TypingPreview`/`TypingExample`: chạy engine thật như bộ gõ. App chủ dùng chúng để dựng mọi ví dụ "phím → kết quả" trên giao diện (`SettingsSamples` trong `Apps/Dau`, có test ở `scripts/snapshot-settings`), nên mọi ví dụ đều do engine tính (N5).
 
 ### DauInputMethod (input method)
 - Lớp con `IMKInputController`, mỗi client một instance và một `VietEngine` riêng (không có trạng thái toàn cục — khác OpenKey).
@@ -47,7 +47,19 @@ dau/
 - Khoá Info.plist cần nghiên cứu và xác minh theo tài liệu Apple / mẫu IMK: `InputMethodConnectionName`, `InputMethodServerControllerClass`, `LSBackgroundOnly`, `TISInputSourceID`, `TISIntendedLanguage`, `ComponentInputModeDict`, `tsInputModeListKey`, icon cho từng mode.
 
 ### Dau (app chủ)
-- SwiftUI `Settings` với sidebar 4 mục, onboarding 3 bước, sheet báo lỗi (xem `docs/UI.md`).
+- **Cửa sổ Cài đặt:** scene SwiftUI `Window` (không dùng scene `Settings`), là cửa sổ chính của app. ⌘, mở lại cửa sổ. Cỡ mặc định 820×600, tối thiểu 760×520. Điểm vào là `main.swift`: nó ghim bản địa hoá `vi` trước khi AppKit chạy.
+  - Bố cục: `NavigationSplitView`, sidebar cố định 220 pt, có ô tìm và 4 mục. Ô icon ở sidebar là ảnh vẽ theo SVG của mockup.
+  - Mỗi trang là `SettingsPage`: `ScrollView` gồm các card tự xếp theo mockup. Nền chọn trong các màu hệ thống, control đều là control hệ thống (D9). Không dùng `Form`, vì `Form(.grouped)` tự giới hạn độ rộng nội dung.
+- **Header:** tiêu đề mục là một ToolbarItem `.navigation` (macOS 26+ tắt nền glass của item này). Tiêu đề hệ thống bị gỡ, nên mọi mục có cùng toolbar và tiêu đề không đổi chỗ. Mục Ứng dụng có thêm ô tìm và nút "+": hai item riêng, ngăn bằng `ToolbarSpacer(.fixed)` để macOS 26+ không gộp thành một khối glass.
+- **Cuộn:**
+  - Scroll view lấp cột chi tiết tới mép phải cửa sổ. Nội dung lấp độ rộng scroll view, không tính độ rộng bằng tay.
+  - Trên macOS 26+, nội dung cuộn dưới header được che bằng `scrollEdgeEffectStyle(.hard, for: .top)`.
+  - Thanh cuộn theo cài đặt hệ thống. Kiểu overlay không chiếm chỗ. Kiểu legacy chỉ hiện ở mục cần cuộn; mục đó hẹp hơn đúng độ rộng thanh cuộn, còn vị trí mọi thứ giữ nguyên (xem `docs/UI-CHECKS.md`).
+- **Control hệ thống được bọc:**
+  - `SegmentedPicker` bọc `NSSegmentedControl`: `Picker(.segmented)` trên macOS giữ độ rộng nội tại và căn giữa, không trải theo khung như mockup (ví dụ "Kiểu gõ" trải hết card).
+  - `SearchField` bọc `NSSearchField`: cần ô tìm có độ rộng cố định trong toolbar và trong sheet, mà `.searchable` không cho đặt.
+- Bản Debug có cờ chạy không mở cửa sổ (`--print-…`) và `--capture-window` để chụp cửa sổ thật; `scripts/check-settings-window` dùng cờ này để kiểm giao diện.
+- Onboarding 3 bước và sheet báo lỗi: chưa làm (M5, M7; xem `docs/UI.md`).
 - Cài bộ gõ: chép bundle `DauInputMethod.app` từ trong app chủ vào `~/Library/Input Methods`, đăng ký qua Text Input Sources. Gỡ cài đặt và quay về bản trước cũng nằm ở đây (D16).
 - Sparkle 2 + tải danh sách tương thích có chữ ký (D7). Sau khi cập nhật, chờ người dùng ngừng gõ rồi dừng tiến trình bộ gõ cũ.
 - Phát hiện bộ gõ cũ đang chạy bằng `NSWorkspace.shared.runningApplications` (D14).

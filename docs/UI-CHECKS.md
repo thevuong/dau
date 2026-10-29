@@ -26,9 +26,9 @@ Toạ độ tính bằng pt, gốc ở góc trên-trái cửa sổ 820×600.
 |---|---|---|---|
 | 1 | Nội dung co thành cột hẹp, căn giữa (do `Form(.grouped)`) | run.sh, khung `content`, `firstCard` | `content` x 220, rộng = độ rộng cột (600 với thanh cuộn overlay); `firstCard` x 248 |
 | 2 | Nhảy bố cục khi đổi mục (toolbar đổi cao, tiêu đề đổi chỗ) | run.sh (a); snapshot-settings "Layout" | (a) x, y của `content`, `title`, `close` và x của `firstCard` bằng nhau ở 4 mục, lệch 0 pt. Độ rộng của `content` và `firstCard` chỉ được lệch đúng bằng độ rộng thanh cuộn legacy của hệ thống (`NSScroller.scrollerWidth`, 17 pt), và chỉ ở mục đang hiện thanh cuộn (clip view hẹp hơn scroll view). Tọa độ y của `firstCard` không so, vì phụ thuộc mục có tiêu đề nhóm đầu trang hay không. |
-| 3 | Màu không theo HIG (tự pha nền, chữ cố định) | `grep -nE "Color\(red\|#[0-9a-fA-F]{6}\|\.opacity\(\|gradient\|blended" Apps/Dau/Sources` | Không có kết quả, trừ màu ô icon sidebar (hình minh hoạ, D9) |
+| 3 | Màu không theo HIG (tự pha nền, chữ cố định) | `grep -nE "Color\(red\|#[0-9a-fA-F]{6}\|\.opacity\(\|gradient\|blended" Apps/Dau/Sources` | Không có kết quả (D9: chỉ màu hệ thống, kể cả ô icon sidebar) |
 | 4 | Mất đèn giao thông | run.sh (e) | `close` = 19,19 14×14 ở mọi ảnh |
-| 5 | Icon sidebar sai (glyph, màu, cỡ, sát chữ) | `sidebar-compare-*.png`; khung `sidebarRow-*` | Ô 22, bo 6, màu #0A64D8 / #7A3FD1 / #C2410C / #1F7A4D, glyph theo SVG mockup; hàng cao 24 + 8 của list (vệt chọn 32), cách nhau 32 |
+| 5 | Icon sidebar sai (glyph, màu, cỡ, sát chữ) | `sidebar-compare-*.png`; khung `sidebarRow-*` | Ô 22, bo 6, màu `systemBlue` / `systemPurple` / `systemOrange` / `systemGreen`, glyph nét trắng theo SVG mockup; hàng cao 24 + 8 của list (vệt chọn 32), cách nhau 32 |
 | 6 | Segmented "Kiểu gõ" hẹp, căn giữa | khung `segmented` (frames.json) | x 264, rộng 512 (trải hết card trừ 16 mỗi bên) |
 | 7 | Ô tìm và "+" dính nhau thành một khối glass | run.sh (e); `apps-header-compare-*.png` | `headerSearch` x 556 ± 2, rộng 200; `headerAdd` bắt đầu sau mép phải ô tìm ít nhất 8 pt |
 | 8 | Nút "+" méo (bầu dục) | `apps-header-compare-*.png` | Viền nút tròn: rộng bằng cao, đo trên ảnh |
