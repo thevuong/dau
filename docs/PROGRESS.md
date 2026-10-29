@@ -54,6 +54,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | 29/10/2026 | `VietEngine.handle` VNI, release | 0,142 µs/phím (8,5 ms / 60.071 phím, best of 5) | `PerformanceTests`, đoạn VNI dài; Telex đo lại cùng lượt 0,154 µs/phím |
 | 29/10/2026 | IMK cách A, Sublime Text 4 (Debug, sơ bộ) | `selectedRange` p50 334 / p99 3.718 µs; `insertText` p50 1.466 / p99 7.787 µs; cả phím có thay p50 2.002 / p99 8.087 µs (n=35) | `scripts/perf-report.sh`, người dùng gõ tay |
 | 29/10/2026 | IMK cách A, TextEdit (Debug, sơ bộ) | `selectedRange` p50 288 / p99 7.306 µs; `insertText` p50 3.760 / p99 8.546 µs; cả phím có thay p50 4.536 / p99 15.933 µs (n=11) | như trên |
+| 29/10/2026 | IMK cách A, Safari (Debug, sơ bộ) | `selectedRange` p50 333 / p99 1.639 µs; `insertText` p50 4.298 / p99 13.696 µs; cả phím có thay p50 4.790 / p99 14.242 µs (n=11) | `scripts/perf-report.sh`, người dùng gõ tay |
 | 29/10/2026 | Cấp phát trong `handle` VNI | 0 lần / 37.200 phím | như đo Telex |
 | 29/10/2026 | Cấp phát bộ nhớ trong `handle` | 0 lần / 41.600 phím | chương trình ngoài repo móc `malloc_logger`, có đối chứng dương; chưa có trong CI |
 
