@@ -97,3 +97,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 29/10/2026 — header che nội dung cuộn (scrollEdgeEffectStyle .hard) + thanh cuộn nằm trong cửa sổ (trước nằm ngoài vì ScrollView macOS 26 trải dưới sidebar), chừa cột scroller khi luôn hiện để không nhảy — app-ui-dev (da3ae8d)
 - 29/10/2026 — bỏ khoảng chừa 17 pt (gây dải hở phải); scroll view tới mép cửa sổ; ma trận cửa sổ thật `scripts/check-settings-window/run.sh` + `docs/UI-CHECKS.md` — app-ui-dev (62a07f5, 9e0dbf3). Chốt: thanh cuộn legacy làm mục có cuộn hẹp 17 pt như macOS chuẩn (x/y không đổi)
 - 29/10/2026 — người dùng xác nhận giao diện Cài đặt (mép phải, thanh cuộn) đã ổn
+- 29/10/2026 — đẩy repo công khai lên https://github.com/thevuong/dau (nhánh main, theo yêu cầu người dùng); đã quét lịch sử không có khoá/token — phiên chính
