@@ -26,7 +26,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | M1 Engine | xong | ĐẠT (29/10, lần 2) | Telex, Telex đơn giản, VNI, 75 test; release ~0,15 µs/phím; 0 từ sai / 474 từ, 0 khôi phục nhầm / 15.796 âm tiết, fuzz 800k thao tác không crash |
 | M2 Bộ gõ tối thiểu | đang làm | — | TextEdit + Safari đạt; selectedRange p50 ~0,3 ms ≈ 6–7% thời gian phím có thay (insertText chiếm chủ yếu); còn 4 app |
 | M3 Độ tin cậy | chưa | — | |
-| M4 App Cài đặt | đang làm | — | DauShared + cửa sổ 4 mục xong (2d6206e, c731c61; 25 test); bộ gõ đọc cài đặt chung + D5 (0aa4872, 30 test IMK); chờ người dùng thử `docs/M4-TESTING.md`; cách hiểu D5 đã chốt. Cần Team ID để App Group chia sẻ thật |
+| M4 App Cài đặt | đang làm | lần 1 CHƯA ĐẠT (N5 gạch chân/D20 trên UI, menu "Cài đặt Dấu…", mã chết, ngoại lệ màu D9/D25) | DauShared + cửa sổ 4 mục xong (2d6206e, c731c61; 25 test); bộ gõ đọc cài đặt chung + D5 (0aa4872, 30 test IMK); chờ người dùng thử `docs/M4-TESTING.md`; cách hiểu D5 đã chốt. Cần Team ID để App Group chia sẻ thật |
 | M5 Onboarding, cài, gỡ | chưa | — | |
 | M6 Hiệu năng dưới tải | chưa | — | |
 | M7 Phát hành | chưa | — | |
@@ -102,3 +102,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 29/10/2026 — người dùng xác nhận giao diện Cài đặt (mép phải, thanh cuộn) đã ổn
 - 29/10/2026 — đẩy repo công khai lên https://github.com/thevuong/dau (nhánh main, theo yêu cầu người dùng); đã quét lịch sử không có khoá/token — phiên chính
 - 29/10/2026 — người dùng cấp quyền Trợ năng cho Claude; phiên chính tự gõ thử bằng System Events: TextEdit đúng; VS Code và Terminal SAI (lệch dự đoán con trỏ → reset). Slack không cài. Chờ chẩn đoán (imk-dev)
+- 29/10/2026 — kiểm toán M4 lần 1 — auditor — CHƯA ĐẠT; ma trận UI mã 0, test 25/76/30/9 xanh. Giao app-ui-dev sửa N5 + mã chết + ARCHITECTURE; imk-dev thêm "Cài đặt Dấu…" sau chẩn đoán VS Code/Terminal; hỏi người dùng D9/D25 (ngoại lệ màu, banner cam, nút Nâng cao)
