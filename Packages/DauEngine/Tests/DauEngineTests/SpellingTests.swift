@@ -1,0 +1,59 @@
+import Testing
+import DauEngine
+
+/// Group 4 — syllable spelling (D31) and stopping transforms on misspelled words (D30).
+@Suite("4. Chính tả âm tiết (D30, D31)")
+struct SpellingTests {
+    /// D31 c/k/q, g/gh, ng/ngh distribution: misspelled words stop transforming (D30)
+    /// and are restored as typed (D4).
+    @Test(arguments: [
+        Case("ce ", "ce "), Case("ces", "ces"), Case("cis", "cis"),
+        Case("ka ", "ka "), Case("kas", "kas"), Case("kis", "kí"), Case("kys", "ký"),
+        Case("ghu ", "ghu "), Case("ghus", "ghus"), Case("ghis", "ghí"), Case("ghees", "ghế"),
+        Case("ngi ", "ngi "), Case("ngif", "ngif"), Case("nghix", "nghĩ"),
+        Case("ges", "ges"), Case("gaf", "gà"),
+        Case("qa ", "qa "), Case("qas", "qas"), Case("quas", "quá"),
+    ])
+    func initialDistribution(_ c: Case) { expectTyped(c.keys, c.expected) }
+
+    /// D31: "p" is an initial (pin, pa-tê).
+    @Test(arguments: [Case("pin ", "pin "), Case("pins ", "pín "), Case("pa ", "pa ")])
+    func initialP(_ c: Case) { expectTyped(c.keys, c.expected) }
+
+    /// D31: stop finals p, t, c, ch take only sắc or nặng; without a tone they are not
+    /// valid either. While typing only the prefix matters (D30), so the tone shows;
+    /// the full rule applies at the boundary.
+    @Test(arguments: [
+        Case("catf", "càt"), Case("catf ", "catf "), Case("capf ", "capf "),
+        Case("cacr ", "cacr "), Case("cachx ", "cachx "),
+        Case("bak ", "bak "), Case("bach ", "bach "), Case("hoc ", "hoc "),
+        Case("vieet ", "vieet "),  // "viêt" without a tone is not a syllable.
+        Case("cats ", "cát "), Case("hocj ", "học "), Case("cachs ", "cách "),
+        Case("carcs", "các"),      // tone typed before the final, changed later
+    ])
+    func stopFinals(_ c: Case) { expectTyped(c.keys, c.expected) }
+
+    /// D31: ă and â do not end a syllable; D30: they are fine while typing.
+    @Test(arguments: [
+        Case("aw ", "aw "), Case("aa ", "aa "), Case("traw", "tră"), Case("trawngf ", "trằng "),
+        Case("caan ", "cân "),
+    ])
+    func breveAndCircumflexNeedFinal(_ c: Case) { expectTyped(c.keys, c.expected) }
+
+    /// D30: once the word cannot become a syllable, later keys are plain letters.
+    @Test(arguments: [
+        Case("Hasaki", "Hấki"), Case("windows", "ưindows"), Case("banana", "bânna"),
+        Case("banana ", "banana "), Case("lazy ", "lazy "), Case("fanf", "fanf"),
+        Case("jas", "jas"), Case("zas", "zas"),
+    ])
+    func stopTransforming(_ c: Case) { expectTyped(c.keys, c.expected) }
+
+    /// Rhyme table spot checks: valid rhymes stay, invalid clusters are restored.
+    @Test(arguments: [
+        Case("khuyas ", "khuýa "), Case("oangf ", "oàng "), Case("hoawcj ", "hoặc "),
+        Case("ngoeos ", "ngoéo "), Case("yeeu ", "yêu "), Case("uoongs ", "uống "),
+        Case("ooa ", "ooa "), Case("aoa ", "aoa "), Case("ieu ", "ieu "),
+        Case("thuowr ", "thuở "), Case("huow ", "huơ "),
+    ])
+    func rhymes(_ c: Case) { expectTyped(c.keys, c.expected) }
+}
