@@ -3,7 +3,7 @@
 Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị nén) tiếp tục đúng chỗ. Phiên chính cập nhật file này sau mỗi bước.
 
 ## Trạng thái hiện tại
-- Mốc đang làm: M1 — M1b Telex xong (cf5c2bb, ebfce9a, 50 test xanh); M1c VNI xong; engine 70 test xanh (HEAD a59c44f/ba6a2b8). Kiểm toán M1 lần 1: CHƯA ĐẠT chỉ vì 2 tài liệu lệch — đã sửa (7d28fb2). Siết D31 + test bổ sung (19fd8f1, 48c839c): 72 test xanh. Chờ người dùng 3 câu (D28 tắt × phím biến đổi xa; địa danh Đắk Lắk/Kạn/Krông; VNI U23 → Ủ) rồi kiểm toán lại. M2 bắt đầu song song (imk-dev).
+- Mốc đang làm: M1 — M1b Telex xong (cf5c2bb, ebfce9a, 50 test xanh); M1c VNI xong; engine 70 test xanh (HEAD a59c44f/ba6a2b8). Kiểm toán M1 lần 1: CHƯA ĐẠT chỉ vì 2 tài liệu lệch — đã sửa (7d28fb2). Siết D31 + test bổ sung (19fd8f1, 48c839c): 72 test xanh. Người dùng đã chốt 3 câu (D28, D31 nới địa danh, D36); engine-dev đang làm D31 + đo ảnh hưởng, sau đó kiểm toán lại. M2 bắt đầu song song (imk-dev).
 - Việc đang chờ người dùng: Bundle ID / Team ID (placeholder `com.example.dau`, Team ID trống — người dùng sẽ gửi sau)
 - M1a xong: `docs/OPENKEY-NOTES.md` (commit b0739c7).
 - M0: khung xong (commit b2a331d, 06f0dcb, 6fe660b), phiên chính đã kiểm chứng lại: xcodegen + build Debug 2 target với `-destination 'generic/platform=macOS'` ra `x86_64 arm64`, swift test 2 package xanh, bộ gõ không có network.client. Tên hiển thị "Dấu" cho locale `en` đã sửa (0b188dd). **Kiểm toán M0: ĐẠT.**
@@ -69,3 +69,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 29/10/2026 — sửa engine theo D20/D33 mới, 70 test xanh, Telex 0,151 / VNI 0,141 µs/phím release (a59c44f, ba6a2b8); làm rõ câu chữ D20 cho khớp ví dụ "viet" + j → "vietj" người dùng đã duyệt — engine-dev, phiên chính
 - 29/10/2026 — kiểm toán M1 lần 1 — auditor — CHƯA ĐẠT (ARCHITECTURE DauEngine lệch mã; OPENKEY-NOTES `uow` + 3 chỗ cũ) → phiên chính sửa tài liệu
 - 29/10/2026 — siết D31 (iê/yê, c + oa/uy) + test VNI hoa, hofa kiểu cũ, ⌫ hết từ — engine-dev — 72 test xanh, Telex 0,152 / VNI 0,144 µs/phím (19fd8f1, 48c839c)
+- 29/10/2026 — người dùng duyệt: D28 tắt vẫn cho phím biến đổi từ xa; D31 nới k/âm cuối k/kr cho địa danh (đo ảnh hưởng); D36 VNI chữ số sau âm tiết thành dấu — phiên chính — xong
