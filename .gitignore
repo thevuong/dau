@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Xcode — Dau.xcodeproj is generated from project.yml by XcodeGen
+Dau.xcodeproj/
+*.xcworkspace/
+!Packages/**/*.xcworkspace/
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Release artifacts and secrets (never commit)
+*.dmg
+*.p12
+*.cer
+*.mobileprovision
+*.provisionprofile
+.env
