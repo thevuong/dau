@@ -7,11 +7,11 @@ Danh sách việc người dùng làm trên máy để kiểm chứng mốc M2. 
 1. Thoát các bộ gõ tiếng Việt khác đang chạy (OpenKey, EVKey, GoTiengViet…), kể cả trong Mục đăng nhập.
 2. Trong Terminal, ở thư mục repo: `scripts/install-debug.sh`. Script build bản Debug, chép `DauInputMethod.app` vào `~/Library/Input Methods`, dừng tiến trình bộ gõ cũ và in các bước bật nguồn nhập liệu.
 3. Làm theo các bước script in ra: Cài đặt hệ thống › Bàn phím › Nguồn đầu vào › Sửa… › "+" › Tiếng Việt › "Dấu – Tiếng Việt" › Thêm. Thêm cả "Dấu – Tiếng Anh" (nằm trong ngôn ngữ Tiếng Anh). Không thấy "Dấu" thì đăng xuất, đăng nhập lại rồi làm lại.
-4. Chọn "Dấu – Tiếng Việt" ở menu nguồn nhập liệu trên thanh menu.
+4. Chọn "Dấu – Tiếng Việt" ở menu nguồn nhập liệu trên thanh menu. Nếu máy bật "Tự động chuyển sang nguồn đầu vào của tài liệu" (Cài đặt hệ thống › Bàn phím › Nguồn đầu vào), mỗi ứng dụng/cửa sổ nhớ nguồn riêng: phải chọn lại "Dấu – Tiếng Việt" **sau khi** chuyển sang từng ứng dụng thử, và nhìn biểu tượng V trên thanh menu trước khi gõ.
 5. (Tuỳ chọn, để xem lỗi nếu bộ gõ không chạy) mở một cửa sổ Terminal riêng:
-   `log stream --predicate 'process == "DauInputMethod"'`
+   `/usr/bin/log stream --predicate 'process == "DauInputMethod"'` (trong zsh, `log` là lệnh có sẵn khác, phải gõ đường dẫn đầy đủ)
 
-Bản Debug ghi một dòng log cho mỗi phím, category `perf`, chỉ gồm loại sự kiện, thời gian (ns) và bundle ID của ứng dụng đang gõ. **Không** ghi chữ bạn gõ (D8). Có thể tự kiểm: `log show --last 5m --predicate 'category == "perf"' --style compact`.
+Bản Debug ghi một dòng log cho mỗi phím, category `perf`, chỉ gồm loại sự kiện, thời gian (ns) và bundle ID của ứng dụng đang gõ. **Không** ghi chữ bạn gõ (D8). Có thể tự kiểm: `/usr/bin/log show --last 5m --predicate 'category == "perf"' --style compact`.
 
 ## 1. Câu mẫu
 
