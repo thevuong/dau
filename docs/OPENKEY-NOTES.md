@@ -107,6 +107,8 @@ Các phím được xử lý (`IS_SPECIALKEY` trong `DataType.h`): `a e o w d s 
 
 ### 3.4 VNI
 
+- **Dấu (D36):** chữ số gõ ngay sau một âm tiết hợp lệ thành dấu ("U23" → "Ủ", "lan2" → "làn"); gõ đúp để giữ chữ số ("U223" → "U23"); chữ số khi bộ đệm rỗng đi thẳng ("2024").
+
 - 1 sắc, 2 huyền, 3 hỏi, 4 ngã, 5 nặng.
 - 6 thêm mũ cho a/e/o **gần cuối từ nhất** ("toi" + `6` → "tôi").
 - 7 thêm móc cho o/u, áp dụng cả cụm "uo" → "ươ".
@@ -164,7 +166,7 @@ Hai kiểu chỉ khác nhau ở oa, oe, uy **khi không có phụ âm cuối**. 
 
 - Sau **mỗi** phím, nếu bộ đệm có dấu thanh thì engine gỡ dấu ra và đặt lại theo cụm nguyên âm hiện tại (`checkGrammar`). Ví dụ "ho" + `f` → "hò", gõ tiếp `a` → "hoà" (kiểu mới). Nhờ vậy người dùng gõ dấu ở bất kỳ đâu sau nguyên âm đầu, kể cả sau phụ âm cuối, và dấu vẫn vào đúng chỗ.
 - Biến `vFreeMark` trong engine có nghĩa **ngược** với cái tên: bật nó thì engine **không** đặt lại dấu ("dấu ở đâu để đó"). Ở bản macOS, `OpenKey.mm` luôn gán 0 khi khởi động, bỏ qua giá trị đã lưu. Nghĩa là trên thực tế dấu luôn được tự đặt lại, còn nút "FreeMark" trong cửa sổ chỉ có tác dụng tới lần mở app sau (B18).
-- **Dấu (đã chốt, D28):** bật thì phím dấu thanh gõ ở bất kỳ đâu sau nguyên âm đầu, kể cả sau phụ âm cuối; dấu tự vào đúng nguyên âm và tự dời khi gõ thêm nguyên âm ("hof" + a → "hoà"). Phím d sau nguyên âm vẫn biến d đầu từ thành đ ("did" → "đi"). Tắt thì phím dấu chỉ có tác dụng khi gõ ngay sau nguyên âm (dấu đã đặt vẫn tự dời khi gõ thêm nguyên âm) và d → đ chỉ khi hai d liền nhau. Đây là nghĩa (a) ở M2, khác nghĩa biến `vFreeMark` của OpenKey.
+- **Dấu (đã chốt, D28):** bật thì phím dấu thanh gõ ở bất kỳ đâu sau nguyên âm đầu, kể cả sau phụ âm cuối; dấu tự vào đúng nguyên âm và tự dời khi gõ thêm nguyên âm ("hof" + a → "hoà"). Phím d sau nguyên âm vẫn biến d đầu từ thành đ ("did" → "đi"). Tắt thì phím dấu chỉ có tác dụng khi gõ ngay sau nguyên âm (dấu đã đặt vẫn tự dời khi gõ thêm nguyên âm) và d → đ chỉ khi hai d liền nhau; phím biến đổi nguyên âm (w, aa, ee, oo; VNI 6, 7, 8) vẫn tác dụng từ xa ("tuongw" → "tương"). Đây là nghĩa (a) ở M2, khác nghĩa biến `vFreeMark` của OpenKey.
 
 ### 3.8 Kiểm tra chính tả âm tiết
 
