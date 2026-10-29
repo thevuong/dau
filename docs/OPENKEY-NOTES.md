@@ -477,7 +477,10 @@ Cột "Ghi chú" dẫn số quyết định khi kết quả do quyết định �
 | `tatf␣` | `tatf␣` | vần t không mang huyền | |
 | `capf␣` | `capf␣` | vần p không mang huyền | **Khác (cố ý)**. OpenKey: "càp" |
 | `cacr␣` | `cacr␣` | vần c không mang hỏi | |
-| `kas␣` | `kas␣` | k không đứng trước a | **Khác (cố ý)**. OpenKey: "ká" |
+| `kas␣` | `ká␣` | D31 nới cho địa danh: k đứng trước mọi nguyên âm | Giống OpenKey (sau khi nới) |
+| `DDawks Lawks␣`, `Bawsc Kajn␣`, `Kroong Pawsc␣`, `Kow Tu␣` | `Đắk Lắk␣`, `Bắc Kạn␣`, `Krông Pắc␣`, `Kơ Tu␣` | D31 phương án d (âm cuối k chỉ sau ă, phụ âm đầu kr) | |
+| `ask␣`, `task␣`, `desk␣`, `hawk␣` | giữ nguyên | D31: âm cuối k không nhận sau a/e; "ăk" không dấu không hợp lệ | |
+| `karma␣`, `hawks␣`, `awkward␣` | `kẩm␣`, `hắk␣`, `akward␣` | hệ quả đã chấp nhận của D31 phương án d | |
 | `ghus␣` | `ghus␣` | gh chỉ đứng trước i, e, ê | **Khác (cố ý)** |
 | `aw␣` | `aw␣` | ă không đứng cuối âm tiết (D31) | **Khác (cố ý)**. OpenKey: "ă" |
 | `pin␣` / `pins␣` | `pin␣` / `pín␣` | "p" đơn là phụ âm đầu hợp lệ (D31) | |
