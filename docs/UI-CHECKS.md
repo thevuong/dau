@@ -1,0 +1,45 @@
+# Kiểm tra giao diện
+
+Danh sách phải chạy hết trước khi báo xong bất kỳ thay đổi giao diện nào của app Dấu. Mỗi mục là một lỗi người dùng đã gặp ở M4, kèm cách kiểm và chỉ số đạt.
+
+## Lệnh
+
+1. Build Debug:
+   `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project Dau.xcodeproj -scheme Dau -configuration Debug -destination 'generic/platform=macOS' -derivedDataPath build/DerivedData build`
+2. Kiểm cửa sổ thật:
+   `scripts/check-settings-window/run.sh <thư-mục-ra>`
+   - Chép bản Debug và ký lại không sandbox để được ghi ảnh. Chạy `Dau --capture-window` với mọi tổ hợp: thanh cuộn {overlay `WhenScrolling`, `Always`, `Automatic`} × cuộn {0, 60 pt}. Mỗi lần chụp 4 mục × {sáng, tối}.
+   - Ảnh lấy từ window server nên có material, vibrancy và hiệu ứng mép cuộn.
+   - Kiểm (a)–(e) bên dưới. Ghi `matrix-grid.png` (mỗi hàng một tổ hợp). Thoát với mã 0 chỉ khi mọi kiểm tra đạt.
+   - Cửa sổ được đưa ra ngoài màn hình nhưng vẫn tồn tại vài giây mỗi lần chạy.
+3. So với mockup:
+   `swift run --package-path scripts/snapshot-settings SnapshotSettings <ra> <thư-mục-artboard> [<thư-mục-chụp-thật>]`
+   - Ghi ảnh ghép mockup | app (`*-compare-*.png`, sidebar 4×, segmented 3×, header Ứng dụng 3×) và bảng khung phần tử.
+   - Kiểm khung 4 mục trong cửa sổ dựng tay: in "Layout: identical in all sections", thoát 1 nếu lệch.
+4. Test: `swift test --package-path scripts/snapshot-settings` (ví dụ do engine tính, phím tắt, ô tìm sidebar).
+
+Toạ độ tính bằng pt, gốc ở góc trên-trái cửa sổ 820×600.
+
+## Danh sách
+
+| # | Lỗi đã gặp | Cách kiểm | Đạt khi |
+|---|---|---|---|
+| 1 | Nội dung co thành cột hẹp, căn giữa (do `Form(.grouped)`) | run.sh, khung `content`, `firstCard` | `content` x 220, rộng = độ rộng cột (600 với thanh cuộn overlay); `firstCard` x 248 |
+| 2 | Nhảy bố cục khi đổi mục (toolbar đổi cao, tiêu đề đổi chỗ) | run.sh (a); snapshot-settings "Layout" | (a) `content`, `firstCard` (x, rộng), `title`, `close` bằng nhau ở 4 mục, lệch 0 pt |
+| 3 | Màu không theo HIG (tự pha nền, chữ cố định) | `grep -nE "Color\(red\|#[0-9a-fA-F]{6}\|\.opacity\(\|gradient\|blended" Apps/Dau/Sources` | Không có kết quả, trừ màu ô icon sidebar (hình minh hoạ, D9) |
+| 4 | Mất đèn giao thông | run.sh (e) | `close` = 19,19 14×14 ở mọi ảnh |
+| 5 | Icon sidebar sai (glyph, màu, cỡ, sát chữ) | `sidebar-compare-*.png`; khung `sidebarRow-*` | Ô 22, bo 6, màu #0A64D8 / #7A3FD1 / #C2410C / #1F7A4D, glyph theo SVG mockup; hàng cao 24 + 8 của list (vệt chọn 32), cách nhau 32 |
+| 6 | Segmented "Kiểu gõ" hẹp, căn giữa | khung `segmented` (frames.json) | x 264, rộng 512 (trải hết card trừ 16 mỗi bên) |
+| 7 | Ô tìm và "+" dính nhau thành một khối glass | run.sh (e); `apps-header-compare-*.png` | `headerSearch` x 556 ± 2, rộng 200; `headerAdd` bắt đầu sau mép phải ô tìm ít nhất 8 pt |
+| 8 | Nút "+" méo (bầu dục) | `apps-header-compare-*.png` | Viền nút tròn: rộng bằng cao, đo trên ảnh |
+| 9 | Header không che nội dung khi cuộn | run.sh (d), cuộn 60 pt | Vùng header (x 390–540, y 6–46) khác ảnh chưa cuộn trung bình ≤ 4/255 |
+| 10 | Thiếu thanh cuộn (nằm ngoài cửa sổ) | run.sh (b), (d); khung `scroller` | Mục có cuộn: `scroller` x ≥ 700, mép phải ≤ 820, y ≥ 51 |
+| 11 | Dải hở ở mép phải (cột thanh cuộn chừa sẵn) | run.sh (b), (c) | (b) màu nền trang ở mép phải (hoặc sát trái thanh cuộn) trùng màu nền trang bên trái, lệch ≤ 6/255; vạch dưới header có ở x 600 và x 817 cùng hàng. (c) dải 24 pt ở mép phải không có điểm nào khác màu nền trang, trừ thanh cuộn |
+
+## Đã biết, chưa đạt
+
+- **(a) với thanh cuộn legacy** (`Always`, hoặc `Automatic` khi có chuột): trên mục cuộn được (Cập nhật & hỗ trợ), hệ thống hiện thanh cuộn và trừ độ rộng của nó, nên nội dung hẹp hơn 17 pt so với các mục không cuộn (`content` 583 so với 600, `firstCard` 527 so với 544).
+  - `.scrollIndicators(.visible)` không giữ thanh cuộn ở các mục không cuộn.
+  - Tắt `autohidesScrollers` của `NSScrollView` thì rãnh luôn hiện, nhưng SwiftUI vẫn dàn nội dung rộng 600 ở mục không cuộn.
+  - Cách chừa sẵn 17 pt đã bị bỏ vì sinh lỗi 11.
+  - Đang chờ quyết định.
