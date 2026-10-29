@@ -102,6 +102,21 @@ targets:
       - package: DauShared
       - sdk: InputMethodKit.framework
 
+  # Logic tests for the input method's pure helpers (key routing, cursor tracking).
+  # No host app: the files are compiled straight into the test bundle.
+  DauInputMethodTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Apps/DauInputMethod/Tests
+      - path: Apps/DauInputMethod/Sources/KeyRouter.swift
+      - path: Apps/DauInputMethod/Sources/CursorTracker.swift
+    settings:
+      base:
+        PRODUCT_NAME: DauInputMethodTests
+        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).inputmethod.tests
+        GENERATE_INFOPLIST_FILE: YES
+
 schemes:
   Dau:
     build:
@@ -117,5 +132,9 @@ schemes:
         DauInputMethod: all
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - DauInputMethodTests
     archive:
       config: Release
