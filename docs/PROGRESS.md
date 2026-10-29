@@ -80,3 +80,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 29/10/2026 — kiểm toán M1 lần 2 — auditor — **ĐẠT** (75 test, 512 từ Việt: chỉ "ăk" + phím biến đổi sau k; 16.960 âm tiết: 0 khôi phục nhầm từ chuẩn; fuzz 800k không crash; 0 cấp phát). Đóng M1. Người dùng chọn giữ: "lakws" không biến đổi, gõ "lawks" (ghi vào D31)
 - 29/10/2026 — gõ thử TextEdit (người dùng): câu mẫu ra đúng, không gạch chân, không nhảy chữ — tiêu chí M2 còn Safari
 - 29/10/2026 — gõ thử Safari (người dùng): câu mẫu ra đúng, không gạch chân, không nhảy chữ → tiêu chí "TextEdit và Safari không gạch chân" của M2 đạt. Còn: đo Chrome, Slack, VS Code, Terminal để chốt A/B và câu hỏi Chrome/Terminal, rồi kiểm toán M2
+- 29/10/2026 — gõ thử Chrome (người dùng): câu mẫu ra đúng, không gạch chân, không nhảy chữ; selectedRange trả vị trí hợp lệ → Chrome không cần quyền Trợ năng/gạch chân. Còn Slack, VS Code, Terminal
