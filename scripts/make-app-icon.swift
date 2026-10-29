@@ -1,16 +1,22 @@
 // Builds the temporary app icon for Dấu: "ấ" in Giấy on a Mực plate, the circumflex in the
 // letter colour and only the acute in Son (docs/BRAND.md "Biểu tượng", D25).
 //
-// The letter is outlined: glyph contours are extracted once from Be Vietnam Pro (SIL OFL 1.1)
-// into Resources/Brand/app-icon-glyphs.txt, so rendering never needs the font. The font file
-// itself is never committed.
+// Geometry follows the canvas mockup "Nhận diện – biểu tượng ứng dụng" (a 100 × 100 design):
+//   letter "a"   Be Vietnam Pro Bold (700), size 64, centred on x = 48, baseline y = 80
+//   circumflex   stroke M34 35 L47 25 L60 35, width 7, round caps and joins, Giấy
+//   acute        stroke M63 24 L73 13, width 7.5, round caps, Son
+// The 100 grid is mapped onto the 824 × 824 plate of the macOS icon grid (1024 canvas).
+//
+// Only the letter comes from the font: its contours are extracted once into
+// Resources/Brand/app-icon-glyphs.txt, so rendering never needs the font (never commit the
+// font file). The marks are drawn as strokes and converted to outlined paths.
 //
 // TODO(M7): the official icon is built in Icon Composer (Default / Dark / Clear / Tinted
 // appearances on macOS 26+) plus an .icns for macOS 14–15; this script is a stand-in.
 //
 // Usage (normally via scripts/make-app-icon.sh):
-//   make-app-icon.swift outline <BeVietnamPro-*.ttf> <glyphs.txt>
-//       Extract the contours of "ấ" (a, circumflex, acute) in font units, y up.
+//   make-app-icon.swift outline <BeVietnamPro-Bold.ttf> <glyphs.txt>
+//       Extract the contours and advance width of "a" in font units, y up.
 //   make-app-icon.swift render <glyphs.txt> <svg-dir> <appiconset-dir> [<preview-dir>]
 //       Write the SVG sources (one per size variant), the AppIcon.appiconset PNGs and
 //       Contents.json, and optionally icon-512.png + sizes.png for review.
@@ -53,7 +59,7 @@ func svgData(_ path: Path) -> String {
     }.joined(separator: " ")
 }
 
-/// Parses the absolute M/L/Q/C/Z subset written by `svgData` and by `outline`.
+/// Parses the absolute M/L/Q/C/Z subset written by `svgData`.
 func parse(_ d: String) -> Path {
     var tokens: [String] = []
     var cur = ""
@@ -116,6 +122,22 @@ func cgPath(_ path: Path) -> CGPath {
     return p
 }
 
+func path(_ cg: CGPath) -> Path {
+    var out: Path = []
+    cg.applyWithBlock { e in
+        let el = e.pointee
+        switch el.type {
+        case .moveToPoint: out.append(.move(el.points[0]))
+        case .addLineToPoint: out.append(.line(el.points[0]))
+        case .addQuadCurveToPoint: out.append(.quad(el.points[0], el.points[1]))
+        case .addCurveToPoint: out.append(.cubic(el.points[0], el.points[1], el.points[2]))
+        case .closeSubpath: out.append(.close)
+        @unknown default: break
+        }
+    }
+    return out
+}
+
 func bounds(_ path: Path) -> CGRect { cgPath(path).boundingBoxOfPath }
 
 // MARK: - outline: font → glyph contours
@@ -123,53 +145,25 @@ func bounds(_ path: Path) -> CGRect { cgPath(path).boundingBoxOfPath }
 func outline(fontURL: URL, out: URL) throws {
     guard let descs = CTFontManagerCreateFontDescriptorsFromURL(fontURL as CFURL) as? [CTFontDescriptor],
           let desc = descs.first else { fatalError("cannot read font \(fontURL.path)") }
-    let font = CTFontCreateWithFontDescriptor(desc, CGFloat(CTFontGetUnitsPerEm(CTFontCreateWithFontDescriptor(desc, 1, nil))), nil)
-    var chars = Array("ấ".utf16)
+    let upm = CGFloat(CTFontGetUnitsPerEm(CTFontCreateWithFontDescriptor(desc, 1, nil)))
+    let font = CTFontCreateWithFontDescriptor(desc, upm, nil)  // 1 point = 1 font unit
+    var chars = Array("a".utf16)
     var glyphs = [CGGlyph](repeating: 0, count: chars.count)
     guard CTFontGetGlyphsForCharacters(font, &chars, &glyphs, chars.count),
           let glyphPath = CTFontCreatePathForGlyph(font, glyphs[0], nil) else {
-        fatalError("font has no glyph for ấ")
+        fatalError("font has no glyph for a")
     }
-    // Split into contours.
-    var contours: [Path] = []
-    var cur: Path = []
-    glyphPath.applyWithBlock { e in
-        let el = e.pointee
-        switch el.type {
-        case .moveToPoint:
-            if !cur.isEmpty { contours.append(cur) }
-            cur = [.move(el.points[0])]
-        case .addLineToPoint: cur.append(.line(el.points[0]))
-        case .addQuadCurveToPoint: cur.append(.quad(el.points[0], el.points[1]))
-        case .addCurveToPoint: cur.append(.cubic(el.points[0], el.points[1], el.points[2]))
-        case .closeSubpath: cur.append(.close)
-        @unknown default: break
-        }
-    }
-    if !cur.isEmpty { contours.append(cur) }
-
-    // Letter body: contours that stay below the top of the x-height overshoot.
-    // Marks: the rest; the acute is the mark that sits furthest right (Vietnamese stacking).
-    let xHeight = CTFontGetXHeight(font)
-    var body: Path = []
-    var marks: [Path] = []
-    for c in contours {
-        if bounds(c).maxY <= xHeight + 40 { body += c } else { marks.append(c) }
-    }
-    guard marks.count == 2 else { fatalError("expected 2 mark contours, found \(marks.count)") }
-    marks.sort { bounds($0).midX < bounds($1).midX }
-    let circumflex = marks[0], acute = marks[1]
-
+    let advance = CTFontGetAdvancesForGlyphs(font, .horizontal, glyphs, nil, 1)
     let name = CTFontCopyFullName(font) as String
     let version = (CTFontCopyName(font, kCTFontVersionNameKey) as String?) ?? "?"
     let text = """
-    # Outlines of "ấ" from \(name) (\(version)), SIL Open Font License 1.1,
+    # Outline of "a" from \(name) (\(version)), SIL Open Font License 1.1,
     # https://github.com/bettergui/BeVietnamPro (via github.com/google/fonts, ofl/bevietnampro).
-    # Font units (\(CTFontGetUnitsPerEm(font))/em), y up, baseline 0. Generated by
+    # Font units (\(Int(upm))/em), y up, baseline 0. Generated by
     # scripts/make-app-icon.sh outline; the font file is not part of the repo.
-    a \(svgData(body))
-    circumflex \(svgData(circumflex))
-    acute \(svgData(acute))
+    em \(fmt(upm))
+    advance \(fmt(advance))
+    a \(svgData(path(glyphPath)))
 
     """
     try text.write(to: out, atomically: true, encoding: .utf8)
@@ -180,9 +174,15 @@ func outline(fontURL: URL, out: URL) throws {
 
 let canvas: CGFloat = 1024
 // macOS (Big Sur and later) icon grid: 824 × 824 plate centred on the 1024 canvas,
-// continuous ("squircle") corners with radius ≈ 185.4.
+// continuous ("squircle") corners with radius ≈ 185.4 (mockup: rx 22.4 on 100 ≈ 184.6).
 let plateRect = CGRect(x: 100, y: 100, width: 824, height: 824)
 let plateRadius: CGFloat = 185.4
+
+/// Mockup 100 × 100 design space → canvas.
+let grid = plateRect.width / 100
+func fromGrid(_ p: CGPoint) -> CGPoint {
+    CGPoint(x: plateRect.minX + grid * p.x, y: plateRect.minY + grid * p.y)
+}
 
 /// Rounded rect with continuous corners (the iOS 7+/macOS 11+ shape), y down.
 /// Control points follow the widely published reconstruction of UIBezierPath's
@@ -194,8 +194,8 @@ func squircle(_ r: CGRect, radius: CGFloat) -> Path {
     func br(_ a: CGFloat, _ b: CGFloat) -> CGPoint { CGPoint(x: r.maxX - a * k, y: r.maxY - b * k) }
     func bl(_ a: CGFloat, _ b: CGFloat) -> CGPoint { CGPoint(x: r.minX + a * k, y: r.maxY - b * k) }
     typealias F = (CGFloat, CGFloat) -> CGPoint
-    // One corner, starting on the horizontal edge and ending on the vertical edge (or the
-    // reverse, depending on `f`): the same five segments for every corner.
+    // One corner, from one edge to the next; `swap` mirrors the corner for the corners that
+    // start on a vertical edge.
     func corner(_ f: F, swap: Bool) -> Path {
         func q(_ a: CGFloat, _ b: CGFloat) -> CGPoint { swap ? f(b, a) : f(a, b) }
         return [
@@ -217,23 +217,22 @@ func squircle(_ r: CGRect, radius: CGFloat) -> Path {
     return p
 }
 
-/// Per-size adjustments. Small icons get thicker marks (BRAND.md: "Ở 16–32 pt tăng độ dày
-/// nét dấu"), lifted a little so the circumflex does not merge with the letter, and a
-/// slightly larger letter. Values are canvas units (1024 grid).
+/// Per-size adjustments. Small icons get thicker marks on the same centre lines
+/// (BRAND.md: "Ở 16–32 pt tăng độ dày nét dấu") and a slightly larger letter, scaled about
+/// the top of its x-height so the gap under the circumflex stays. Widths in grid units.
 struct Variant {
-    let name: String        // SVG file suffix
-    let maxPixels: Int      // used for rendered sizes up to this many pixels
-    let markStroke: CGFloat // extra outline width on circumflex and acute (fill colour)
-    let letterStroke: CGFloat
-    let markLift: CGFloat
-    let scale: CGFloat
+    let name: String          // SVG file suffix
+    let maxPixels: Int        // used for rendered sizes up to this many pixels
+    let circumflexWidth: CGFloat
+    let acuteWidth: CGFloat
+    let letterScale: CGFloat
 }
 
 let variants: [Variant] = [
-    Variant(name: "16", maxPixels: 16, markStroke: 40, letterStroke: 6, markLift: 72, scale: 1.12),
-    Variant(name: "32", maxPixels: 32, markStroke: 26, letterStroke: 0, markLift: 36, scale: 1.05),
-    Variant(name: "64", maxPixels: 64, markStroke: 12, letterStroke: 0, markLift: 12, scale: 1.0),
-    Variant(name: "", maxPixels: .max, markStroke: 0, letterStroke: 0, markLift: 0, scale: 1.0),
+    Variant(name: "16", maxPixels: 16, circumflexWidth: 10, acuteWidth: 10.5, letterScale: 1.06),
+    Variant(name: "32", maxPixels: 32, circumflexWidth: 8.5, acuteWidth: 9, letterScale: 1.03),
+    Variant(name: "64", maxPixels: 64, circumflexWidth: 7.6, acuteWidth: 8.1, letterScale: 1.0),
+    Variant(name: "", maxPixels: .max, circumflexWidth: 7, acuteWidth: 7.5, letterScale: 1.0),
 ]
 
 func variant(forPixels px: Int) -> Variant { variants.first { px <= $0.maxPixels }! }
@@ -256,32 +255,47 @@ struct Layer {
     let id: String
     let path: Path
     let fill: Colour
-    let stroke: CGFloat
 }
 
-/// Letter height on the plate: font units → canvas units at the default size.
-let baseScale: CGFloat = 0.62
+struct Glyph {
+    let em: CGFloat
+    let advance: CGFloat
+    let a: Path
+}
 
-func layers(glyphs: [String: Path], variant v: Variant) -> [Layer] {
-    guard let a = glyphs["a"], let circ = glyphs["circumflex"], let acute = glyphs["acute"] else {
-        fatalError("glyph file must define a, circumflex and acute")
-    }
-    let s = baseScale * v.scale
-    // Centre the letter body horizontally (the acute hangs to the right, as in text), and
-    // centre the whole stack (letter bottom to acute top) vertically, nudged down a touch
-    // because the marks are lighter than the letter.
-    let body = bounds(a)
-    let all = bounds(a + circ + acute).union(bounds(acute).offsetBy(dx: 0, dy: v.markLift / s))
-    let cx = plateRect.midX - s * body.midX + 6
-    let cy = plateRect.midY + s * all.midY + 12  // canvas y of font baseline
-    func place(_ lift: CGFloat) -> (CGPoint) -> CGPoint {
-        { CGPoint(x: cx + s * $0.x, y: cy - s * $0.y - lift) }
+// Mockup letter placement (grid units).
+let letterSize: CGFloat = 64
+let letterCentreX: CGFloat = 48
+let letterBaseline: CGFloat = 80
+
+/// Outlines a round-capped polyline given in grid units.
+func outlinedStroke(_ points: [CGPoint], width: CGFloat) -> Path {
+    let line = CGMutablePath()
+    line.addLines(between: points.map(fromGrid))
+    return path(line.copy(strokingWithWidth: width * grid, lineCap: .round, lineJoin: .round, miterLimit: 10))
+}
+
+func layers(glyph g: Glyph, variant v: Variant) -> [Layer] {
+    // SVG text-anchor="middle" centres the advance box on x.
+    let k = letterSize / g.em
+    let originX = letterCentreX - k * g.advance / 2
+    let top = bounds(g.a).maxY  // top of the x-height (font units)
+    let anchor = CGPoint(x: letterCentreX, y: letterBaseline - k * top)
+    let a = transform(g.a) { p in
+        let m = CGPoint(x: originX + k * p.x, y: letterBaseline - k * p.y)
+        return fromGrid(CGPoint(x: anchor.x + (m.x - anchor.x) * v.letterScale,
+                                y: anchor.y + (m.y - anchor.y) * v.letterScale))
     }
     return [
-        Layer(id: "plate", path: squircle(plateRect, radius: plateRadius), fill: muc, stroke: 0),
-        Layer(id: "a", path: transform(a, place(0)), fill: giay, stroke: v.letterStroke),
-        Layer(id: "circumflex", path: transform(circ, place(v.markLift)), fill: giay, stroke: v.markStroke),
-        Layer(id: "acute", path: transform(acute, place(v.markLift)), fill: son, stroke: v.markStroke),
+        Layer(id: "plate", path: squircle(plateRect, radius: plateRadius), fill: muc),
+        Layer(id: "a", path: a, fill: giay),
+        Layer(id: "circumflex",
+              path: outlinedStroke([CGPoint(x: 34, y: 35), CGPoint(x: 47, y: 25), CGPoint(x: 60, y: 35)],
+                                   width: v.circumflexWidth),
+              fill: giay),
+        Layer(id: "acute",
+              path: outlinedStroke([CGPoint(x: 63, y: 24), CGPoint(x: 73, y: 13)], width: v.acuteWidth),
+              fill: son),
     ]
 }
 
@@ -296,7 +310,7 @@ func svg(_ layers: [Layer], variant v: Variant) -> String {
     var lines = [
         #"<?xml version="1.0" encoding="UTF-8"?>"#,
         "<!-- Dấu app icon (temporary, docs/BRAND.md). Generated by scripts/make-app-icon.sh; do not edit by hand. -->",
-        "<!-- Letter outlined from Be Vietnam Pro (SIL OFL 1.1); no font needed to render. -->",
+        "<!-- Letter outlined from Be Vietnam Pro Bold (SIL OFL 1.1), marks are outlined strokes; no font needed. -->",
         "<!-- TODO(M7): official icon is built in Icon Composer (Default/Dark/Clear/Tinted). -->",
     ]
     if !v.name.isEmpty {
@@ -312,9 +326,6 @@ func svg(_ layers: [Layer], variant v: Variant) -> String {
     ]
     for l in layers {
         var attrs = "id=\"\(l.id)\" fill=\"\(l.fill.hex)\""
-        if l.stroke > 0 {
-            attrs += " stroke=\"\(l.fill.hex)\" stroke-width=\"\(fmt(l.stroke))\" stroke-linejoin=\"round\""
-        }
         if l.id == "plate" { attrs += " filter=\"url(#shadow)\"" }
         lines.append("  <path \(attrs) d=\"\(svgData(l.path))\"/>")
     }
@@ -324,14 +335,18 @@ func svg(_ layers: [Layer], variant v: Variant) -> String {
 
 // MARK: - Raster
 
-func render(_ layers: [Layer], pixels px: Int) -> CGImage {
-    guard let ctx = CGContext(data: nil, width: px, height: px, bitsPerComponent: 8, bytesPerRow: 0,
+func bitmap(_ w: Int, _ h: Int) -> CGContext {
+    guard let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0,
                               space: CGColorSpace(name: CGColorSpace.sRGB)!,
                               bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
         fatalError("cannot create bitmap context")
     }
+    return ctx
+}
+
+func render(_ layers: [Layer], pixels px: Int) -> CGImage {
+    let ctx = bitmap(px, px)
     let k = CGFloat(px) / canvas
-    ctx.interpolationQuality = .high
     ctx.setShouldAntialias(true)
     // Flip to the SVG coordinate system (y down).
     ctx.translateBy(x: 0, y: CGFloat(px))
@@ -346,13 +361,6 @@ func render(_ layers: [Layer], pixels px: Int) -> CGImage {
         ctx.addPath(cgPath(l.path))
         ctx.setFillColor(l.fill.cg)
         ctx.fillPath()
-        if l.stroke > 0 {
-            ctx.addPath(cgPath(l.path))
-            ctx.setStrokeColor(l.fill.cg)
-            ctx.setLineWidth(l.stroke)
-            ctx.setLineJoin(.round)
-            ctx.strokePath()
-        }
         ctx.restoreGState()
     }
     return ctx.makeImage()!
@@ -372,9 +380,7 @@ func contactSheet(_ images: [(Int, CGImage)]) -> CGImage {
     let pad = 24, magnified = 256
     let width = pad + images.count * (magnified + pad)
     let height = pad + 2 * (128 + pad) + magnified + pad
-    let ctx = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0,
-                        space: CGColorSpace(name: CGColorSpace.sRGB)!,
-                        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+    let ctx = bitmap(width, height)
     // y up: bottom row = magnified, then dark, then light at the top.
     ctx.setFillColor(CGColor(srgbRed: 0.93, green: 0.93, blue: 0.94, alpha: 1))
     ctx.fill(CGRect(x: 0, y: 0, width: width, height: height))
@@ -394,19 +400,25 @@ func contactSheet(_ images: [(Int, CGImage)]) -> CGImage {
     return ctx.makeImage()!
 }
 
-func renderAll(glyphFile: URL, svgDir: URL, iconset: URL, preview: URL?) throws {
-    var glyphs: [String: Path] = [:]
-    for line in try String(contentsOf: glyphFile, encoding: .utf8).split(separator: "\n") {
+func loadGlyph(_ url: URL) throws -> Glyph {
+    var fields: [String: String] = [:]
+    for line in try String(contentsOf: url, encoding: .utf8).split(separator: "\n") {
         if line.hasPrefix("#") || line.trimmingCharacters(in: .whitespaces).isEmpty { continue }
         guard let sp = line.firstIndex(of: " ") else { continue }
-        glyphs[String(line[..<sp])] = parse(String(line[line.index(after: sp)...]))
+        fields[String(line[..<sp])] = String(line[line.index(after: sp)...])
     }
+    guard let em = fields["em"].flatMap(Double.init), let adv = fields["advance"].flatMap(Double.init),
+          let a = fields["a"] else { fatalError("glyph file must define em, advance and a") }
+    return Glyph(em: CGFloat(em), advance: CGFloat(adv), a: parse(a))
+}
 
+func renderAll(glyphFile: URL, svgDir: URL, iconset: URL, preview: URL?) throws {
+    let glyph = try loadGlyph(glyphFile)
     let fm = FileManager.default
     try fm.createDirectory(at: svgDir, withIntermediateDirectories: true)
     for v in variants {
         let name = v.name.isEmpty ? "AppIcon.svg" : "AppIcon-\(v.name).svg"
-        try svg(layers(glyphs: glyphs, variant: v), variant: v)
+        try svg(layers(glyph: glyph, variant: v), variant: v)
             .write(to: svgDir.appendingPathComponent(name), atomically: true, encoding: .utf8)
         print("wrote \(svgDir.appendingPathComponent(name).path)")
     }
@@ -417,7 +429,7 @@ func renderAll(glyphFile: URL, svgDir: URL, iconset: URL, preview: URL?) throws 
     var cache: [Int: CGImage] = [:]
     func image(_ px: Int) -> CGImage {
         if let i = cache[px] { return i }
-        let i = render(layers(glyphs: glyphs, variant: variant(forPixels: px)), pixels: px)
+        let i = render(layers(glyph: glyph, variant: variant(forPixels: px)), pixels: px)
         cache[px] = i
         return i
     }
