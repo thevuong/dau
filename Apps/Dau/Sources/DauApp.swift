@@ -3,10 +3,10 @@ import SwiftUI
 import DauShared
 
 /// Host app: the Settings window (M4). Onboarding (M5) and updates (M7) come later.
+/// The entry point is main.swift, which pins the localization first.
 ///
 /// The Settings window is the app's main window, so opening Dấu (from Finder or from
 /// the input menu's "Cài đặt Dấu…") shows it. ⌘, reopens it after it was closed.
-@main
 struct DauApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var model = SettingsModel.appGroup()
