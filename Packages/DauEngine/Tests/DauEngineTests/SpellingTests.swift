@@ -48,6 +48,27 @@ struct SpellingTests {
     ])
     func stopTransforming(_ c: Case) { expectTyped(c.keys, c.expected) }
 
+    /// D31: iê without an initial is written yê; yê after a consonant needs the u of
+    /// uyê (or qu); c never takes oa, oă, oe, uy, uê, uâ (written qu). Misspelled forms
+    /// stop transforming and are restored; the valid spellings next to them stay.
+    @Test(arguments: [
+        Case("ieen ", "ieen "), Case("ieeu ", "ieeu "), Case("ieens", "ieens"),
+        Case("tyeen ", "tyeen "), Case("tyeens", "tyeens"),
+        Case("coa ", "coa "), Case("coas", "coas"), Case("coan ", "coan "), Case("coawn ", "coawn "),
+        Case("coe ", "coe "), Case("cuy ", "cuy "), Case("cuys", "cuys"), Case("cuee ", "cuee "),
+        Case("cuaan ", "cuaan "),
+    ])
+    func misspelledRhymes(_ c: Case) { expectTyped(c.keys, c.expected) }
+
+    @Test(arguments: [
+        Case("yeen ", "yên "), Case("yeeu ", "yêu "), Case("khuyeen ", "khuyên "),
+        Case("tuyeets ", "tuyết "), Case("quyeenr ", "quyển "), Case("quar ", "quả "),
+        Case("quy ", "quy "), Case("hoa ", "hoa "), Case("khoer ", "khoẻ "), Case("cuar ", "của "),
+        Case("cuoons ", "cuốn "), Case("cuowps ", "cướp "), Case("kieens ", "kiến "),
+        Case("ia ", "ia "), Case("uyeen ", "uyên "), Case("gieets ", "giết "),
+    ])
+    func validCounterparts(_ c: Case) { expectTyped(c.keys, c.expected) }
+
     /// Rhyme table spot checks: valid rhymes stay, invalid clusters are restored.
     @Test(arguments: [
         Case("khuyas ", "khuýa "), Case("oangf ", "oàng "), Case("hoawcj ", "hoặc "),

@@ -118,6 +118,10 @@ enum Spelling {
         }
 
         var rs = v          // first letter of the rhyme
+        // Rhymes this initial cannot take (D31): iê needs an initial (else "yê"),
+        // yê after a consonant needs the u of uyê/quyê, c never takes oa/oă/oe/uy/uê/uâ
+        // (those are written with qu).
+        var restrict: UInt8 = v == 0 ? Restrict.noInitial : Restrict.consonantInitial
         var glide: UInt8 = 0 // 'u' after q, 'i' after g, prepended when matching rhymes
         let c0 = w.code(0)
         var first: UInt8 = 0 // base of the first rhyme letter, for c/k/g/gh/ng/ngh rules
@@ -128,6 +132,7 @@ enum Spelling {
             if !w.isVowel(2) { return false }
             rs = 2
             glide = Ch.u
+            restrict = 0
             let fc = w.code(2)
             let fb = Code.base(fc)
             if fb == Ch.u || fb == Ch.i { return false }
@@ -153,6 +158,7 @@ enum Spelling {
             if !contains(initials, packed) && !(allowZFWJ && contains(extraInitials, packed)) {
                 return false
             }
+            if packed == pack(Ch.c) { restrict |= Restrict.initialC }
             first = w.base[v]
             let frontVowel = first == Ch.e || first == Ch.i || first == Ch.y
             switch packed {
@@ -181,9 +187,9 @@ enum Spelling {
             packed |= UInt32(w.code(rs + k)) << (8 * UInt32(k))
             k += 1
         }
-        var ok = rhymeMatches(packed, length: length, mode: mode)
+        var ok = rhymeMatches(packed, length: length, mode: mode, restrict: restrict)
         if !ok && glide != 0 && length <= 3 {
-            ok = rhymeMatches(UInt32(glide) | packed << 8, length: length + 1, mode: mode)
+            ok = rhymeMatches(UInt32(glide) | packed << 8, length: length + 1, mode: mode, restrict: 0)
         }
         if !ok { return false }
 
@@ -250,7 +256,28 @@ enum Spelling {
         return false
     }
 
-    static func rhymeMatches(_ packed: UInt32, length: Int, mode: SpellMode) -> Bool {
+    enum Restrict {
+        static let initialC: UInt8 = 1
+        static let noInitial: UInt8 = 2
+        static let consonantInitial: UInt8 = 4
+    }
+
+    /// Whether table rhyme `e` is ruled out by the initial (see `Restrict`).
+    @inline(__always)
+    static func excluded(_ e: UInt32, _ restrict: UInt8) -> Bool {
+        if restrict == 0 { return false }
+        let b0 = UInt8(truncatingIfNeeded: e)
+        let b1 = UInt8(truncatingIfNeeded: e >> 8)
+        if restrict & Restrict.initialC != 0 {
+            if b0 == Ch.o && (b1 == Ch.a || b1 == Code.aBreve || b1 == Ch.e) { return true }
+            if b0 == Ch.u && (b1 == Ch.y || b1 == Code.eHat || b1 == Code.aHat) { return true }
+        }
+        if restrict & Restrict.noInitial != 0 && b0 == Ch.i && b1 == Code.eHat { return true }
+        if restrict & Restrict.consonantInitial != 0 && b0 == Ch.y && b1 == Code.eHat { return true }
+        return false
+    }
+
+    static func rhymeMatches(_ packed: UInt32, length: Int, mode: SpellMode, restrict: UInt8) -> Bool {
         let mask: UInt32 = length >= 4 ? 0xFFFF_FFFF : (UInt32(1) << (8 * UInt32(length))) - 1
         var i = 0
         while i < rhymes.count {
@@ -259,11 +286,13 @@ enum Spelling {
             let el = entryLength(e)
             switch mode {
             case .full:
-                if el == length && e == packed { return true }
+                if el == length && e == packed && !excluded(e, restrict) { return true }
             case .seeded:
-                if el >= length && (e & mask) == packed { return true }
+                if el >= length && (e & mask) == packed && !excluded(e, restrict) { return true }
             case .prefix:
-                if el >= length && compatiblePrefix(packed, e, length: length) { return true }
+                if el >= length && compatiblePrefix(packed, e, length: length) && !excluded(e, restrict) {
+                    return true
+                }
             }
         }
         return false
