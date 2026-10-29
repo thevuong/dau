@@ -1,0 +1,91 @@
+{
+  "sourceLanguage" : "vi",
+  "strings" : {
+    "Kiểu gõ" : {
+      "comment" : "Input menu: header of the typing method group.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiểu gõ"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiểu gõ"
+          }
+        }
+      }
+    },
+    "Mở cài đặt Bàn phím…" : {
+      "comment" : "Input menu: opens System Settings › Keyboard.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mở cài đặt Bàn phím…"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mở cài đặt Bàn phím…"
+          }
+        }
+      }
+    },
+    "Telex" : {
+      "comment" : "Input menu: typing method name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telex"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telex"
+          }
+        }
+      }
+    },
+    "Telex đơn giản" : {
+      "comment" : "Input menu: typing method name (D29).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telex đơn giản"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telex đơn giản"
+          }
+        }
+      }
+    },
+    "VNI" : {
+      "comment" : "Input menu: typing method name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VNI"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VNI"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
