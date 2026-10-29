@@ -81,6 +81,27 @@ enum Snapshot {
         return (Double(p[0]) / 255, Double(p[1]) / 255, Double(p[2]) / 255)
     }
 
+    /// The part `rect` (points, top-left origin) of a @2x bitmap, enlarged so one point
+    /// becomes `scale` pixels.
+    static func crop(_ rep: NSBitmapImageRep, _ rect: CGRect, scale: CGFloat) -> NSBitmapImageRep? {
+        let pointScale = CGFloat(rep.pixelsWide) / rep.size.width
+        let w = Int(rect.width * scale), h = Int(rect.height * scale)
+        guard let out = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: w, pixelsHigh: h,
+                                         bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+                                         colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0),
+              let cg = rep.cgImage,
+              let part = cg.cropping(to: CGRect(x: rect.minX * pointScale, y: rect.minY * pointScale,
+                                                width: rect.width * pointScale, height: rect.height * pointScale))
+        else { return nil }
+        NSGraphicsContext.saveGraphicsState()
+        let context = NSGraphicsContext(bitmapImageRep: out)
+        context?.imageInterpolation = .none
+        NSGraphicsContext.current = context
+        NSImage(cgImage: part, size: rect.size).draw(in: CGRect(x: 0, y: 0, width: w, height: h))
+        NSGraphicsContext.restoreGraphicsState()
+        return out
+    }
+
     /// Writes bitmaps side by side, top-aligned, with a gap.
     static func sideBySide(_ reps: [NSBitmapImageRep], to url: URL) {
         let gap = 40

@@ -135,6 +135,19 @@ let failed: Bool = MainActor.assumeIsolated {
                                            size: board.size, crop: crop, measure: measure),
                   let shot = app["\(board.page)-\(board.mode)"] else { print("cannot render \(board.file)"); continue }
             let real = realCapture("\(board.page)-\(board.mode)")
+            if board.page == "typing" {
+                // Sidebar only, 4×: the real-window capture does not draw the sidebar's
+                // vibrant content, so the app side is this tool's window.
+                let area = CGRect(x: 0, y: 0, width: 220, height: 280)
+                if let a = Snapshot.crop(mock.image, area, scale: 4), let b = Snapshot.crop(shot.rep, area, scale: 4) {
+                    Snapshot.sideBySide([a, b], to: outDir.appendingPathComponent("sidebar-compare-\(board.mode).png"))
+                }
+                // The "Kiểu gõ" card, 3×, against the real window when captured.
+                let card = CGRect(x: 246, y: 214, width: 548, height: 140)
+                if let a = Snapshot.crop(mock.image, card, scale: 3), let b = Snapshot.crop(real?.0 ?? shot.rep, card, scale: 3) {
+                    Snapshot.sideBySide([a, b], to: outDir.appendingPathComponent("segmented-compare-\(board.mode).png"))
+                }
+            }
             Snapshot.sideBySide([mock.image, real?.0 ?? shot.rep],
                                 to: outDir.appendingPathComponent("\(board.page)-compare-\(board.mode).png"))
             for key in ["close", "title", "firstCard", "segmented", "switch", "button"] {
