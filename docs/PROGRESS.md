@@ -92,3 +92,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 29/10/2026 — Cài đặt bỏ Form, tự dựng card bằng màu ngữ nghĩa (underPage/controlBackground/separator), toolbar trở lại có đèn giao thông, tiêu đề mục là ToolbarItem, SegmentedPicker bọc NSSegmentedControl trải ngang, nút capsule large, cửa sổ 820×600 — app-ui-dev (d6aa417, ddb38c8); bộ chụp dựng artboard bằng WKWebView + ghép mockup|app. Còn chờ người dùng: màu segmented khi cửa sổ active, sidebar vibrancy thật
 - 29/10/2026 — icon sidebar vẽ lại đúng path + mã màu mockup, hàng sidebar tự dựng (ô 22, khe 9), segmented phần chọn trung tính (`controlColor`) — app-ui-dev (a5045dc, fab8b95). Chờ người dùng xem trạng thái active
 - 29/10/2026 — người dùng chốt giữ control hệ thống (D9) dù segmented macOS 27 khác hình viên thuốc của mockup — phiên chính — ghi vào D9
+- 29/10/2026 — tách ô tìm và nút + ở header Ứng dụng (ToolbarSpacer), bỏ mọi phần tự vẽ theo D9 — app-ui-dev (0cdcffa, 439e0b1)
