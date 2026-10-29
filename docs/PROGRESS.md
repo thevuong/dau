@@ -103,3 +103,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 29/10/2026 — đẩy repo công khai lên https://github.com/thevuong/dau (nhánh main, theo yêu cầu người dùng); đã quét lịch sử không có khoá/token — phiên chính
 - 29/10/2026 — người dùng cấp quyền Trợ năng cho Claude; phiên chính tự gõ thử bằng System Events: TextEdit đúng; VS Code và Terminal SAI (lệch dự đoán con trỏ → reset). Slack không cài. Chờ chẩn đoán (imk-dev)
 - 29/10/2026 — kiểm toán M4 lần 1 — auditor — CHƯA ĐẠT; ma trận UI mã 0, test 25/76/30/9 xanh. Giao app-ui-dev sửa N5 + mã chết + ARCHITECTURE; imk-dev thêm "Cài đặt Dấu…" sau chẩn đoán VS Code/Terminal; hỏi người dùng D9/D25 (ngoại lệ màu, banner cam, nút Nâng cao)
+- 29/10/2026 — người dùng chốt: không ngoại lệ màu (icon sidebar dùng màu hệ thống), banner cam hệ thống, chấp nhận nút "Nâng cao" ghép — ghi vào D9 — phiên chính
