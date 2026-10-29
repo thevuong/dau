@@ -49,10 +49,11 @@ struct HeaderActions {
 /// Scrolling: the content scrolls under the toolbar, which covers it with the
 /// system's hard scroll-edge effect on macOS 26+ (a solid material edge, so the title
 /// stays readable) and with the toolbar's own material and separator on macOS 14–15.
-/// The scroll content width never depends on the page: with overlay scroll bars it
-/// is the full column; with legacy (always shown) scroll bars it always leaves the
-/// scroll bar's width free, on every page, so the scroll bar has its column inside
-/// the window and nothing moves between pages that scroll and pages that do not.
+/// The scroll view fills the detail column up to the window's right edge; its content
+/// fills the scroll view's width. Scroll indicators follow the system setting: overlay
+/// scroll bars take no room; a legacy scroll bar appears, and takes its width, only on
+/// a page that scrolls (`.scrollIndicators(.visible)` does not keep it on pages that
+/// fit — measured, see docs/UI-CHECKS.md).
 ///
 /// On macOS 26 and later the toolbar groups adjacent items on one glass background; a
 /// fixed spacer splits the search field and the + button into two controls, as in
@@ -69,31 +70,23 @@ struct SettingsPage<Content: View>: View {
         self.content = content()
     }
 
-    @State private var legacyScrollers = NSScroller.preferredScrollerStyle == .legacy
-
-    private var scrollerAllowance: CGFloat {
-        legacyScrollers ? NSScroller.scrollerWidth(for: .regular, scrollerStyle: .legacy) : 0
-    }
-
     var body: some View {
-        GeometryReader { outer in
-            ScrollView(.vertical) {
-                VStack(alignment: .leading, spacing: 18) {
-                    NotEnabledBanner()
-                    content
-                }
-                .padding(.top, 20)
-                .padding(.horizontal, 28)
-                .padding(.bottom, 24)
-                .frame(width: max(outer.size.width - scrollerAllowance, 0), alignment: .leading)
-                .layoutProbe("content")
+        ScrollView(.vertical) {
+            VStack(alignment: .leading, spacing: 18) {
+                NotEnabledBanner()
+                content
             }
-            .modifier(HardTopScrollEdge())
+            .padding(.top, 20)
+            .padding(.horizontal, 28)
+            .padding(.bottom, 24)
+            // Fill the scroll view's width; the system leaves out a legacy scroll bar
+            // when it shows one. No width is computed here.
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .layoutProbe("content")
         }
+        .scrollIndicators(.visible)
+        .modifier(HardTopScrollEdge())
         .background(SettingsColors.page)
-        .onReceive(NotificationCenter.default.publisher(for: NSScroller.preferredScrollerStyleDidChangeNotification)) { _ in
-            legacyScrollers = NSScroller.preferredScrollerStyle == .legacy
-        }
         .toolbar {
             if #available(macOS 26, *) {
                 ToolbarItem(placement: .navigation) { PageTitle(title: title) }

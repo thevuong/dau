@@ -21,3 +21,4 @@ struct HiddenWindowTitle: NSViewRepresentable {
         }
     }
 }
+
