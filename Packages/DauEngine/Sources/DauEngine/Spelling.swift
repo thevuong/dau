@@ -5,10 +5,10 @@ enum SpellMode {
     /// While typing (D30): can the word still become a valid syllable by adding
     /// letters, diacritics or a tone? "viêt", "hoc", "tră", "viet" all pass.
     case prefix
-    /// First key after `seed(displayed:)` (D20): the word must be a valid syllable,
-    /// or the start of one, *with the diacritics it has now* (no "viẹt"), and a stop
-    /// final may not carry huyền/hỏi/ngã. A missing tone is still allowed so that
-    /// "viet" + e → "viêt" can be followed by j → "việt".
+    /// First key after `seed(displayed:)` (D20): the D30 prefix level, except that
+    /// the vowels keep the diacritics they have now. D20 adds no other transform, so
+    /// "viet" + j → "viẹt" is not accepted (the plain e cannot be fixed by the same
+    /// key) while "viet" + e → "viêt" and "tra" + w → "tră" are.
     case seeded
     /// At a word boundary (D4, D21): a complete valid syllable.
     case full
@@ -131,7 +131,7 @@ enum Spelling {
             let fc = w.code(2)
             let fb = Code.base(fc)
             if fb == Ch.u || fb == Ch.i { return false }
-            if fc == Ch.o && mode != .prefix { return false }
+            if fc == Ch.o && mode == .full { return false }
         } else if v == 1 && c0 == Ch.g && w.base[1] == Ch.i {
             if n > 2 && w.isVowel(2) {
                 // "gi" + vowel: "gia", "giữa", "giết" (gi + iêt written "giêt").
@@ -194,10 +194,8 @@ enum Spelling {
                 switch mode {
                 case .full:
                     if w.tone != Tone.acute && w.tone != Tone.dot { return false }
-                case .seeded:
-                    if w.tone == Tone.grave || w.tone == Tone.hook || w.tone == Tone.tilde { return false }
-                case .prefix:
-                    break // D30: the tone can still change before the word ends.
+                case .prefix, .seeded:
+                    break // D30, D20: the tone can still change before the word ends.
                 }
             }
         }

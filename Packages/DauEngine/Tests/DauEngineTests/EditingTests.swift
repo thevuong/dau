@@ -62,6 +62,17 @@ struct EditingTests {
         #expect(t.string == "Hasakiaaaass ")
     }
 
+    /// D33 with auto restore off: the word only stops transforming.
+    @Test func overflowWithoutAutoRestore() {
+        var t = Typist(noRestore)
+        t.type("Hasakiaaa")
+        #expect(t.string == "Hấkiaaa")
+        t.type("a")
+        #expect(t.string == "Hấkiaaaa")
+        t.type("ss ")
+        #expect(t.string == "Hấkiaaaass ")
+    }
+
     @Test func longWordsLoseNothing() {
         let word = String(repeating: "vieetj", count: 7)   // 42 keys
         expectTyped(word + " ", word + " ")

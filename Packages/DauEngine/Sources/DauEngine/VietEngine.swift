@@ -121,7 +121,8 @@ public struct VietEngine: Sendable {
     /// read as letters (not keystrokes). Call with the word right before the cursor
     /// when the buffer is empty, then pass the key to `handle`. The seeded text becomes
     /// the restore baseline (D4). The first key after seeding applies only if the
-    /// result is valid with the diacritics shown ("viet" + j → "vietj").
+    /// result is a valid prefix (D30) with the diacritics shown ("viet" + j → "vietj",
+    /// "viet" + e → "viêt"); a double key still undoes (D26: "cả" + r → "car").
     ///
     /// Accepts precomposed or decomposed (NFD) text. Returns false, and stays empty,
     /// if the text is not a word the engine can track (non-letters, more than 7
@@ -212,15 +213,14 @@ public struct VietEngine: Sendable {
                     if w.count >= Word.maxLetters { return startOverflow(v) }
                     w.append(base: info.base, mod: Mod.none, upper: info.upper)
                 }
-                if !seeded || isValid(w, .seeded) {
-                    word = w
-                    if lock { lockedByDouble = true }
-                    lockedBySpelling = !isValid(word, .prefix)
-                    if !isLocked { word.placeTone(modern: modern) }
-                    let rendered = render(word)
-                    raw = rendered // D4: the baseline after a double key is the text shown.
-                    return commit(typed: v)
-                }
+                // A double key always undoes, also on a seeded word (D20: "cả" + r → "car").
+                word = w
+                if lock { lockedByDouble = true }
+                lockedBySpelling = !isValid(word, .prefix)
+                if !isLocked { word.placeTone(modern: modern) }
+                let rendered = render(word)
+                raw = rendered // D4: the baseline after a double key is the text shown.
+                return commit(typed: v)
             case .appendHornedU:
                 if w.count >= Word.maxLetters { return startOverflow(v) }
                 w.append(base: Ch.u, mod: Mod.hook, upper: info.upper, standalone: true)
@@ -372,7 +372,7 @@ public struct VietEngine: Sendable {
     }
 
     /// Breve/horn key: Telex w (a, o, u), VNI 7 (o, u) and VNI 8 (a).
-    /// "uo" gets the horn on both, except an open "uơ" (thuở, huơ). With no target in
+    /// "uo" gets the horn on both, except an open "uơ" (thuở, huơ; D35). With no target in
     /// the word, Telex w appends "ư" (`loneU`, D23); Telex đơn giản keeps the letter w
     /// (D29); VNI keeps the digit.
     func hookKey(_ w: inout Word, mode: SpellMode, onA: Bool, onOU: Bool, loneU: Bool) -> Outcome {
@@ -505,11 +505,11 @@ public struct VietEngine: Sendable {
     }
 
     /// D33: the word is longer than any syllable. Restore the keys typed (if anything
-    /// was transformed) and let the rest of the word through.
+    /// was transformed and auto restore is on) and let the rest of the word through.
     mutating func startOverflow(_ v: UInt32) -> Action {
         overflow = true
         var action = Action.passThrough
-        if raw != screen {
+        if options.autoRestore && raw != screen {
             var output = raw
             output.append(v)
             action = VietEngine.diff(from: screen, to: output, typed: nil)

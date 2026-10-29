@@ -32,7 +32,13 @@ struct SeedTests {
         SeedCase("hòa", "s", "hoá"),        // re-placed in the current (modern) style
         SeedCase("nha", "fk ", "nhafk "),   // D4: baseline = seeded text + keys typed after
         SeedCase("nha", "f ", "nhà "),
-        SeedCase("tra", "w", "tră"),        // valid start of a syllable (D30 prefix)
+        SeedCase("tra", "w", "tră"),        // valid start of a syllable (D20 uses the D30 prefix level)
+        SeedCase("viet", "e", "viêt"),
+        SeedCase("cả", "r", "car"),         // D20 + D26: a double key undoes the tone
+        SeedCase("cả", "r ", "car "),       // D4: the baseline after the double is the text shown
+        SeedCase("cả", "rs", "cars"),       // D26: locked until the word ends
+        SeedCase("hoc", "f", "hòc"),        // D30 prefix: the tone can still change…
+        SeedCase("hoc", "f ", "hocf "),     // …but "hòc" is not a syllable at the boundary (D31)
         SeedCase("tra", "w ", "traw "),     // …but not a syllable at the boundary
     ])
     func seeded(_ c: SeedCase) {
