@@ -9,7 +9,8 @@
 # Usage:
 #   scripts/perf-report.sh                      last 1 hour, all apps
 #   scripts/perf-report.sh --last 10m           any `log show --last` value
-#   scripts/perf-report.sh --app com.apple.TextEdit
+#   scripts/perf-report.sh --app TextEdit       bundle ID or part of it, any case
+#                                               (TextEdit, com.apple.Safari, chrome, slack)
 #   scripts/perf-report.sh --input FILE         parse saved `log show --style compact` output
 #
 # Subsystem = the input method's bundle ID, read from the installed bundle; override with
@@ -22,7 +23,7 @@ INPUT=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --last) LAST="${2:?--last cần giá trị, ví dụ 10m}"; shift 2 ;;
-    --app) APP_FILTER="${2:?--app cần bundle ID}"; shift 2 ;;
+    --app) APP_FILTER="${2:?--app cần tên app hoặc bundle ID}"; shift 2 ;;
     --input) INPUT="${2:?--input cần đường dẫn file}"; shift 2 ;;
     -h|--help) sed -n '2,17p' "$0"; exit 0 ;;
     *) echo "Tham số không hợp lệ: $1" >&2; exit 2 ;;
@@ -49,7 +50,7 @@ TMP="$(mktemp)"
 trap 'rm -f "$TMP"' EXIT
 
 # Step 1: one row per measurement: "<app> <metric> <value>".
-read_log | awk -v want="$APP_FILTER" '
+read_log | awk -v want="$(printf '%s' "$APP_FILTER" | tr '[:upper:]' '[:lower:]')" '
   function field(name,   i, n, parts) {
     for (i = 1; i <= NF; i++) {
       if (index($i, name "=") == 1) { return substr($i, length(name) + 2) }
@@ -59,7 +60,7 @@ read_log | awk -v want="$APP_FILTER" '
   / key kind=/ {
     app = field("app"); kind = field("kind")
     if (app == "" || kind == "") next
-    if (want != "" && app != want) next
+    if (want != "" && index(tolower(app), want) == 0) next
     print app, "count_" kind, 1
     h = field("handle_ns"); s = field("sel_ns"); i = field("ins_ns")
     if (h != "") print app, "handle_us", h / 1000
@@ -71,7 +72,7 @@ read_log | awk -v want="$APP_FILTER" '
   }
   / event name=/ {
     app = field("app"); name = field("name")
-    if (want != "" && app != want) next
+    if (want != "" && index(tolower(app), want) == 0) next
     if (app != "" && name != "") print app, "event_" name, 1
   }
 ' | sort -k1,1 -k2,2 -k3,3g > "$TMP"
@@ -79,6 +80,11 @@ read_log | awk -v want="$APP_FILTER" '
 if [[ ! -s "$TMP" ]]; then
   echo "Không có số đo nào (subsystem $SUBSYSTEM, --last $LAST${APP_FILTER:+, app $APP_FILTER})."
   echo "Kiểm tra: bộ gõ bản Debug đã cài và đã gõ thử trong khoảng thời gian này chưa?"
+  if [[ -n "$APP_FILTER" ]]; then
+    echo "--app so khớp một phần bundle ID (không phân biệt hoa thường), không nhận PID."
+    echo "Các app có số đo trong khoảng này:"
+    read_log | grep -o 'app=[^ ]*' | sort -u | sed 's/^app=/  /' || true
+  fi
   exit 0
 fi
 

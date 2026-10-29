@@ -46,7 +46,7 @@ Mỗi ứng dụng: mở một ô soạn thảo trống, gõ câu mẫu, ghi l�
 | VS Code | `com.microsoft.VSCode` | | | | | | |
 | Terminal | `com.apple.Terminal` | | | | | | |
 
-Bundle ID thật mà bộ gõ nhận được có thể khác cột trên (ví dụ tiến trình con của trình duyệt). Nếu `--app` không ra số, chạy `scripts/perf-report.sh --last 5m` không kèm `--app` và đọc tên ứng dụng trong kết quả.
+Bundle ID thật mà bộ gõ nhận được có thể khác cột trên (ví dụ tiến trình con của trình duyệt). `--app` nhận tên app hoặc một phần bundle ID, không phân biệt hoa thường (`--app TextEdit`, `--app chrome`), **không nhận PID**. Nếu `--app` không ra số, script in danh sách app có số đo trong khoảng thời gian đó.
 
 Ý nghĩa các loại sự kiện trong báo cáo:
 - `replace`: hỏi `selectedRange` rồi thay chữ tại chỗ bằng một lần `insertText` (cách A).
