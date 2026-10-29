@@ -61,6 +61,8 @@ struct Chip: View {
     var body: some View {
         text
             .font(.caption)
+            .lineLimit(1)
+            .fixedSize()
             .padding(.horizontal, 7)
             .padding(.vertical, 2)
             .background(.quaternary, in: Capsule())

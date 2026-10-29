@@ -24,7 +24,6 @@ struct SettingsWindow: View {
                 }
                 .tag(section)
             }
-            .navigationSplitViewColumnWidth(min: 210, ideal: 230, max: 280)
             .searchable(text: $query, placement: .sidebar, prompt: Text("Tìm kiếm"))
             .onChange(of: query) {
                 // Jump to the first match so the result is visible right away.
@@ -32,10 +31,12 @@ struct SettingsWindow: View {
                     selection = first
                 }
             }
+            // Wide enough for the longest section name, "Cập nhật & hỗ trợ".
+            .navigationSplitViewColumnWidth(min: 220, ideal: 230, max: 300)
         } detail: {
             SettingsDetail(section: selection ?? .typing)
         }
-        .frame(minWidth: 700, minHeight: 500)
+        .frame(minWidth: 820, minHeight: 520)
     }
 }
 
