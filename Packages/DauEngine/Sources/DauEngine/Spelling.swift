@@ -17,9 +17,10 @@ enum SpellMode {
 enum Spelling {
     // MARK: Tables
 
-    /// Initial consonants (D31), including "p" (pin, pa-tê). "gi" and "qu" are listed
-    /// only so that prefix checks accept "g", "q"; they are parsed specially.
-    static let initials: [UInt32] = parse("b c ch d đ g gh gi h k kh l m n ng ngh nh p ph qu r s t th tr v x")
+    /// Initial consonants (D31), including "p" (pin, pa-tê) and, for place names,
+    /// "kr" (Krông Pắc). "gi" and "qu" are listed only so that prefix checks accept
+    /// "g", "q"; they are parsed specially.
+    static let initials: [UInt32] = parse("b c ch d đ g gh gi h k kh kr l m n ng ngh nh p ph qu r s t th tr v x")
     /// Extra initials accepted with "Cho phép z, f, w, j" (D22).
     static let extraInitials: [UInt32] = parse("f j w z")
 
@@ -165,8 +166,9 @@ enum Spelling {
             case pack(Ch.c), pack(Ch.g), pack(Ch.n, Ch.g):
                 // c, g, ng never before i, e, ê, y (g + i is the "gi" case above).
                 if frontVowel { return false }
-            case pack(Ch.k), pack(Ch.g, Ch.h), pack(Ch.n, Ch.g, Ch.h):
-                // k, gh, ngh only before i, e, ê, y.
+            case pack(Ch.g, Ch.h), pack(Ch.n, Ch.g, Ch.h):
+                // gh, ngh only before i, e, ê, y. k may stand before any vowel for
+                // place names (D31: Kon Tum, Bắc Kạn, Kơ Tu).
                 if !frontVowel { return false }
             default:
                 break
@@ -181,10 +183,16 @@ enum Spelling {
         if k != n { return false }
         let length = n - rs
         if length > 4 { return false }
+        // D31, place names: final k only after ă ("ăk": Đắk, Lắk), matched as "ăc"
+        // with the same tone rule as c. Allowing k after every vowel turned common
+        // English words into syllables (ask → ák, task, desk, mask), so it stops here.
+        let finalK = finalStart == n - 1 && w.code(finalStart) == Ch.k
+            && finalStart >= 1 && w.code(finalStart - 1) == Code.aBreve
         var packed: UInt32 = 0
         k = 0
         while k < length {
-            packed |= UInt32(w.code(rs + k)) << (8 * UInt32(k))
+            let code = finalK && rs + k == finalStart ? Ch.c : w.code(rs + k)
+            packed |= UInt32(code) << (8 * UInt32(k))
             k += 1
         }
         var ok = rhymeMatches(packed, length: length, mode: mode, restrict: restrict)
@@ -196,7 +204,7 @@ enum Spelling {
         // Stop finals p, t, c, ch take only sắc or nặng (D31).
         if finalStart < n {
             let fc = w.code(finalStart)
-            if fc == Ch.p || fc == Ch.t || fc == Ch.c {
+            if fc == Ch.p || fc == Ch.t || fc == Ch.c || fc == Ch.k {
                 switch mode {
                 case .full:
                     if w.tone != Tone.acute && w.tone != Tone.dot { return false }

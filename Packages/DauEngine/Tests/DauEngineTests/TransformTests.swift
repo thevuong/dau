@@ -20,7 +20,7 @@ struct TransformTests {
     @Test(arguments: [
         Case("w", "ư"), Case("W", "Ư"), Case("ww", "w"), Case("www", "ww"),
         Case("wa", "ưa"), Case("wa ", "ưa "), Case("tw", "tư"), Case("trw", "trư"),
-        Case("ngw", "ngư"), Case("kw", "kw"),
+        Case("ngw", "ngư"), Case("kw", "kư"),   // D31: k before any vowel
     ])
     func loneW(_ c: Case) { expectTyped(c.keys, c.expected) }
 

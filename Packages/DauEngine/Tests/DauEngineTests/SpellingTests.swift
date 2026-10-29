@@ -8,7 +8,8 @@ struct SpellingTests {
     /// and are restored as typed (D4).
     @Test(arguments: [
         Case("ce ", "ce "), Case("ces", "ces"), Case("cis", "cis"),
-        Case("ka ", "ka "), Case("kas", "kas"), Case("kis", "kí"), Case("kys", "ký"),
+        // D31 place names: k may stand before any vowel (Kon Tum, Bắc Kạn).
+        Case("ka ", "ka "), Case("kas", "ká"), Case("kis", "kí"), Case("kys", "ký"),
         Case("ghu ", "ghu "), Case("ghus", "ghus"), Case("ghis", "ghí"), Case("ghees", "ghế"),
         Case("ngi ", "ngi "), Case("ngif", "ngif"), Case("nghix", "nghĩ"),
         Case("ges", "ges"), Case("gaf", "gà"),
@@ -68,6 +69,32 @@ struct SpellingTests {
         Case("ia ", "ia "), Case("uyeen ", "uyên "), Case("gieets ", "giết "),
     ])
     func validCounterparts(_ c: Case) { expectTyped(c.keys, c.expected) }
+
+    /// D31, place names: k before any vowel, the initial "kr", and final k after ă.
+    @Test(arguments: [
+        Case("DDawks Lawks", "Đắk Lắk"), Case("DDawks Lawks ", "Đắk Lắk "),
+        Case("Bawsc Kajn ", "Bắc Kạn "), Case("Kroong Pawsc ", "Krông Pắc "),
+        Case("Kow Tu ", "Kơ Tu "), Case("Kon Tum ", "Kon Tum "),
+        Case("lawk ", "lawk "),   // "ăk" is a stop rhyme: without sắc/nặng it is restored
+    ])
+    func placeNames(_ c: Case) { expectTyped(c.keys, c.expected) }
+
+    /// Accepted consequences of the D31 place-name rules (measured on a 428-word list):
+    /// these English words now spell a valid syllable, or start one, so Vietnamese wins
+    /// (D4) or a later key counts as a double (D26).
+    @Test(arguments: [
+        Case("karma ", "kẩm "), Case("Kansas ", "Kâns "), Case("Kris ", "Krí "),
+        Case("hawks ", "hắk "), Case("gawks ", "gắk "), Case("awkward ", "akward "),
+    ])
+    func placeNameSideEffects(_ c: Case) { expectTyped(c.keys, c.expected) }
+
+    /// Final k is not accepted elsewhere, so these stay as typed.
+    @Test(arguments: [
+        Case("ask ", "ask "), Case("task ", "task "), Case("desk ", "desk "), Case("hawk ", "hawk "),
+        Case("back ", "back "), Case("tracks ", "tracks "), Case("squawk ", "squawk "),
+        Case("Jack ", "Jack "), Case("risks ", "risks "),
+    ])
+    func englishWordsWithK(_ c: Case) { expectTyped(c.keys, c.expected) }
 
     /// Rhyme table spot checks: valid rhymes stay, invalid clusters are restored.
     @Test(arguments: [
