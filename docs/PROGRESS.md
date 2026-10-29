@@ -76,3 +76,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 29/10/2026 — D31 nới địa danh: đo 3 phương án (đầy đủ hỏng 19 từ Anh; d hỏng 6; a hỏng 3) — engine-dev — người dùng chọn d
 - 29/10/2026 — D31 phương án d vào mã + test địa danh — engine-dev — 75 test xanh, Telex 0,156 / VNI 0,147 µs/phím (31a04b3)
 - 29/10/2026 — kiểm toán M1 lần 2 — auditor — **ĐẠT** (75 test, 512 từ Việt: chỉ "ăk" + phím biến đổi sau k; 16.960 âm tiết: 0 khôi phục nhầm từ chuẩn; fuzz 800k không crash; 0 cấp phát). Đóng M1. Người dùng chọn giữ: "lakws" không biến đổi, gõ "lawks" (ghi vào D31)
+- 29/10/2026 — gõ thử TextEdit (người dùng): câu mẫu ra đúng, không gạch chân, không nhảy chữ — tiêu chí M2 còn Safari
