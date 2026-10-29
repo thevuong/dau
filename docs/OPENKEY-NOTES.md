@@ -134,7 +134,7 @@ Bộ gõ "Telex đơn giản" có sẵn của macOS hoạt động ra sao thì *
 
 **Dấu (đã chốt, D29):** "Telex đơn giản" = Telex trừ hai điểm: w chỉ biến đổi khi đứng sau a, o, u (aw, ow, uw), ở chỗ khác w là chữ w ("web", "www"); không có `[ ]` (D27). Không có gõ tắt w → qu (D23 chỉ VNI). Như vậy Dấu theo Simple Telex 1 nhưng **bỏ** w → qu mà Simple Telex 1 của OpenKey có.
 
-Lưu ý câu chữ: D29 ghi "đứng **ngay** sau a, o, u". Ở OpenKey Simple Telex 1, w vẫn biến đổi khi phụ âm cuối đã gõ trước ("tuongw" → "tương", qua mẫu vần như Telex). Ca `tuongw` ở 6.2 đang chờ người dùng duyệt câu chữ DECISIONS.
+D29 đã sửa câu chữ (29/10/2026): w biến đổi khi trong từ có a, o, u, không cần đứng sát (D28), giống Simple Telex 1 của OpenKey ("tuongw" → "tương").
 
 ### 3.6 Đặt dấu kiểu mới / kiểu cũ
 
@@ -340,7 +340,7 @@ Kết quả mong đợi viết theo chính tả tiếng Việt và DECISIONS.md,
 
 Cột "So với OpenKey" theo ba mức:
 - **Khác (cố ý)**: Dấu cố ý khác OpenKey.
-- **Chờ chốt**: kết quả phụ thuộc một quyết định chưa có. Hiện chỉ còn hai ca: `dD` và `duo7c59`.
+- **Chờ chốt**: không còn ca nào (`dD` → D34, `duo7c59` → D28, chốt 29/10/2026).
 - **Chờ duyệt câu chữ**: ca do phiên chính thêm theo các quyết định mới, **đang chờ người dùng duyệt câu chữ DECISIONS**. Gom ở 6.9.
 - Bỏ trống: kết quả được dự đoán là giống OpenKey.
 
@@ -431,7 +431,7 @@ Cột "Ghi chú" dẫn số quyết định khi kết quả do quyết định �
 | `VIEETJ` | `VIỆT` | |
 | `Vieetj` | `Việt` | |
 | `Dd` / `DD` | `Đ` | |
-| `dD` | `đ` (phím biến đổi không đổi kiểu hoa) | **Chờ chốt** (đề xuất, chưa có quyết định) |
+| `dD` | `đ` (phím biến đổi không đổi kiểu hoa) | D34 |
 | `W` | `Ư` | |
 | `a1␣` (Telex) | `a1␣` | |
 | `2024␣` (VNI) | `2024␣` | |
@@ -440,7 +440,7 @@ Cột "Ghi chú" dẫn số quyết định khi kết quả do quyết định �
 | `a71␣` (VNI) | `a71␣` | Khác (cố ý), B13 |
 | `toi6` (VNI) | `tôi` | |
 | `d9uo7c5` (VNI) | `được` | |
-| `duo7c59` (VNI, 9 gõ sau cùng) | `được` | **Chờ chốt**: D28 nói "phím d" sau nguyên âm (Telex); chưa nói rõ phím 9 của VNI |
+| `duo7c59` (VNI, 9 gõ sau cùng) | `được` | D28 (VNI 9 không cần đứng sát) |
 | `supercalifragilistic␣` | giữ nguyên | |
 | từ 40 chữ cái bất kỳ + `␣` | giữ nguyên, không mất chữ (D33) | Khác (cố ý), B15 |
 
@@ -493,23 +493,25 @@ Cột "Ghi chú" dẫn số quyết định khi kết quả do quyết định �
 | `viet` + `e` + `j` | `việt` | phím biến đổi cũng áp dụng (D20) |
 | `nha` + `f` (ra `nhà`), rồi `k␣` | `nhafk␣` | Mốc khôi phục = chữ hiển thị trước khi sửa + các phím gõ sau đó (suy ra từ D20 + D32, bài học B12; DECISIONS chưa ghi trực tiếp) |
 
-### 6.9 Ca thêm theo quyết định mới — đang chờ người dùng duyệt câu chữ DECISIONS
+### 6.9 Ca thêm theo quyết định mới (đã duyệt 29/10/2026)
 
-Phiên chính yêu cầu thêm các ca này. Kết quả mong đợi theo DECISIONS hiện hành, nhưng **đang chờ người dùng duyệt câu chữ DECISIONS**: chưa dùng làm tiêu chí đóng mốc cho tới khi được duyệt.
+Người dùng đã duyệt câu chữ DECISIONS cho các ca này (D4 mốc khôi phục, D26, D28, D29, D30, D33). Dùng làm tiêu chí đóng mốc.
 
 | Chuỗi phím | Mong đợi | Căn cứ | Ghi chú |
 |---|---|---|---|
-| `vieetj␣` | `việt␣` | D4, D28 | |
-| `hocj␣` | `học␣` | D4 | |
-| `trawngf␣` | `trằng␣` | D4, D31 | |
+| `vieetj␣` | `việt␣` | D30 (tiền tố), D28 | |
+| `hocj␣` | `học␣` | D30 (tiền tố) | |
+| `trawngf␣` | `trằng␣` | D30 (tiền tố), D31 | |
 | `aw␣` | `aw␣` | D31 | trùng 6.7 |
 | `carr␣` | `car␣` | D4, D26 | trùng 6.1 |
 | `tesst␣` | `test␣` | D4, D26 | trùng 6.1 |
-| `tesst` ⌫ `s` | `tess` | D32, D30 (hoặc D26) | "test" ⌫ → "tes"; "tes" không hợp lệ (s không là phụ âm cuối) nên `s` đi thẳng |
+| `tesst` ⌫ `s` | `tess` | D26 (khoá giữ sau ⌫), D32 | "test" ⌫ → "tes"; "tes" không hợp lệ (s không là phụ âm cuối) nên `s` đi thẳng |
 | `tuongw` (Telex) | `tương` | D29 cho Telex | |
-| `tuongw` (Telex đơn giản) | `tương` | D29 | Câu chữ D29 "w chỉ biến đổi khi đứng **ngay** sau a, o, u" hiểu sát chữ thì ra `tuongw`. Cần sửa câu chữ D29 nếu giữ kết quả này |
-| `did␣` (bỏ dấu tự do **tắt**) | `did␣` | D28 | D28 chỉ nói "phím dấu" khi tắt; ca này mở rộng sang phím d. Cần câu chữ rõ |
-| từ vượt 7 chữ cái (ví dụ `windowsx`) | khôi phục ngay về đúng phím đã gõ | D33 | D33 hiện ghi "ngừng biến đổi", không ghi "khôi phục ngay"; D4 ghi khôi phục khi kết thúc từ. Cần câu chữ rõ thời điểm |
+| `tuongw` (Telex đơn giản) | `tương` | D29 | |
+| `did␣` (bỏ dấu tự do **tắt**) | `did␣` | D28 | |
+| từ vượt 7 chữ cái (ví dụ `windowsx`) | khôi phục ngay về đúng phím đã gõ | D33 | |
+| `nha` + `f` + `k␣` (D20) | `nhafk␣` | D4 mốc khôi phục | mốc là chữ đọc từ ứng dụng |
+| `dD` | `đ` | D34 | |
 
 ---
 
