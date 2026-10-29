@@ -26,7 +26,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | M1 Engine | xong | ĐẠT (29/10, lần 2) | Telex, Telex đơn giản, VNI, 75 test; release ~0,15 µs/phím; 0 từ sai / 474 từ, 0 khôi phục nhầm / 15.796 âm tiết, fuzz 800k thao tác không crash |
 | M2 Bộ gõ tối thiểu | đang làm | — | mã xong (9999122…d5f0123), 14 test IMK xanh; chờ người dùng cài và gõ thử theo `docs/M2-TESTING.md` để đo A/B |
 | M3 Độ tin cậy | chưa | — | |
-| M4 App Cài đặt | chưa | — | |
+| M4 App Cài đặt | đang làm | — | app-ui-dev: DauShared settings model + cửa sổ Cài đặt 4 mục (song song, chờ M2) |
 | M5 Onboarding, cài, gỡ | chưa | — | |
 | M6 Hiệu năng dưới tải | chưa | — | |
 | M7 Phát hành | chưa | — | |
