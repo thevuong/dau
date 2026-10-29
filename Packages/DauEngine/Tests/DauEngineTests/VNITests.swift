@@ -26,7 +26,7 @@ struct VNITests {
     ])
     func marks(_ c: Case) { expectTyped(c.keys, c.expected, vni) }
 
-    /// 7 on "uo": both get the horn when something follows, "uơ" when open (thuở).
+    /// D35: 7 on "uo" gives "uơ" at the end of the word (thuở), "ươ" once a letter follows.
     @Test(arguments: [
         Case("uo7", "uơ"), Case("uo7n", "ươn"), Case("u7o", "ưo"), Case("u7on", "ươn"),
         Case("nguoi72", "người"), Case("thuo73", "thuở"), Case("huo7", "huơ"),

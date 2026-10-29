@@ -106,7 +106,7 @@ struct Word: Sendable, Equatable {
 
     /// "uơ"/"ưo" followed by another letter becomes "ươ" ("tưon" → "tươn",
     /// "đuơc" → "đươc", "huơu" → "hươu"). Without a following letter "uơ" stays, for
-    /// "thuở" and "huơ" (OPENKEY-NOTES B4).
+    /// "thuở" and "huơ" (D35).
     mutating func normalizeHornedUO() {
         let (s, e) = nucleus()
         var i = s

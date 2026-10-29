@@ -31,8 +31,8 @@ struct TransformTests {
     ])
     func tripleO(_ c: Case) { expectTyped(c.keys, c.expected) }
 
-    /// "uo" + w → ươ when something follows, "uơ" for an open syllable (thuở, huơ;
-    /// OPENKEY-NOTES B4, chosen for Dấu). "ưo"/"uơ" + a following letter → "ươ".
+    /// D35: "uo" + w → ươ when something follows, "uơ" when the pair ends the word
+    /// (thuở, huơ); "ưo"/"uơ" + a following letter → "ươ".
     @Test(arguments: [
         Case("nguoiwf", "người"), Case("nguwowif", "người"), Case("dduowcj", "được"),
         Case("truwowngf", "trường"), Case("tuwongf", "tường"), Case("thuowngf", "thường"),
