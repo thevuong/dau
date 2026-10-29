@@ -1,21 +1,49 @@
+import AppKit
 import SwiftUI
 import DauShared
 
-/// Host app. M0 scaffold only: a Settings scene placeholder.
-/// The real Settings window (sidebar, 4 sections), onboarding and updates come in M4/M5/M7.
+/// Host app: the Settings window (M4). Onboarding (M5) and updates (M7) come later.
+///
+/// The Settings window is the app's main window, so opening Dấu (from Finder or from
+/// the input menu's "Cài đặt Dấu…") shows it. ⌘, reopens it after it was closed.
 @main
 struct DauApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    @State private var model = SettingsModel.appGroup()
+    @State private var inputSource = InputSourceStatus()
+
     var body: some Scene {
-        Settings {
-            SettingsPlaceholderView()
+        Window(Text("Cài đặt Dấu"), id: SettingsScene.id) {
+            SettingsWindow()
+                .environment(model)
+                .environment(inputSource)
+        }
+        .windowResizability(.contentMinSize)
+        .commands {
+            SettingsCommands()
         }
     }
 }
 
-struct SettingsPlaceholderView: View {
-    var body: some View {
-        Text("Cài đặt")
-            .padding()
-            .frame(minWidth: 320, minHeight: 200)
+enum SettingsScene {
+    static let id = "settings"
+}
+
+/// Replaces the standard "Settings…" item so ⌘, opens the Settings window.
+struct SettingsCommands: Commands {
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some Commands {
+        CommandGroup(replacing: .appSettings) {
+            Button("Cài đặt…") { openWindow(id: SettingsScene.id) }
+                .keyboardShortcut(",", modifiers: .command)
+        }
+    }
+}
+
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    /// Dấu has no other window; closing Settings quits, like System Settings.
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        true
     }
 }

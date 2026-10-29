@@ -1,13 +1,922 @@
 {
   "sourceLanguage" : "vi",
   "strings" : {
-    "Cài đặt" : {
-      "comment" : "Placeholder title of the Settings window (M0 scaffold).",
+    "%@ gõ thêm %@ thành %@" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cài đặt"
+            "value" : "%@ gõ thêm %@ thành %@"
+          }
+        }
+      }
+    },
+    "%@ thành %@" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ thành %@"
+          }
+        }
+      }
+    },
+    "2 tuỳ chọn, 1 đang bật" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 tuỳ chọn, 1 đang bật"
+          }
+        }
+      }
+    },
+    "2 tuỳ chọn, đang tắt" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 tuỳ chọn, đang tắt"
+          }
+        }
+      }
+    },
+    "Beta" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beta"
+          }
+        }
+      }
+    },
+    "Báo lỗi…" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Báo lỗi…"
+          }
+        }
+      }
+    },
+    "Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt."
+          }
+        }
+      }
+    },
+    "Bật lại" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bật lại"
+          }
+        }
+      }
+    },
+    "Bật mục này sẽ tắt Cho phép phụ âm z, f, w, j." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bật mục này sẽ tắt Cho phép phụ âm z, f, w, j."
+          }
+        }
+      }
+    },
+    "Bật mục này sẽ tắt Gõ tắt phụ âm." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bật mục này sẽ tắt Gõ tắt phụ âm."
+          }
+        }
+      }
+    },
+    "Bỏ dấu tự do" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bỏ dấu tự do"
+          }
+        }
+      }
+    },
+    "Cho phép phụ âm z, f, w, j" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cho phép phụ âm z, f, w, j"
+          }
+        }
+      }
+    },
+    "Chuyển Tiếng Việt ↔ Tiếng Anh" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chuyển Tiếng Việt ↔ Tiếng Anh"
+          }
+        }
+      }
+    },
+    "Chưa có quy tắc riêng. Bấm + để thêm." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa có quy tắc riêng. Bấm + để thêm."
+          }
+        }
+      }
+    },
+    "Chế độ khi mở %@" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chế độ khi mở %@"
+          }
+        }
+      }
+    },
+    "Chỉ áp dụng cho ứng dụng không có quy tắc riêng." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chỉ áp dụng cho ứng dụng không có quy tắc riêng."
+          }
+        }
+      }
+    },
+    "Chọn" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chọn"
+          }
+        }
+      }
+    },
+    "Chọn ứng dụng cần quy tắc riêng" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chọn ứng dụng cần quy tắc riêng"
+          }
+        }
+      }
+    },
+    "Chọn ứng dụng khác…" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chọn ứng dụng khác…"
+          }
+        }
+      }
+    },
+    "Cài đặt Dấu" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cài đặt Dấu"
+          }
+        }
+      }
+    },
+    "Cài đặt…" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cài đặt…"
+          }
+        }
+      }
+    },
+    "Có gạch chân" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Có gạch chân"
+          }
+        }
+      }
+    },
+    "Cấu hình hiện tại" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cấu hình hiện tại"
+          }
+        }
+      }
+    },
+    "Cập nhật" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cập nhật"
+          }
+        }
+      }
+    },
+    "Cập nhật & hỗ trợ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cập nhật & hỗ trợ"
+          }
+        }
+      }
+    },
+    "Danh sách ứng dụng" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danh sách ứng dụng"
+          }
+        }
+      }
+    },
+    "Dùng phím tắt chuyển nguồn nhập liệu của macOS." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dùng phím tắt chuyển nguồn nhập liệu của macOS."
+          }
+        }
+      }
+    },
+    "Dấu" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu"
+          }
+        }
+      }
+    },
+    "Dấu chưa được bật" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu chưa được bật"
+          }
+        }
+      }
+    },
+    "Dấu không gửi chữ bạn gõ ra khỏi máy. Bộ gõ không có quyền truy cập mạng; chỉ phần cập nhật kết nối để tải bản mới và danh sách ứng dụng tương thích. Mã nguồn mở theo giấy phép GPLv3." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu không gửi chữ bạn gõ ra khỏi máy. Bộ gõ không có quyền truy cập mạng; chỉ phần cập nhật kết nối để tải bản mới và danh sách ứng dụng tương thích. Mã nguồn mở theo giấy phép GPLv3."
+          }
+        }
+      }
+    },
+    "Gõ lẫn từ nước ngoài" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gõ lẫn từ nước ngoài"
+          }
+        }
+      }
+    },
+    "Gõ phím" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gõ phím"
+          }
+        }
+      }
+    },
+    "Gõ phím dấu ở bất kỳ đâu sau nguyên âm, dấu tự vào đúng chỗ." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gõ phím dấu ở bất kỳ đâu sau nguyên âm, dấu tự vào đúng chỗ."
+          }
+        }
+      }
+    },
+    "Gõ tắt phụ âm" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gõ tắt phụ âm"
+          }
+        }
+      }
+    },
+    "Gõ đúp phím dấu để giữ chữ gốc (%@ → %@)." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gõ đúp phím dấu để giữ chữ gốc (%@ → %@)."
+          }
+        }
+      }
+    },
+    "Gạch chân" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gạch chân"
+          }
+        }
+      }
+    },
+    "Gạch chân khi gõ trong %@" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gạch chân khi gõ trong %@"
+          }
+        }
+      }
+    },
+    "Gỡ cài đặt…" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gỡ cài đặt…"
+          }
+        }
+      }
+    },
+    "Huỷ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Huỷ"
+          }
+        }
+      }
+    },
+    "Hỗ trợ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hỗ trợ"
+          }
+        }
+      }
+    },
+    "Khi kết thúc từ, từ không phải âm tiết tiếng Việt hợp lệ trở về đúng như đã gõ." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Khi kết thúc từ, từ không phải âm tiết tiếng Việt hợp lệ trở về đúng như đã gõ."
+          }
+        }
+      }
+    },
+    "Khi mở app" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Khi mở app"
+          }
+        }
+      }
+    },
+    "Khi đang gõ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Khi đang gõ"
+          }
+        }
+      }
+    },
+    "Không có ứng dụng nào khớp." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Không có ứng dụng nào khớp."
+          }
+        }
+      }
+    },
+    "Không gạch chân" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Không gạch chân"
+          }
+        }
+      }
+    },
+    "Kiểm tra ngay" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiểm tra ngay"
+          }
+        }
+      }
+    },
+    "Kiểu cũ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiểu cũ"
+          }
+        }
+      }
+    },
+    "Kiểu gõ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiểu gõ"
+          }
+        }
+      }
+    },
+    "Kiểu mới" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiểu mới"
+          }
+        }
+      }
+    },
+    "Kênh" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kênh"
+          }
+        }
+      }
+    },
+    "Mới" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mới"
+          }
+        }
+      }
+    },
+    "Mở Cài đặt Bàn phím của macOS" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mở Cài đặt Bàn phím của macOS"
+          }
+        }
+      }
+    },
+    "Nhớ chế độ theo từng ứng dụng" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nhớ chế độ theo từng ứng dụng"
+          }
+        }
+      }
+    },
+    "Nâng cao" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nâng cao"
+          }
+        }
+      }
+    },
+    "Phiên bản" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phiên bản"
+          }
+        }
+      }
+    },
+    "Phiên bản %@ (%@)" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phiên bản %@ (%@)"
+          }
+        }
+      }
+    },
+    "Phím tắt" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phím tắt"
+          }
+        }
+      }
+    },
+    "Quay về…" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quay về…"
+          }
+        }
+      }
+    },
+    "Quy tắc riêng" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quy tắc riêng"
+          }
+        }
+      }
+    },
+    "Quy tắc riêng luôn áp dụng." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quy tắc riêng luôn áp dụng."
+          }
+        }
+      }
+    },
+    "Quyền riêng tư" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quyền riêng tư"
+          }
+        }
+      }
+    },
+    "Sửa từ đã gõ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sửa từ đã gõ"
+          }
+        }
+      }
+    },
+    "Telex" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telex"
+          }
+        }
+      }
+    },
+    "Telex đơn giản" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telex đơn giản"
+          }
+        }
+      }
+    },
+    "Thêm" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thêm"
+          }
+        }
+      }
+    },
+    "Thêm dấu cho từ đã gõ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thêm dấu cho từ đã gõ"
+          }
+        }
+      }
+    },
+    "Thêm quy tắc" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thêm quy tắc"
+          }
+        }
+      }
+    },
+    "Thêm quy tắc ứng dụng" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thêm quy tắc ứng dụng"
+          }
+        }
+      }
+    },
+    "Thông minh" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thông minh"
+          }
+        }
+      }
+    },
+    "Tiếng Anh" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiếng Anh"
+          }
+        }
+      }
+    },
+    "Tiếng Việt" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiếng Việt"
+          }
+        }
+      }
+    },
+    "Tìm kiếm" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tìm kiếm"
+          }
+        }
+      }
+    },
+    "Tìm ứng dụng" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tìm ứng dụng"
+          }
+        }
+      }
+    },
+    "Từ trùng thì tiếng Việt thắng (%@ → %@)." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Từ trùng thì tiếng Việt thắng (%@ → %@)."
+          }
+        }
+      }
+    },
+    "Tự khôi phục từ không phải tiếng Việt" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tự khôi phục từ không phải tiếng Việt"
+          }
+        }
+      }
+    },
+    "Tự kiểm tra" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tự kiểm tra"
+          }
+        }
+      }
+    },
+    "Tự tải và cài" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tự tải và cài"
+          }
+        }
+      }
+    },
+    "VNI" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VNI"
+          }
+        }
+      }
+    },
+    "Vị trí dấu thanh" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vị trí dấu thanh"
+          }
+        }
+      }
+    },
+    "Với Telex, w ở đầu từ luôn thành ư nên mục này chỉ có tác dụng với z, f, j." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Với Telex, w ở đầu từ luôn thành ư nên mục này chỉ có tác dụng với z, f, j."
+          }
+        }
+      }
+    },
+    "Xem trước" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xem trước"
+          }
+        }
+      }
+    },
+    "Xoá quy tắc" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xoá quy tắc"
+          }
+        }
+      }
+    },
+    "Xoá quy tắc cho %@" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xoá quy tắc cho %@"
+          }
+        }
+      }
+    },
+    "[Kết quả kiểm chứng trên Google Docs, Notion…]" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[Kết quả kiểm chứng trên Google Docs, Notion…]"
+          }
+        }
+      }
+    },
+    "[Phím tắt hệ thống]" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[Phím tắt hệ thống]"
+          }
+        }
+      }
+    },
+    "[Trạng thái kiểm tra cập nhật]" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[Trạng thái kiểm tra cập nhật]"
+          }
+        }
+      }
+    },
+    "Đầu từ f → ph, j → gi, w → qu; cuối từ g → ng, h → nh, k → ch. Áp dụng khi kết thúc từ và chỉ khi ra từ hợp lệ." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đầu từ f → ph, j → gi, w → qu; cuối từ g → ng, h → nh, k → ch. Áp dụng khi kết thúc từ và chỉ khi ra từ hợp lệ."
+          }
+        }
+      }
+    },
+    "Đầu từ f → ph, j → gi; cuối từ g → ng, h → nh, k → ch. Áp dụng khi kết thúc từ và chỉ khi ra từ hợp lệ." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đầu từ f → ph, j → gi; cuối từ g → ng, h → nh, k → ch. Áp dụng khi kết thúc từ và chỉ khi ra từ hợp lệ."
+          }
+        }
+      }
+    },
+    "Đề xuất" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đề xuất"
+          }
+        }
+      }
+    },
+    "Đổi…" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đổi…"
+          }
+        }
+      }
+    },
+    "Ổn định" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ổn định"
+          }
+        }
+      }
+    },
+    "Ứng dụng" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ứng dụng"
           }
         }
       }
