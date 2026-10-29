@@ -40,7 +40,7 @@ struct TypingSettingsView: View {
                         .frame(width: 220)
                     }
                     RowDivider()
-                    SettingsRow(Text("Bỏ dấu tự do"), hint: Text("Gõ phím dấu ở bất kỳ đâu trong từ")) {
+                    SettingsRow(Text("Bỏ dấu tự do"), hint: Text("Gõ phím dấu ở bất kỳ đâu sau nguyên âm")) {
                         RowSwitch(label: Text("Bỏ dấu tự do"), isOn: $model.settings.freeMarking)
                     }
                 }

@@ -291,12 +291,12 @@
         }
       }
     },
-    "Gõ phím dấu ở bất kỳ đâu trong từ" : {
+    "Gõ phím dấu ở bất kỳ đâu sau nguyên âm" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gõ phím dấu ở bất kỳ đâu trong từ"
+            "value" : "Gõ phím dấu ở bất kỳ đâu sau nguyên âm"
           }
         }
       }
