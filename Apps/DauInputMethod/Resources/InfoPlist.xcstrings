@@ -5,6 +5,12 @@
       "comment" : "Bundle display name (D24: always with diacritics).",
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17,6 +23,12 @@
       "comment" : "Bundle name (D24: always with diacritics).",
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -29,6 +41,12 @@
       "comment" : "Input mode name shown in the input source menu (D2, D24). Key = mode ID in Info.plist.",
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu – Tiếng Anh"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -41,6 +59,12 @@
       "comment" : "Input mode name shown in the input source menu (D2, D24). Key = mode ID in Info.plist.",
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu – Tiếng Việt"
+          }
+        },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
