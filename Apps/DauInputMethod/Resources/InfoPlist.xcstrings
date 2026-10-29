@@ -1,0 +1,54 @@
+{
+  "sourceLanguage" : "vi",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name (D24: always with diacritics).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu"
+          }
+        }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "Bundle name (D24: always with diacritics).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu"
+          }
+        }
+      }
+    },
+    "com.example.dau.inputmethod.Dau.en" : {
+      "comment" : "Input mode name shown in the input source menu (D2, D24). Key = mode ID in Info.plist.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu – Tiếng Anh"
+          }
+        }
+      }
+    },
+    "com.example.dau.inputmethod.Dau.vi" : {
+      "comment" : "Input mode name shown in the input source menu (D2, D24). Key = mode ID in Info.plist.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu – Tiếng Việt"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "vi",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name (D24: always with diacritics).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu"
+          }
+        }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "Bundle name (D24: always with diacritics).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

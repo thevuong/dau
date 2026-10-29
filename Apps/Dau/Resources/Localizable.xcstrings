@@ -1,0 +1,17 @@
+{
+  "sourceLanguage" : "vi",
+  "strings" : {
+    "Cài đặt" : {
+      "comment" : "Placeholder title of the Settings window (M0 scaffold).",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cài đặt"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

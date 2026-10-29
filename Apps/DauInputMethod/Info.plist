@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Dấu</string>
+	<key>CFBundleDisplayName</key>
+	<string>Dấu</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>GPLv3</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>LSBackgroundOnly</key>
+	<true/>
+	<key>DauAppGroupIdentifier</key>
+	<string>$(APP_GROUP_ID)</string>
+
+	<!-- Input Method Kit -->
+	<key>InputMethodConnectionName</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)_Connection</string>
+	<key>InputMethodServerControllerClass</key>
+	<string>DauInputController</string>
+	<key>TISInputSourceID</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>TISIntendedLanguage</key>
+	<string>vi</string>
+	<key>tsInputMethodCharacterRepertoireKey</key>
+	<array>
+		<string>Latn</string>
+	</array>
+	<!-- TODO(imk-dev, M2): add tsInputMethodIconFileKey and per-mode
+	     tsInputModeMenuIconFileKey / tsInputModePaletteIconFileKey icons (see docs/BRAND.md),
+	     set TISIconIsTemplate, and verify every key on a real machine. -->
+	<!-- Input mode IDs are literal: Xcode does not expand build settings in plist keys.
+	     They must start with this bundle's identifier. When BUNDLE_ID_PREFIX changes in
+	     project.yml, update every "com.example.dau.inputmethod.Dau.*" here AND the matching
+	     keys in Resources/InfoPlist.xcstrings (display names "Dấu – Tiếng Việt"/"Dấu – Tiếng Anh"). -->
+	<key>ComponentInputModeDict</key>
+	<dict>
+		<key>tsInputModeListKey</key>
+		<dict>
+			<key>com.example.dau.inputmethod.Dau.vi</key>
+			<dict>
+				<key>TISInputSourceID</key>
+				<string>com.example.dau.inputmethod.Dau.vi</string>
+				<key>TISIntendedLanguage</key>
+				<string>vi</string>
+				<key>tsInputModeScriptKey</key>
+				<string>smRoman</string>
+				<key>tsInputModePrimaryInScriptKey</key>
+				<true/>
+				<key>tsInputModeDefaultStateKey</key>
+				<true/>
+				<key>tsInputModeIsVisibleKey</key>
+				<true/>
+			</dict>
+			<key>com.example.dau.inputmethod.Dau.en</key>
+			<dict>
+				<key>TISInputSourceID</key>
+				<string>com.example.dau.inputmethod.Dau.en</string>
+				<key>TISIntendedLanguage</key>
+				<string>en</string>
+				<key>tsInputModeScriptKey</key>
+				<string>smRoman</string>
+				<key>tsInputModePrimaryInScriptKey</key>
+				<false/>
+				<key>tsInputModeDefaultStateKey</key>
+				<true/>
+				<key>tsInputModeIsVisibleKey</key>
+				<true/>
+			</dict>
+		</dict>
+		<key>tsVisibleInputModeOrderedArrayKey</key>
+		<array>
+			<string>com.example.dau.inputmethod.Dau.vi</string>
+			<string>com.example.dau.inputmethod.Dau.en</string>
+		</array>
+	</dict>
+</dict>
+</plist>
