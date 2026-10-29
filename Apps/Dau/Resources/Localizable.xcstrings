@@ -621,12 +621,12 @@
         }
       }
     },
-    "Quy tắc riêng luôn được áp dụng. “Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ." : {
+    "Quy tắc riêng luôn được áp dụng. “Đề xuất” đến từ danh sách tương thích. [Gạch chân — có ở bản sau (M3)]" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quy tắc riêng luôn được áp dụng. “Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ."
+            "value" : "Quy tắc riêng luôn được áp dụng. “Đề xuất” đến từ danh sách tương thích. [Gạch chân — có ở bản sau (M3)]"
           }
         }
       }
@@ -831,6 +831,16 @@
         }
       }
     },
+    "Ví dụ của tính năng sắp có:" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ví dụ của tính năng sắp có:"
+          }
+        }
+      }
+    },
     "Vị trí dấu thanh" : {
       "localizations" : {
         "vi" : {
@@ -881,6 +891,16 @@
         }
       }
     },
+    "[Thêm dấu cho từ đã gõ — có ở bản sau (M3)]" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[Thêm dấu cho từ đã gõ — có ở bản sau (M3)]"
+          }
+        }
+      }
+    },
     "[Trạng thái kiểm tra cập nhật]" : {
       "localizations" : {
         "vi" : {
@@ -907,16 +927,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đầu từ: f → ph, j → gi (VNI thêm w → qu) · Cuối từ: g → ng, h → nh, k → ch. Áp dụng khi gõ xong từ, chỉ khi ra từ tiếng Việt hợp lệ. Bật mục này sẽ tắt Cho phép phụ âm z, f, w, j."
-          }
-        }
-      }
-    },
-    "Đặt con trỏ ngay sau từ rồi gõ phím dấu. [Kết quả kiểm chứng trên Google Docs, Notion…]" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Đặt con trỏ ngay sau từ rồi gõ phím dấu. [Kết quả kiểm chứng trên Google Docs, Notion…]"
           }
         }
       }

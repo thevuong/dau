@@ -60,7 +60,8 @@ struct AppRulesView: View {
                     }
                 }
             } footer: {
-                Hint(Text("Quy tắc riêng luôn được áp dụng. “Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ."))
+                // N5: underlining (D13) is not in the input method yet.
+                Hint(Text("Quy tắc riêng luôn được áp dụng. “Đề xuất” đến từ danh sách tương thích. [Gạch chân — có ở bản sau (M3)]"))
                     .padding(.horizontal, 4)
             }
         }
@@ -107,7 +108,9 @@ struct AppRuleRow: View {
             .fixedSize()
             Picker(selection: binding(\.underline)) {
                 Text("Không gạch chân").tag(false)
-                Text("Có gạch chân").tag(true)
+                // N5: underlining (D13) is not in the input method yet; a saved value
+                // is kept and shown, but cannot be chosen.
+                Text("Có gạch chân").tag(true).disabled(true)
             } label: {
                 Text("Gạch chân khi gõ trong \(name)")
             }

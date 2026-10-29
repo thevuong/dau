@@ -64,9 +64,11 @@ struct AddAppRuleSheet: View {
                 }
                 RowDivider()
                 SettingsRow(Text("Khi đang gõ")) {
+                    // N5: underlining (D13) is not in the input method yet.
                     SegmentedPicker(String(localized: "Khi đang gõ"), selection: $underline,
                                     options: [(false, String(localized: "Không gạch chân")),
-                                              (true, String(localized: "Có gạch chân"))])
+                                              (true, String(localized: "Có gạch chân"))],
+                                    disabled: [true])
                         .frame(width: 240)
                 }
             }

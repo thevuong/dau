@@ -9,12 +9,15 @@ import SwiftUI
 struct SegmentedPicker<Value: Hashable>: NSViewRepresentable {
     let label: String
     let options: [(Value, String)]
+    /// Options shown but not selectable.
+    var disabled: [Value] = []
     @Binding var selection: Value
 
-    init(_ label: String, selection: Binding<Value>, options: [(Value, String)]) {
+    init(_ label: String, selection: Binding<Value>, options: [(Value, String)], disabled: [Value] = []) {
         self.label = label
         self._selection = selection
         self.options = options
+        self.disabled = disabled
     }
 
     func makeNSView(context: Context) -> NSSegmentedControl {
@@ -33,6 +36,9 @@ struct SegmentedPicker<Value: Hashable>: NSViewRepresentable {
         control.isEnabled = context.environment.isEnabled
         let selected = options.firstIndex(where: { $0.0 == selection }) ?? -1
         if control.selectedSegment != selected { control.selectedSegment = selected }
+        for (index, option) in options.enumerated() {
+            control.setEnabled(!disabled.contains(option.0), forSegment: index)
+        }
     }
 
     func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSSegmentedControl, context: Context) -> CGSize? {

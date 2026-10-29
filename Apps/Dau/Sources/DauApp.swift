@@ -5,12 +5,21 @@ import DauShared
 /// Host app: the Settings window (M4). Onboarding (M5) and updates (M7) come later.
 /// The entry point is main.swift, which pins the localization first.
 ///
-/// The Settings window is the app's main window, so opening Dấu (from Finder or from
-/// the input menu's "Cài đặt Dấu…") shows it. ⌘, reopens it after it was closed.
+/// The Settings window is the app's main window, so opening Dấu from Finder shows it;
+/// the input menu's "Cài đặt Dấu…" item, which the input method will add, is meant to
+/// open the app the same way. ⌘, reopens it after it was closed.
 struct DauApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var model = SettingsModel.appGroup()
-    @State private var inputSource = InputSourceStatus()
+    @State private var inputSource = DauApp.makeInputSourceStatus()
+
+    private static func makeInputSourceStatus() -> InputSourceStatus {
+        #if DEBUG
+        // `--not-enabled`: show the "Dấu chưa được bật" banner (window captures).
+        if CommandLine.arguments.contains("--not-enabled") { return InputSourceStatus(fixed: false) }
+        #endif
+        return InputSourceStatus()
+    }
 
     var body: some Scene {
         Window(Text("Cài đặt Dấu"), id: SettingsScene.id) {

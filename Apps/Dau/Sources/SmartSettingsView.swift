@@ -45,16 +45,23 @@ struct SmartSettingsView: View {
                             Text("Thêm dấu cho từ đã gõ")
                             NewBadge()
                         }
-                        // N5: stability on web editors is an open question in
-                        // DECISIONS.md; the placeholder stays until it is measured.
-                        Hint(Text("Đặt con trỏ ngay sau từ rồi gõ phím dấu. [Kết quả kiểm chứng trên Google Docs, Notion…]"))
+                        // N5: the input method does not seed the engine from the app's
+                        // text yet (D20); the switch stays off-limits until it does. The
+                        // stored setting (D15 default) is unchanged.
+                        Hint(Text("[Thêm dấu cho từ đã gõ — có ở bản sau (M3)]"))
                     } trailing: {
                         RowSwitch(label: Text("Thêm dấu cho từ đã gõ"),
                                   isOn: $model.settings.addMarksToTypedWords)
+                            .disabled(true)
                     }
                     RowDivider()
-                    WrappingHStack {
-                        ExampleChips(example: SettingsSamples.addMarks(method))
+                    VStack(alignment: .leading, spacing: 8) {
+                        // The engine computes this example; the feature around it is
+                        // not in the input method yet.
+                        Hint(Text("Ví dụ của tính năng sắp có:"))
+                        WrappingHStack {
+                            ExampleChips(example: SettingsSamples.addMarks(method))
+                        }
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 12)
