@@ -55,6 +55,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | 29/10/2026 | IMK cách A, Sublime Text 4 (Debug, sơ bộ) | `selectedRange` p50 334 / p99 3.718 µs; `insertText` p50 1.466 / p99 7.787 µs; cả phím có thay p50 2.002 / p99 8.087 µs (n=35) | `scripts/perf-report.sh`, người dùng gõ tay |
 | 29/10/2026 | IMK cách A, TextEdit (Debug, sơ bộ) | `selectedRange` p50 288 / p99 7.306 µs; `insertText` p50 3.760 / p99 8.546 µs; cả phím có thay p50 4.536 / p99 15.933 µs (n=11) | như trên |
 | 29/10/2026 | IMK cách A, Safari (Debug, sơ bộ) | `selectedRange` p50 333 / p99 1.639 µs; `insertText` p50 4.298 / p99 13.696 µs; cả phím có thay p50 4.790 / p99 14.242 µs (n=11) | `scripts/perf-report.sh`, người dùng gõ tay |
+| 29/10/2026 | IMK cách A, Chrome (Debug, sơ bộ) | `selectedRange` p50 380 / p99 3.976 µs; `insertText` p50 4.581 / p99 11.309 µs; cả phím có thay p50 5.013 / p99 14.964 µs (n=11); không có `event_client-not-text-input` | `scripts/perf-report.sh --last 5m --app Chrome` |
 | 29/10/2026 | Cấp phát trong `handle` VNI | 0 lần / 37.200 phím | như đo Telex |
 | 29/10/2026 | Cấp phát bộ nhớ trong `handle` | 0 lần / 41.600 phím | chương trình ngoài repo móc `malloc_logger`, có đối chứng dương; chưa có trong CI |
 
