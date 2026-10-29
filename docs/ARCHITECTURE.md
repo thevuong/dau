@@ -19,10 +19,16 @@ dau/
 ```
 
 ### DauEngine
-- `struct VietEngine: Sendable` giữ trạng thái từ đang gõ trong bộ đệm `[Unicode.Scalar]` có sẵn dung lượng, không cấp phát lại mỗi phím.
-- API dạng hàm thuần: `mutating func handle(_ key: Unicode.Scalar) -> Action`, với `Action` là `passThrough` hoặc `replace(deleteCount:insert:)`; `reset()` khi lệch ngữ cảnh.
-- Tuỳ chọn: kiểu gõ (Telex, VNI, Telex đơn giản), vị trí dấu (mới/cũ), bỏ dấu tự do, tự khôi phục từ không phải tiếng Việt, nhóm nâng cao. Gõ đúp phím dấu thì bỏ dấu và giữ chữ gốc (chuẩn Telex).
-- Đường nóng không dùng `String`, `any Protocol`, closure. Chỉ chuẩn hoá NFC khi sinh chuỗi kết quả.
+- `struct VietEngine: Sendable` giữ từ đang gõ trong bộ đệm dung lượng cố định (`TextBuffer`: tối đa 32 scalar lưu trong `SIMD32<UInt32>` — `InlineArray` cần macOS 26), không cấp phát mỗi phím (đã đo: 0 lần).
+- API (mọi hàm `mutating`, trả `Action`):
+  - `handle(_ key: Unicode.Scalar)`: chữ cái/chữ số nối vào từ; ký tự in ra khác (Space, Enter, Tab, dấu câu) kết thúc từ (D4) và nằm luôn trong `insert`; ký tự điều khiển, 0x7F và phím chức năng 0xF700–0xF8FF chỉ `reset()`.
+  - `backspace()` (D32) — IMK phải gọi hàm này cho phím xoá, **không** đưa 0x7F vào `handle`.
+  - `endWord()` — kết thúc từ không chèn ký tự, cho Return/Tab/Enter bàn phím số (0x03) khi IMK muốn để app tự xử lý phím.
+  - `seed(displayed:) -> Bool` (D20) — nạp từ đọc được từ ứng dụng; nhận NFC hoặc NFD.
+  - `reset()`, `isComposing`.
+- `Action` = `.passThrough` (IMK trả `false`) | `.replace(deleteCount:insert: TextBuffer)`: xoá `deleteCount` **scalar** trước con trỏ và chèn `insert` trong một lần `insertText` (N3). Chữ Việt dựng sẵn đều nằm trong BMP nên số scalar bằng độ dài UTF-16, trừ khi từ được seed từ NFD — khi đó IMK tự đo chuỗi đã seed.
+- Tuỳ chọn `EngineOptions`: kiểu gõ (`telex`, `simpleTelex`, `vni`), vị trí dấu (`modern`/`classic`), bỏ dấu tự do (D28), tự khôi phục (D4/D30/D33), `advanced: .off | .consonantShortcuts | .allowZFWJ` (một enum nên hai mục loại trừ nhau — D22).
+- Đường nóng không dùng `String`, `any Protocol`, closure, không import Foundation. Engine dựng thẳng ký tự NFC từ bảng (D3), không chuẩn hoá lúc chạy.
 
 ### DauInputMethod (input method)
 - Lớp con `IMKInputController`, mỗi client một instance và một `VietEngine` riêng (không có trạng thái toàn cục — khác OpenKey).

@@ -3,7 +3,7 @@
 Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị nén) tiếp tục đúng chỗ. Phiên chính cập nhật file này sau mỗi bước.
 
 ## Trạng thái hiện tại
-- Mốc đang làm: M1 — M1b Telex xong (cf5c2bb, ebfce9a, 50 test xanh); M1c VNI xong (8bddba8, ecd81b3, 68 test xanh); kiểm toán M1 đang chạy
+- Mốc đang làm: M1 — M1b Telex xong (cf5c2bb, ebfce9a, 50 test xanh); M1c VNI xong; engine 70 test xanh (HEAD a59c44f/ba6a2b8). Kiểm toán M1 lần 1: CHƯA ĐẠT chỉ vì 2 tài liệu lệch (ARCHITECTURE DauEngine, OPENKEY-NOTES) — đã sửa, chờ kiểm toán lại
 - Việc đang chờ người dùng: Bundle ID / Team ID (placeholder `com.example.dau`, Team ID trống — người dùng sẽ gửi sau)
 - M1a xong: `docs/OPENKEY-NOTES.md` (commit b0739c7).
 - M0: khung xong (commit b2a331d, 06f0dcb, 6fe660b), phiên chính đã kiểm chứng lại: xcodegen + build Debug 2 target với `-destination 'generic/platform=macOS'` ra `x86_64 arm64`, swift test 2 package xanh, bộ gõ không có network.client. Tên hiển thị "Dấu" cho locale `en` đã sửa (0b188dd). **Kiểm toán M0: ĐẠT.**
@@ -23,7 +23,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | Mốc | Trạng thái | Kiểm toán | Ghi chú |
 |---|---|---|---|
 | M0 Khung dự án | xong | ĐẠT (29/10) | build Debug universal cần `-destination generic/platform=macOS` |
-| M1 Engine | đang làm | — | OPENKEY-NOTES xong; 13 điểm đã chốt (D28–D33 + sửa D4, D20–D23, D26); engine Telex đang làm |
+| M1 Engine | đang làm | lần 1 CHƯA ĐẠT (tài liệu) | Telex, Telex đơn giản, VNI, 70 test; 0 từ sai / 474 từ, 0 khôi phục nhầm / 15.796 âm tiết, fuzz 800k thao tác không crash |
 | M2 Bộ gõ tối thiểu | chưa | — | câu hỏi mở A/B, Chrome/Terminal |
 | M3 Độ tin cậy | chưa | — | |
 | M4 App Cài đặt | chưa | — | |
@@ -38,6 +38,12 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - Thêm `*.p8`, `*.pem`, `*.key`, `*.xcarchive` vào `.gitignore`.
 - UI.md onboarding viết cứng "⌃Space" — phải hiện phím tắt hệ thống thật (N5), xử lý ở M5.
 - `en.lproj` khiến menu hệ thống có thể hiện tiếng Anh trên máy tiếng Anh — quyết định ở M4.
+
+## Ghi nhớ cho M2 (từ kiểm toán M1)
+- Phím xoá gọi `backspace()`; `handle` coi 0x7F là reset.
+- Enter bàn phím số (0x03), Return, Tab: dùng `endWord()` nếu để app tự xử lý phím.
+- Từ seed dạng NFD: `deleteCount` phải đổi sang UTF-16 theo chuỗi đã seed.
+- M7: đưa phép đếm cấp phát (`malloc_logger`) vào CI.
 
 ## Số đo
 (engine µs/phím, chi phí selectedRange theo app, độ trễ p50/p99 dưới tải, bộ nhớ…)
@@ -61,3 +67,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 29/10/2026 — người dùng chọn giữ cách A: chữ cái lặp trùng phím dấu gõ 3 lần (passsword); ghi vào D26 — phiên chính — xong
 - 29/10/2026 — người dùng duyệt 4 điểm: D33 khi tắt tự khôi phục chỉ ngừng biến đổi; D20 hợp lệ theo mức tiền tố + gõ đúp là bỏ dấu; D28 tắt vẫn dời dấu; D35 uơ/ươ — phiên chính — xong
 - 29/10/2026 — sửa engine theo D20/D33 mới, 70 test xanh, Telex 0,151 / VNI 0,141 µs/phím release (a59c44f, ba6a2b8); làm rõ câu chữ D20 cho khớp ví dụ "viet" + j → "vietj" người dùng đã duyệt — engine-dev, phiên chính
+- 29/10/2026 — kiểm toán M1 lần 1 — auditor — CHƯA ĐẠT (ARCHITECTURE DauEngine lệch mã; OPENKEY-NOTES `uow` + 3 chỗ cũ) → phiên chính sửa tài liệu

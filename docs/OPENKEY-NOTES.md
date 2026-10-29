@@ -164,7 +164,7 @@ Hai kiểu chỉ khác nhau ở oa, oe, uy **khi không có phụ âm cuối**. 
 
 - Sau **mỗi** phím, nếu bộ đệm có dấu thanh thì engine gỡ dấu ra và đặt lại theo cụm nguyên âm hiện tại (`checkGrammar`). Ví dụ "ho" + `f` → "hò", gõ tiếp `a` → "hoà" (kiểu mới). Nhờ vậy người dùng gõ dấu ở bất kỳ đâu sau nguyên âm đầu, kể cả sau phụ âm cuối, và dấu vẫn vào đúng chỗ.
 - Biến `vFreeMark` trong engine có nghĩa **ngược** với cái tên: bật nó thì engine **không** đặt lại dấu ("dấu ở đâu để đó"). Ở bản macOS, `OpenKey.mm` luôn gán 0 khi khởi động, bỏ qua giá trị đã lưu. Nghĩa là trên thực tế dấu luôn được tự đặt lại, còn nút "FreeMark" trong cửa sổ chỉ có tác dụng tới lần mở app sau (B18).
-- **Dấu (đã chốt, D28):** bật thì phím dấu thanh gõ ở bất kỳ đâu sau nguyên âm đầu, kể cả sau phụ âm cuối; dấu tự vào đúng nguyên âm và tự dời khi gõ thêm nguyên âm ("hof" + a → "hoà"). Phím d sau nguyên âm vẫn biến d đầu từ thành đ ("did" → "đi"). Tắt thì phím dấu chỉ có tác dụng khi gõ ngay sau nguyên âm. Đây là nghĩa (a) ở M2, khác nghĩa biến `vFreeMark` của OpenKey.
+- **Dấu (đã chốt, D28):** bật thì phím dấu thanh gõ ở bất kỳ đâu sau nguyên âm đầu, kể cả sau phụ âm cuối; dấu tự vào đúng nguyên âm và tự dời khi gõ thêm nguyên âm ("hof" + a → "hoà"). Phím d sau nguyên âm vẫn biến d đầu từ thành đ ("did" → "đi"). Tắt thì phím dấu chỉ có tác dụng khi gõ ngay sau nguyên âm (dấu đã đặt vẫn tự dời khi gõ thêm nguyên âm) và d → đ chỉ khi hai d liền nhau. Đây là nghĩa (a) ở M2, khác nghĩa biến `vFreeMark` của OpenKey.
 
 ### 3.8 Kiểm tra chính tả âm tiết
 
@@ -388,7 +388,7 @@ Cột "Ghi chú" dẫn số quyết định khi kết quả do quyết định �
 | `az` | `az` | không có dấu để xoá | |
 | `asf` | `à` | đổi dấu | |
 | `xooong␣` | `xoong␣` | ooo → oo, vẫn gõ dấu được (`xooongf` → `xoòng`) (D26) | |
-| `uow` | `ươ` | | |
+| `uow` | `uơ` | D35: cặp đứng cuối từ ("huơ", "thuở"); gõ tiếp thì thành ươ (`uown` → `ươn`) | |
 | `tuwongf` | `tường` | ưo + phụ âm cuối → ươ | |
 | `thuowr` | `thuở` | | |
 | `THUOWR` | `THUỞ` | | Khác (cố ý), B4 |
@@ -491,7 +491,7 @@ Cột "Ghi chú" dẫn số quyết định khi kết quả do quyết định �
 | `car` + `s` | `cars` | "cár" không hợp lệ → phím đi thẳng (D20) |
 | `viet` + `j` | `vietj` | "viẹt" không hợp lệ; không tự thêm mũ (D20) |
 | `viet` + `e` + `j` | `việt` | phím biến đổi cũng áp dụng (D20) |
-| `nha` + `f` (ra `nhà`), rồi `k␣` | `nhafk␣` | Mốc khôi phục = chữ hiển thị trước khi sửa + các phím gõ sau đó (suy ra từ D20 + D32, bài học B12; DECISIONS chưa ghi trực tiếp) |
+| `nha` + `f` (ra `nhà`), rồi `k␣` | `nhafk␣` | Mốc khôi phục = chữ hiển thị trước khi sửa + các phím gõ sau đó (D4 mốc khôi phục; bài học B12) |
 
 ### 6.9 Ca thêm theo quyết định mới (đã duyệt 29/10/2026)
 
@@ -512,6 +512,10 @@ Người dùng đã duyệt câu chữ DECISIONS cho các ca này (D4 mốc khô
 | từ vượt 7 chữ cái (ví dụ `windowsx`) | khôi phục ngay về đúng phím đã gõ | D33 | |
 | `nha` + `f` + `k␣` (D20) | `nhafk␣` | D4 mốc khôi phục | mốc là chữ đọc từ ứng dụng |
 | `dD` | `đ` | D34 | |
+| `password␣` / `passsword␣` | `pasword␣` / `password␣` | D26 (chữ lặp trùng phím dấu gõ 3 lần) | |
+| `cofffee␣`, `errror␣` | `coffee␣`, `error␣` | D26 | |
+| seed `cả` + `r` | `car` | D20 + D26 | |
+| `uown`, `nguwowif` | `ươn`, `người` | D35 | |
 
 ---
 
