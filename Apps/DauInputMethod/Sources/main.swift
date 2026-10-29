@@ -1,6 +1,7 @@
 import AppKit
 import InputMethodKit
 import os
+import DauShared
 
 // Entry point of the input method process.
 // IMKServer registers the Mach connection named in Info.plist (InputMethodConnectionName);
@@ -16,6 +17,13 @@ guard let connectionName = Bundle.main.object(forInfoDictionaryKey: "InputMethod
 
 let server = IMKServer(name: connectionName, bundleIdentifier: Bundle.main.bundleIdentifier)
 
-withExtendedLifetime(server) {
+#if DEBUG
+// Debug only: log the settings at launch and on every change (SettingsReloadLog).
+let settingsReloadLog = SettingsReloadLog.start()
+#else
+let settingsReloadLog: SettingsChangeObserver? = nil
+#endif
+
+withExtendedLifetime((server, settingsReloadLog)) {
     NSApplication.shared.run()
 }

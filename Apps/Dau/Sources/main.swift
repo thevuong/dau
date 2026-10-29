@@ -22,6 +22,7 @@ pinVietnameseLocalization()
 #if DEBUG
 // Debug checks that run inside the sandboxed build without opening a window: each
 // prints one value and exits.
+DebugSettingsCommand.runIfRequested()
 if CommandLine.arguments.contains("--print-localizations") {
     print(Bundle.main.preferredLocalizations)
     exit(0)
