@@ -31,7 +31,7 @@ dau/
 - App trong danh sách tương thích cần gạch chân: dùng `setMarkedText` thay cho thay chữ tại chỗ (D13).
 - Hai input mode "Tiếng Việt" và "Tiếng Anh" khai báo trong Info.plist (`ComponentInputModeDict`); ở chế độ Anh, mọi phím đi thẳng (D2).
 - Đọc cài đặt và danh sách tương thích từ App Group; nghe thay đổi để áp dụng ngay.
-- Entitlements: App Sandbox, App Group. **Không** `com.apple.security.network.client`.
+- Entitlements: App Sandbox, App Group, tạm thêm `temporary-exception.mach-register.global-name` cho tên kết nối IMK (theo mẫu IMK có sandbox; M2 kiểm chứng có cần không). **Không** `com.apple.security.network.client`.
 - Khoá Info.plist cần nghiên cứu và xác minh theo tài liệu Apple / mẫu IMK: `InputMethodConnectionName`, `InputMethodServerControllerClass`, `LSBackgroundOnly`, `TISInputSourceID`, `TISIntendedLanguage`, `ComponentInputModeDict`, `tsInputModeListKey`, icon cho từng mode.
 
 ### Dau (app chủ)
@@ -43,7 +43,7 @@ dau/
 ## Luồng một phím (chế độ Tiếng Việt)
 
 1. IMK gọi `handle(event, client)` trên main thread. Bỏ qua event nil/bất thường (D18).
-2. Phím điều khiển (mũi tên, ⌘-tổ hợp, Esc…) → reset engine, trả `false` cho hệ thống xử lý Không khôi phục từ ở bước này (D4).
+2. Phím điều khiển (mũi tên, ⌘-tổ hợp, Esc…) → reset engine, trả `false` cho hệ thống xử lý. Không khôi phục từ ở bước này (D4).
    Backspace → engine bỏ chữ cuối đang hiển thị và đặt lại dấu (D32); bộ đệm rỗng thì trả `false`.
 3. Ký tự → `engine.handle(scalar)`:
    - `passThrough` → trả `false`.
