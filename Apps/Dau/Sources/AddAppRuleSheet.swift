@@ -3,9 +3,10 @@ import SwiftUI
 import UniformTypeIdentifiers
 import DauShared
 
-/// "Thêm quy tắc ứng dụng" sheet (docs/UI.md): search, a list of apps (running apps,
-/// plus any app picked with "Chọn ứng dụng khác…"), "Khi mở app" and "Khi đang gõ",
-/// Huỷ / Thêm.
+/// "Thêm quy tắc cho ứng dụng" sheet (mockup "SettingsAppsAdd"), 460 wide: search,
+/// a card listing the apps in the Applications folders and the running apps, a card
+/// with "Khi mở app" and "Khi đang gõ", then Huỷ / Thêm. "Chọn ứng dụng khác…" opens
+/// the system open panel for apps stored elsewhere.
 struct AddAppRuleSheet: View {
     @Environment(SettingsModel.self) private var model
     @Environment(\.dismiss) private var dismiss
@@ -25,42 +26,61 @@ struct AddAppRuleSheet: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Thêm quy tắc ứng dụng")
-                .font(.headline)
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Thêm quy tắc cho ứng dụng")
+                .font(.system(size: 15, weight: .bold))
+                .accessibilityAddTraits(.isHeader)
 
-            TextField("Tìm ứng dụng", text: $query, prompt: Text("Tìm ứng dụng"))
-                .textFieldStyle(.roundedBorder)
+            SearchField(text: $query, prompt: String(localized: "Tìm trong Ứng dụng"))
 
-            List(visibleCandidates, selection: $selection) { candidate in
-                HStack(spacing: 8) {
-                    Image(nsImage: candidate.icon)
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .accessibilityHidden(true)
-                    Text(verbatim: candidate.name)
+            SettingsCard {
+                List(visibleCandidates, selection: $selection) { candidate in
+                    HStack(spacing: 10) {
+                        Image(nsImage: candidate.icon)
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .accessibilityHidden(true)
+                        Text(verbatim: candidate.name)
+                            .font(.system(size: 13))
+                            .lineLimit(1)
+                    }
+                    .frame(height: 40)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 1, leading: 4, bottom: 1, trailing: 4))
+                    .tag(candidate.id)
                 }
-                .tag(candidate.id)
-            }
-            .listStyle(.bordered)
-            .frame(minHeight: 180)
-            .accessibilityLabel(Text("Danh sách ứng dụng"))
-
-            Button("Chọn ứng dụng khác…", action: chooseApp)
-
-            Form {
-                Picker("Khi mở app", selection: $mode) {
-                    ForEach(AppRule.Mode.allCases, id: \.self) { Text($0.title).tag($0) }
-                }
-                .pickerStyle(.segmented)
-                Picker("Khi đang gõ", selection: $underline) {
-                    Text("Không gạch chân").tag(false)
-                    Text("Có gạch chân").tag(true)
-                }
-                .pickerStyle(.segmented)
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .frame(height: 188)
+                .padding(6)
+                .accessibilityLabel(Text("Ứng dụng"))
             }
 
-            HStack {
+            SettingsCard {
+                SettingsRow(Text("Khi mở app")) {
+                    Picker("Khi mở app", selection: $mode) {
+                        ForEach(AppRule.Mode.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .frame(width: 220)
+                }
+                RowDivider()
+                SettingsRow(Text("Khi đang gõ")) {
+                    Picker("Khi đang gõ", selection: $underline) {
+                        Text("Không gạch chân").tag(false)
+                        Text("Có gạch chân").tag(true)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .frame(width: 240)
+                }
+            }
+
+            HStack(spacing: 8) {
+                Button("Chọn ứng dụng khác…", action: chooseApp)
+                    .buttonStyle(.link)
+                    .font(.system(size: 12))
                 Spacer()
                 Button("Huỷ", role: .cancel) { dismiss() }
                     .keyboardShortcut(.cancelAction)
@@ -69,27 +89,30 @@ struct AddAppRuleSheet: View {
                     .disabled(selection == nil)
             }
         }
-        .padding(20)
-        .frame(width: 440)
-        .onAppear(perform: loadRunningApps)
+        .padding(22)
+        .frame(width: 460)
+        .background(SettingsColors.page)
+        .task { await loadApps() }
     }
 
-    private func loadRunningApps() {
+    /// Apps in the Applications folders plus running apps, without the ones that
+    /// already have a rule and without Dấu itself.
+    private func loadApps() async {
         let ruled = Set(model.settings.appRules.map(\.bundleID))
         let own = Bundle.main.bundleIdentifier
-        var seen = Set<String>()
-        candidates = NSWorkspace.shared.runningApplications
-            .filter { $0.activationPolicy == .regular }
-            .compactMap { app -> AppCandidate? in
-                guard let id = app.bundleIdentifier, id != own, !ruled.contains(id),
-                      seen.insert(id).inserted else { return nil }
-                let url = app.bundleURL ?? AppDirectory.url(for: id)
-                return AppCandidate(
-                    bundleID: id,
-                    name: url.map(AppDirectory.name(at:)) ?? app.localizedName ?? id,
-                    icon: app.icon ?? AppDirectory.icon(for: id))
+        var running: [AppListing] = []
+        for app in NSWorkspace.shared.runningApplications where app.activationPolicy == .regular {
+            if let id = app.bundleIdentifier, let url = app.bundleURL {
+                running.append(AppListing(bundleID: id, name: AppDirectory.name(at: url), path: url.path))
             }
+        }
+        let installed = await Task.detached(priority: .userInitiated) { AppListing.installed() }.value
+        var seen = Set<String>()
+        candidates = (installed + running)
+            .filter { $0.bundleID != own && !ruled.contains($0.bundleID) && seen.insert($0.bundleID).inserted }
             .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+            .map { AppCandidate(bundleID: $0.bundleID, name: $0.name,
+                                icon: NSWorkspace.shared.icon(forFile: $0.path)) }
     }
 
     /// Picks any app with the system open panel (works in the sandbox through the
@@ -128,4 +151,30 @@ struct AppCandidate: Identifiable {
     let name: String
     let icon: NSImage
     var id: String { bundleID }
+}
+
+/// An app found on disk (Sendable, built off the main thread).
+struct AppListing: Sendable {
+    let bundleID: String
+    let name: String
+    let path: String
+
+    static let folders = ["/Applications", "/Applications/Utilities",
+                          "/System/Applications", "/System/Applications/Utilities"]
+
+    /// Apps in the standard Applications folders. Folders the sandbox cannot read are
+    /// skipped; running apps and the open panel cover the rest.
+    static func installed() -> [AppListing] {
+        let fm = FileManager.default
+        var result: [AppListing] = []
+        for folder in folders {
+            guard let names = try? fm.contentsOfDirectory(atPath: folder) else { continue }
+            for name in names where name.hasSuffix(".app") {
+                let url = URL(fileURLWithPath: folder).appendingPathComponent(name)
+                guard let id = Bundle(url: url)?.bundleIdentifier else { continue }
+                result.append(AppListing(bundleID: id, name: AppDirectory.name(at: url), path: url.path))
+            }
+        }
+        return result
+    }
 }

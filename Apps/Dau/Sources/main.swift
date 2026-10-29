@@ -20,9 +20,31 @@ private func pinVietnameseLocalization() {
 pinVietnameseLocalization()
 
 #if DEBUG
-// Debug check without opening a window: prints the chosen localization and exits.
+// Debug checks that run inside the sandboxed build without opening a window: each
+// prints one value and exits.
 if CommandLine.arguments.contains("--print-localizations") {
     print(Bundle.main.preferredLocalizations)
+    exit(0)
+}
+if CommandLine.arguments.contains("--print-input-source-status") {
+    switch InputSourceStatus.query() {
+    case true?: print("enabled")
+    case false?: print("disabled")
+    case nil: print("unknown (input method bundle not found)")
+    }
+    exit(0)
+}
+if CommandLine.arguments.contains("--print-input-shortcut") {
+    if let shortcut = InputSourceShortcut.current() {
+        print(shortcut.keys.joined(separator: " "), shortcut.globeKey ? "+ globe key" : "")
+    } else {
+        print("unreadable")
+    }
+    exit(0)
+}
+if CommandLine.arguments.contains("--print-installed-apps") {
+    // Apps the add-rule sheet can list from the Applications folders in the sandbox.
+    print(AppListing.installed().count)
     exit(0)
 }
 #endif

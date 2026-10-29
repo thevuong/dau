@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// The Settings window: sidebar with search and four sections (docs/UI.md). The title
-/// bar shows the selected section's name.
+/// The Settings window (mockup "SettingsTyping" and siblings): a 220 pt sidebar with
+/// search, the four sections and "Dấu <version>" at the bottom; the toolbar shows the
+/// selected section's name.
 struct SettingsWindow: View {
     @State private var selection: SettingsSection?
     @State private var query = ""
@@ -19,6 +20,7 @@ struct SettingsWindow: View {
             List(visibleSections, selection: $selection) { section in
                 Label {
                     Text(section.title)
+                        .font(.system(size: 13))
                 } icon: {
                     SectionIcon(section: section)
                 }
@@ -31,16 +33,24 @@ struct SettingsWindow: View {
                     selection = first
                 }
             }
-            // Wide enough for the longest section name, "Cập nhật & hỗ trợ".
-            .navigationSplitViewColumnWidth(min: 220, ideal: 230, max: 300)
+            .safeAreaInset(edge: .bottom, alignment: .leading) {
+                Text(verbatim: AppVersion.nameAndVersion)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 14)
+            }
+            .toolbar(removing: .sidebarToggle)
+            // Must stay the last modifier of the column to take effect.
+            .navigationSplitViewColumnWidth(min: 220, ideal: 220, max: 260)
         } detail: {
             SettingsDetail(section: selection ?? .typing)
         }
-        .frame(minWidth: 820, minHeight: 520)
+        .frame(minWidth: 820, minHeight: 560)
     }
 }
 
-/// One section, with the "Dấu chưa được bật" banner on top when needed.
+/// One section page, titled in the toolbar.
 struct SettingsDetail: View {
     let section: SettingsSection
 
@@ -53,7 +63,6 @@ struct SettingsDetail: View {
             case .updates: UpdatesSupportView()
             }
         }
-        .formStyle(.grouped)
         .navigationTitle(section.title)
     }
 }

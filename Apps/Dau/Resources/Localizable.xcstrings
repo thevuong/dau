@@ -1,16 +1,6 @@
 {
   "sourceLanguage" : "vi",
   "strings" : {
-    "%@ gõ thêm %@ thành %@" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ gõ thêm %@ thành %@"
-          }
-        }
-      }
-    },
     "%@ thành %@" : {
       "localizations" : {
         "vi" : {
@@ -51,6 +41,16 @@
         }
       }
     },
+    "Báo lại để bản sau xử lý đúng cho ứng dụng đó" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Báo lại để bản sau xử lý đúng cho ứng dụng đó"
+          }
+        }
+      }
+    },
     "Báo lỗi…" : {
       "localizations" : {
         "vi" : {
@@ -77,26 +77,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bật lại"
-          }
-        }
-      }
-    },
-    "Bật mục này sẽ tắt Cho phép phụ âm z, f, w, j." : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bật mục này sẽ tắt Cho phép phụ âm z, f, w, j."
-          }
-        }
-      }
-    },
-    "Bật mục này sẽ tắt Gõ tắt phụ âm." : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bật mục này sẽ tắt Gõ tắt phụ âm."
           }
         }
       }
@@ -147,16 +127,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chế độ khi mở %@"
-          }
-        }
-      }
-    },
-    "Chỉ áp dụng cho ứng dụng không có quy tắc riêng." : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chỉ áp dụng cho ứng dụng không có quy tắc riêng."
           }
         }
       }
@@ -221,16 +191,6 @@
         }
       }
     },
-    "Cấu hình hiện tại" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cấu hình hiện tại"
-          }
-        }
-      }
-    },
     "Cập nhật" : {
       "localizations" : {
         "vi" : {
@@ -251,42 +211,52 @@
         }
       }
     },
-    "Danh sách ứng dụng" : {
+    "Dành cho từ mượn và tên riêng. Bật mục này sẽ tắt Gõ tắt phụ âm." : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Danh sách ứng dụng"
+            "value" : "Dành cho từ mượn và tên riêng. Bật mục này sẽ tắt Gõ tắt phụ âm."
           }
         }
       }
     },
-    "Dùng phím tắt chuyển nguồn nhập liệu của macOS." : {
+    "Dành cho từ mượn và tên riêng. Bật mục này sẽ tắt Gõ tắt phụ âm. Với Telex, w ở đầu từ luôn thành ư nên mục này chỉ có tác dụng với z, f, j." : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dùng phím tắt chuyển nguồn nhập liệu của macOS."
+            "value" : "Dành cho từ mượn và tên riêng. Bật mục này sẽ tắt Gõ tắt phụ âm. Với Telex, w ở đầu từ luôn thành ư nên mục này chỉ có tác dụng với z, f, j."
           }
         }
       }
     },
-    "Dấu" : {
+    "Dùng chung phím tắt của macOS, đổi trong Cài đặt Bàn phím" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dấu"
+            "value" : "Dùng chung phím tắt của macOS, đổi trong Cài đặt Bàn phím"
           }
         }
       }
     },
-    "Dấu chưa được bật" : {
+    "Dùng khi bản mới gây lỗi" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dấu chưa được bật"
+            "value" : "Dùng khi bản mới gây lỗi"
+          }
+        }
+      }
+    },
+    "Dấu chưa được bật trong Nguồn nhập liệu" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu chưa được bật trong Nguồn nhập liệu"
           }
         }
       }
@@ -321,12 +291,12 @@
         }
       }
     },
-    "Gõ phím dấu ở bất kỳ đâu sau nguyên âm, dấu tự vào đúng chỗ." : {
+    "Gõ phím dấu ở bất kỳ đâu trong từ" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gõ phím dấu ở bất kỳ đâu sau nguyên âm, dấu tự vào đúng chỗ."
+            "value" : "Gõ phím dấu ở bất kỳ đâu trong từ"
           }
         }
       }
@@ -337,16 +307,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gõ tắt phụ âm"
-          }
-        }
-      }
-    },
-    "Gõ đúp phím dấu để giữ chữ gốc (%@ → %@)." : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gõ đúp phím dấu để giữ chữ gốc (%@ → %@)."
           }
         }
       }
@@ -367,6 +327,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gạch chân khi gõ trong %@"
+          }
+        }
+      }
+    },
+    "Gặp ứng dụng gõ bị lỗi?" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gặp ứng dụng gõ bị lỗi?"
+          }
+        }
+      }
+    },
+    "Gỡ Dấu khỏi máy" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gỡ Dấu khỏi máy"
           }
         }
       }
@@ -401,12 +381,12 @@
         }
       }
     },
-    "Khi kết thúc từ, từ không phải âm tiết tiếng Việt hợp lệ trở về đúng như đã gõ." : {
+    "Khi gõ xong một từ (Space, dấu câu, Enter), từ không phải âm tiết tiếng Việt hợp lệ trở về đúng như bạn gõ" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Khi kết thúc từ, từ không phải âm tiết tiếng Việt hợp lệ trở về đúng như đã gõ."
+            "value" : "Khi gõ xong một từ (Space, dấu câu, Enter), từ không phải âm tiết tiếng Việt hợp lệ trở về đúng như bạn gõ"
           }
         }
       }
@@ -491,12 +471,42 @@
         }
       }
     },
-    "Kênh" : {
+    "Kiểu mới: hoà, thuý · Kiểu cũ: hòa, thúy" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kênh"
+            "value" : "Kiểu mới: hoà, thuý · Kiểu cũ: hòa, thúy"
+          }
+        }
+      }
+    },
+    "Kênh phát hành" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kênh phát hành"
+          }
+        }
+      }
+    },
+    "Mặc định" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mặc định"
+          }
+        }
+      }
+    },
+    "Mặc định tắt. Áp dụng cho các app không có quy tắc riêng bên dưới" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mặc định tắt. Áp dụng cho các app không có quy tắc riêng bên dưới"
           }
         }
       }
@@ -517,6 +527,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mở Cài đặt Bàn phím của macOS"
+          }
+        }
+      }
+    },
+    "Mở rộng" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mở rộng"
           }
         }
       }
@@ -551,22 +571,32 @@
         }
       }
     },
-    "Phiên bản %@ (%@)" : {
+    "Phím tắt hiện tại" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Phiên bản %@ (%@)"
+            "value" : "Phím tắt hiện tại"
           }
         }
       }
     },
-    "Phím tắt" : {
+    "Phím tắt nguồn nhập liệu" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Phím tắt"
+            "value" : "Phím tắt nguồn nhập liệu"
+          }
+        }
+      }
+    },
+    "Quay về bản trước" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quay về bản trước"
           }
         }
       }
@@ -591,12 +621,12 @@
         }
       }
     },
-    "Quy tắc riêng luôn áp dụng." : {
+    "Quy tắc riêng luôn được áp dụng. “Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ." : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quy tắc riêng luôn áp dụng."
+            "value" : "Quy tắc riêng luôn được áp dụng. “Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ."
           }
         }
       }
@@ -641,6 +671,16 @@
         }
       }
     },
+    "Thu gọn" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thu gọn"
+          }
+        }
+      }
+    },
     "Thêm" : {
       "localizations" : {
         "vi" : {
@@ -661,22 +701,22 @@
         }
       }
     },
-    "Thêm quy tắc" : {
+    "Thêm quy tắc cho ứng dụng" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thêm quy tắc"
+            "value" : "Thêm quy tắc cho ứng dụng"
           }
         }
       }
     },
-    "Thêm quy tắc ứng dụng" : {
+    "Thêm ứng dụng" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thêm quy tắc ứng dụng"
+            "value" : "Thêm ứng dụng"
           }
         }
       }
@@ -721,6 +761,16 @@
         }
       }
     },
+    "Tìm trong Ứng dụng" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tìm trong Ứng dụng"
+          }
+        }
+      }
+    },
     "Tìm ứng dụng" : {
       "localizations" : {
         "vi" : {
@@ -731,12 +781,12 @@
         }
       }
     },
-    "Từ trùng thì tiếng Việt thắng (%@ → %@)." : {
+    "Từ trùng với tiếng Việt thì tiếng Việt được ưu tiên: “%@” ra “%@”. Muốn giữ chữ gốc, gõ đúp phím dấu: “%@” ra “%@”." : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Từ trùng thì tiếng Việt thắng (%@ → %@)."
+            "value" : "Từ trùng với tiếng Việt thì tiếng Việt được ưu tiên: “%@” ra “%@”. Muốn giữ chữ gốc, gõ đúp phím dấu: “%@” ra “%@”."
           }
         }
       }
@@ -751,22 +801,22 @@
         }
       }
     },
-    "Tự kiểm tra" : {
+    "Tự động kiểm tra bản mới" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tự kiểm tra"
+            "value" : "Tự động kiểm tra bản mới"
           }
         }
       }
     },
-    "Tự tải và cài" : {
+    "Tự động tải và cài" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tự tải và cài"
+            "value" : "Tự động tải và cài"
           }
         }
       }
@@ -791,16 +841,6 @@
         }
       }
     },
-    "Với Telex, w ở đầu từ luôn thành ư nên mục này chỉ có tác dụng với z, f, j." : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Với Telex, w ở đầu từ luôn thành ư nên mục này chỉ có tác dụng với z, f, j."
-          }
-        }
-      }
-    },
     "Xem trước" : {
       "localizations" : {
         "vi" : {
@@ -821,22 +861,12 @@
         }
       }
     },
-    "Xoá quy tắc cho %@" : {
+    "[Cách cài bản mới — kiểm chứng ở M7]" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Xoá quy tắc cho %@"
-          }
-        }
-      }
-    },
-    "[Kết quả kiểm chứng trên Google Docs, Notion…]" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "[Kết quả kiểm chứng trên Google Docs, Notion…]"
+            "value" : "[Cách cài bản mới — kiểm chứng ở M7]"
           }
         }
       }
@@ -861,22 +891,32 @@
         }
       }
     },
-    "Đầu từ f → ph, j → gi, w → qu; cuối từ g → ng, h → nh, k → ch. Áp dụng khi kết thúc từ và chỉ khi ra từ hợp lệ." : {
+    "hoặc" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Đầu từ f → ph, j → gi, w → qu; cuối từ g → ng, h → nh, k → ch. Áp dụng khi kết thúc từ và chỉ khi ra từ hợp lệ."
+            "value" : "hoặc"
           }
         }
       }
     },
-    "Đầu từ f → ph, j → gi; cuối từ g → ng, h → nh, k → ch. Áp dụng khi kết thúc từ và chỉ khi ra từ hợp lệ." : {
+    "Đầu từ: f → ph, j → gi (VNI thêm w → qu) · Cuối từ: g → ng, h → nh, k → ch. Áp dụng khi gõ xong từ, chỉ khi ra từ tiếng Việt hợp lệ. Bật mục này sẽ tắt Cho phép phụ âm z, f, w, j." : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Đầu từ f → ph, j → gi; cuối từ g → ng, h → nh, k → ch. Áp dụng khi kết thúc từ và chỉ khi ra từ hợp lệ."
+            "value" : "Đầu từ: f → ph, j → gi (VNI thêm w → qu) · Cuối từ: g → ng, h → nh, k → ch. Áp dụng khi gõ xong từ, chỉ khi ra từ tiếng Việt hợp lệ. Bật mục này sẽ tắt Cho phép phụ âm z, f, w, j."
+          }
+        }
+      }
+    },
+    "Đặt con trỏ ngay sau từ rồi gõ phím dấu. [Kết quả kiểm chứng trên Google Docs, Notion…]" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đặt con trỏ ngay sau từ rồi gõ phím dấu. [Kết quả kiểm chứng trên Google Docs, Notion…]"
           }
         }
       }

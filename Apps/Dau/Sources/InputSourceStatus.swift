@@ -32,22 +32,24 @@ final class InputSourceStatus {
     }
 
     func refresh() {
-        guard let bundleID = Self.inputMethodBundleID else {
-            isEnabled = nil
-            return
-        }
+        isEnabled = Self.query()
+    }
+
+    /// Reads the enabled input sources now. `nil` when the input method bundle is not
+    /// found inside the app.
+    nonisolated static func query() -> Bool? {
+        guard let bundleID = inputMethodBundleID else { return nil }
         let filter = [kTISPropertyBundleID as String: bundleID] as CFDictionary
         // includeAllInstalled = false: only enabled sources are returned.
         guard let list = TISCreateInputSourceList(filter, false)?.takeRetainedValue() else {
-            isEnabled = false
-            return
+            return false
         }
-        isEnabled = CFArrayGetCount(list) > 0
+        return CFArrayGetCount(list) > 0
     }
 
     /// Bundle ID of the input method shipped inside this app (project.yml embeds it in
     /// Contents/Library/Input Methods).
-    static let inputMethodBundleID: String? = {
+    nonisolated static let inputMethodBundleID: String? = {
         let url = Bundle.main.bundleURL
             .appendingPathComponent("Contents/Library/Input Methods/DauInputMethod.app")
         return Bundle(url: url)?.bundleIdentifier

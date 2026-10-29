@@ -18,6 +18,7 @@ struct DauApp: App {
                 .environment(model)
                 .environment(inputSource)
         }
+        .defaultSize(width: 820, height: 600)
         .windowResizability(.contentMinSize)
         .commands {
             SettingsCommands()

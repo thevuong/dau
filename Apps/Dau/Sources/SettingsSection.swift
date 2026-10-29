@@ -45,7 +45,7 @@ enum SettingsSection: String, CaseIterable, Identifiable, Hashable {
             [String(localized: "Xem trước"), String(localized: "Kiểu gõ"), "Telex", "VNI",
              String(localized: "Telex đơn giản"), String(localized: "Vị trí dấu thanh"),
              String(localized: "Kiểu mới"), String(localized: "Kiểu cũ"),
-             String(localized: "Bỏ dấu tự do"), String(localized: "Phím tắt"),
+             String(localized: "Bỏ dấu tự do"), String(localized: "Phím tắt nguồn nhập liệu"),
              String(localized: "Chuyển Tiếng Việt ↔ Tiếng Anh")]
         case .smart:
             [String(localized: "Gõ lẫn từ nước ngoài"),
@@ -54,13 +54,15 @@ enum SettingsSection: String, CaseIterable, Identifiable, Hashable {
              String(localized: "Nâng cao"), String(localized: "Gõ tắt phụ âm"),
              String(localized: "Cho phép phụ âm z, f, w, j")]
         case .apps:
-            [String(localized: "Nhớ chế độ theo từng ứng dụng"), String(localized: "Quy tắc riêng"),
-             String(localized: "Gạch chân"), String(localized: "Tiếng Việt"), String(localized: "Tiếng Anh")]
+            [String(localized: "Mặc định"), String(localized: "Nhớ chế độ theo từng ứng dụng"),
+             String(localized: "Quy tắc riêng"), String(localized: "Gạch chân"),
+             String(localized: "Tiếng Việt"), String(localized: "Tiếng Anh")]
         case .updates:
             [String(localized: "Phiên bản"), String(localized: "Kiểm tra ngay"),
-             String(localized: "Kênh"), String(localized: "Beta"), String(localized: "Báo lỗi…"),
-             String(localized: "Quay về…"), String(localized: "Gỡ cài đặt…"),
-             String(localized: "Quyền riêng tư")]
+             String(localized: "Tự động kiểm tra bản mới"), String(localized: "Tự động tải và cài"),
+             String(localized: "Kênh phát hành"), String(localized: "Beta"),
+             String(localized: "Báo lỗi…"), String(localized: "Quay về bản trước"),
+             String(localized: "Gỡ cài đặt…"), String(localized: "Quyền riêng tư")]
         }
     }
 
@@ -79,10 +81,10 @@ struct SectionIcon: View {
 
     var body: some View {
         Image(systemName: section.symbol)
-            .font(.system(size: 11, weight: .semibold))
+            .font(.system(size: 12, weight: .semibold))
             .foregroundStyle(.white)
-            .frame(width: 20, height: 20)
-            .background(section.color.gradient, in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .frame(width: 22, height: 22)
+            .background(section.color, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
             .accessibilityHidden(true)
     }
 }

@@ -8,5 +8,12 @@
 	<array>
 		<string>$(APP_GROUP_ID)</string>
 	</array>
+	<!-- Read-only access to the user's input-source shortcut (Settings > Gõ phím, D2):
+	     AppleSymbolicHotKeys 60/61 and AppleFnUsageType. Never written (N4). -->
+	<key>com.apple.security.temporary-exception.shared-preference.read-only</key>
+	<array>
+		<string>com.apple.symbolichotkeys</string>
+		<string>com.apple.HIToolbox</string>
+	</array>
 </dict>
 </plist>
