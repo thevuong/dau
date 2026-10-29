@@ -120,6 +120,7 @@ targets:
       - path: Apps/DauInputMethod/Sources/CursorTracker.swift
       - path: Apps/DauInputMethod/Sources/EngineSettings.swift
       - path: Apps/DauInputMethod/Sources/AppModeMemory.swift
+      - path: Apps/DauInputMethod/Sources/HostApp.swift
     dependencies:
       - package: DauEngine
       - package: DauShared

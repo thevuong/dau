@@ -1,6 +1,23 @@
 {
   "sourceLanguage" : "vi",
   "strings" : {
+    "Cài đặt Dấu…" : {
+      "comment" : "Input menu: opens the Dấu app (Settings window).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cài đặt Dấu…"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cài đặt Dấu…"
+          }
+        }
+      }
+    },
     "Kiểu gõ" : {
       "comment" : "Input menu: header of the typing method group.",
       "localizations" : {

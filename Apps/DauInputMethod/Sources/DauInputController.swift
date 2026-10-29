@@ -419,10 +419,11 @@ final class DauInputController: IMKInputController {
                 menu.addItem(item)
             }
             menu.addItem(.separator())
+            menu.addItem(NSMenuItem(title: String(localized: "Cài đặt Dấu…", comment: "Input menu: opens the Dấu app (Settings window)."),
+                                    action: #selector(openHostApp(_:)), keyEquivalent: ""))
             // N4: only open the right System Settings pane; never change settings.
             menu.addItem(NSMenuItem(title: String(localized: "Mở cài đặt Bàn phím…", comment: "Input menu: opens System Settings › Keyboard."),
                                     action: #selector(openKeyboardSettings(_:)), keyEquivalent: ""))
-            // TODO(M4): "Cài đặt Dấu…" opening the host app's Settings window.
             return menu
         }
     }
@@ -442,6 +443,26 @@ final class DauInputController: IMKInputController {
         store.save(new)
         resetComposition()
         apply(new)
+    }
+
+    /// "Cài đặt Dấu…": opens the host app, whose main window is Settings (UI.md).
+    @objc func openHostApp(_ sender: Any?) {
+        guard let (url, reason) = HostApp.url() else {
+            settingsLogger.error("event=host-app-not-found")
+            return
+        }
+        settingsLogger.notice("event=host-app-open reason=\(reason.rawValue, privacy: .public) path=\(url.path, privacy: .public)")
+        _ = onMain {
+            let configuration = NSWorkspace.OpenConfiguration()
+            configuration.activates = true
+            NSWorkspace.shared.openApplication(at: url, configuration: configuration) { _, error in
+                if let error {
+                    settingsLogger.error("event=host-app-open-failed error=\(String(describing: error), privacy: .public)")
+                } else {
+                    settingsLogger.notice("event=host-app-opened")
+                }
+            }
+        }
     }
 
     @objc func openKeyboardSettings(_ sender: Any?) {
