@@ -16,6 +16,7 @@ struct EditingTests {
     @Test(arguments: [
         Case("tesst⌫s", "tess"), Case("carr⌫r", "car"), Case("carr⌫⌫as", "cas"),
         Case("tesst⌫s cas", "tess cá"),
+        Case("aaa⌫⌫a", "a"),   // erasing the whole word ends it, and its lock with it
     ])
     func doubleLockSurvivesBackspace(_ c: Case) { expectTyped(c.keys, c.expected) }
 

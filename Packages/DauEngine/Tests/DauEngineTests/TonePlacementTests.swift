@@ -44,6 +44,7 @@ struct TonePlacementTests {
         PlacementCase("tuaanf", "tuần", "tuần"),
         PlacementCase("hais", "hái", "hái"),
         PlacementCase("nuis", "núi", "núi"),
+        PlacementCase("hofa", "hoà", "hòa"),   // D28: the tone moves when a vowel is added
     ])
     func placement(_ c: PlacementCase) {
         expectTyped(c.keys, c.modern)

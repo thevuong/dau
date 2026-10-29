@@ -97,7 +97,8 @@ struct VNITests {
     /// D34: case follows the letters; digits have none.
     @Test(arguments: [
         Case("VIE6T5", "VIỆT"), Case("Vie6t5", "Việt"), Case("D9", "Đ"), Case("A6", "Â"),
-        Case("NGUOI72", "NGƯỜI"), Case("DUO7C59", "ĐƯỢC"),
+        Case("NGUOI72", "NGƯỜI"), Case("DUO7C59", "ĐƯỢC"), Case("U23", "Ủ"), Case("A4", "Ã"),
+        Case("U223", "U23"),   // D26: the doubled 2 undoes and locks; D4 keeps it
     ])
     func letterCase(_ c: Case) { expectTyped(c.keys, c.expected, vni) }
 
