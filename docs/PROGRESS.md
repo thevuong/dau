@@ -26,7 +26,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | M1 Engine | xong | ĐẠT (29/10, lần 2) | Telex, Telex đơn giản, VNI, 75 test; release ~0,15 µs/phím; 0 từ sai / 474 từ, 0 khôi phục nhầm / 15.796 âm tiết, fuzz 800k thao tác không crash |
 | M2 Bộ gõ tối thiểu | đang làm | — | TextEdit + Safari đạt; selectedRange p50 ~0,3 ms ≈ 6–7% thời gian phím có thay (insertText chiếm chủ yếu); còn 4 app |
 | M3 Độ tin cậy | chưa | — | |
-| M4 App Cài đặt | đang làm | — | DauShared + cửa sổ 4 mục xong (2d6206e, c731c61; 25 test); đang: nối bộ gõ (imk-dev), ngôn ngữ app/sidebar/chế độ tối (app-ui-dev). Cần Team ID để App Group chia sẻ thật giữa 2 tiến trình |
+| M4 App Cài đặt | đang làm | — | DauShared + cửa sổ 4 mục xong (2d6206e, c731c61; 25 test); bộ gõ đọc cài đặt chung + D5 (0aa4872, 30 test IMK); chờ người dùng thử `docs/M4-TESTING.md` và chốt cách hiểu D5. Cần Team ID để App Group chia sẻ thật |
 | M5 Onboarding, cài, gỡ | chưa | — | |
 | M6 Hiệu năng dưới tải | chưa | — | |
 | M7 Phát hành | chưa | — | |
@@ -83,3 +83,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 29/10/2026 — gõ thử Chrome (người dùng): câu mẫu ra đúng, không gạch chân, không nhảy chữ; selectedRange trả vị trí hợp lệ → Chrome không cần quyền Trợ năng/gạch chân. Còn Slack, VS Code, Terminal
 - 29/10/2026 — M4 model cài đặt chung + cửa sổ Cài đặt 4 mục — app-ui-dev — build universal, 25 test DauShared xanh, không quyền mạng (2d6206e, c731c61). Phiên chính đổi APP_GROUP_ID thành `.shared` (trùng bundle ID app chủ thì UserDefaults từ chối) (3ffaee1). Quyết định kỹ thuật: giữ `en.lproj` (D24) và ép ngôn ngữ app = vi bằng registration domain
 - 29/10/2026 — M4: sidebar đủ chữ, cửa sổ tối thiểu 820×520 (0cbef3c); app chủ ép bản địa hoá vi qua argument domain, tôn trọng `-AppleLanguages` dòng lệnh, `--print-localizations` ra ["vi"]/["en"] (0c8e44b); chế độ tối đúng (lỗi do bộ chụp). Còn: người dùng xem menu/Finder trên máy tiếng Anh; imk-dev nối DauShared vào bộ gõ
+- 29/10/2026 — bộ gõ đọc DauShared, đổi options kèm reset, menu Kiểu gõ ghi store, D5 chế độ theo app bằng `selectInputMode:` (IMK), nhớ chế độ lưu trong defaults của bộ gõ — imk-dev — 30 test IMK, build universal, không quyền mạng (0aa4872). Mở: D20 seed (M3), D13 marked text (M3), D17, mục "Cài đặt Dấu…" trong menu; App Group ad-hoc có thể hỏng im lặng / hiện hộp thoại
