@@ -72,6 +72,10 @@ final class DauInputController: IMKInputController {
                                     characters: event.characters)
         let result = process(route, client: client)
         record(result, start: start)
+        #if DEBUG
+        // After the timing is recorded, so the extra selectedRange is not measured.
+        if let diag = result.diag { ReplaceDiag.log(diag, kind: result.kind, client: client, app: clientApp) }
+        #endif
         return result.consumed
     }
 
@@ -83,6 +87,10 @@ final class DauInputController: IMKInputController {
         var insertTextNs: Int64 = -1
         /// The replacement could not be applied (mismatch, unsupported client).
         var failed = false
+        #if DEBUG
+        /// Positions of the last replacement attempt of this key (Debug diagnostics).
+        var diag: ReplaceDiag?
+        #endif
     }
 
     private func process(_ route: KeyRoute, client: IMKTextInput) -> KeyResult {
@@ -174,9 +182,16 @@ final class DauInputController: IMKInputController {
         let selection = client.selectedRange()
         PerfLog.signposter.endInterval("selectedRange", selSignpost)
         result.selectedRangeNs = Int64(PerfLog.now() &- selStart)
+        #if DEBUG
+        result.diag = ReplaceDiag(deleteCount: deleteCount, selection: selection,
+                                  expected: tracker.expected, insertedLength: insert.description.utf16.count)
+        #endif
 
         switch tracker.plan(selection: selection, deleteCount: deleteCount) {
         case .replace(let range):
+            #if DEBUG
+            result.diag?.replacement = range
+            #endif
             let text = insert.description
             let insStart = PerfLog.now()
             let insSignpost = PerfLog.signposter.beginInterval("insertText")

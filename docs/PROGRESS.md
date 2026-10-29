@@ -61,6 +61,8 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | 29/10/2026 | TextEdit (tự gõ lại) | đúng: "tôi yêu tiếng Việt, windows Hasaki car" | |
 | 29/10/2026 | Cấp phát trong `handle` VNI | 0 lần / 37.200 phím | như đo Telex |
 | 29/10/2026 | Cấp phát bộ nhớ trong `handle` | 0 lần / 41.600 phím | chương trình ngoài repo móc `malloc_logger`, có đối chứng dương; chưa có trong CI |
+| 29/10/2026 | Cách A theo tốc độ gõ (Debug), câu mẫu `tooi yeeu tieengs Vieetj, windows Hasaki carr ` | 0 ms/phím (System Events gõ cả chuỗi, ~1–2 ms): TextEdit, Safari đúng; Chrome, VS Code, Terminal SAI (mismatch 3–4, thay nhầm vùng ở lần thay đầu của từ). 5 và 10 ms: Chrome, Terminal đúng; VS Code sai từ đầu ("ôoi"). 20, 30, 60, 120 ms: cả 5 app đúng | `scripts/selftest-typing/run.sh --delay N all`, log `diag` |
+| 29/10/2026 | Cách A, 30 ms/phím, phím có thay (n=12 mỗi app) | `selectedRange` p50/p99 µs: TextEdit 327/606, Safari 622/1.057, Chrome 415/694, VS Code 230/885, Terminal 408/637; cả phím có thay p50/p99 µs: 3.406/7.617, 1.494/4.731, 1.081/5.296, 617/1.236, 1.165/1.669; mismatch 0 | như trên |
 
 ## Nhật ký
 (ngày — việc — agent — kết quả — commit)
@@ -105,3 +107,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 29/10/2026 — kiểm toán M4 lần 1 — auditor — CHƯA ĐẠT; ma trận UI mã 0, test 25/76/30/9 xanh. Giao app-ui-dev sửa N5 + mã chết + ARCHITECTURE; imk-dev thêm "Cài đặt Dấu…" sau chẩn đoán VS Code/Terminal; hỏi người dùng D9/D25 (ngoại lệ màu, banner cam, nút Nâng cao)
 - 29/10/2026 — người dùng chốt: không ngoại lệ màu (icon sidebar dùng màu hệ thống), banner cam hệ thống, chấp nhận nút "Nâng cao" ghép — ghi vào D9 — phiên chính
 - 29/10/2026 — sửa kiểm toán M4: N5 (gạch chân, D20 tạm tắt kèm ô trống), màu hệ thống cho icon sidebar, banner cam hệ thống, gỡ SettingsExamples, ARCHITECTURE — app-ui-dev (d922a70, 373db68, 073bc75); ma trận UI mã 0. Chờ imk-dev (App Group selftest, chẩn đoán VS Code/Terminal, "Cài đặt Dấu…") rồi kiểm toán lại M4
+- 29/10/2026 — chẩn đoán VS Code/Terminal — imk-dev — không phải lỗi dự đoán: app áp phím bất đồng bộ (Chromium/Electron, Terminal chờ shell echo) nên `selectedRange` là ảnh chụp cũ khi phím đến dồn (< ~10 ms; VS Code < ~20 ms); ảnh chụp không cập nhật trong lúc `handle` chạy (hỏi lại 10 × 2 ms vẫn y nguyên). Đã thử và bỏ: hỏi lại chờ app; so chữ trước con trỏ bằng `attributedSubstring` (Safari trả chữ cũ → hỏng cả Safari; VS Code textarea chỉ là cửa sổ nhỏ nên so khớp vô nghĩa). Từ 20 ms/phím cả 5 app đúng. Chờ phiên chính chốt A/B + gạch chân D13
