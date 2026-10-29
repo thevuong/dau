@@ -23,18 +23,10 @@ struct AppRulesView: View {
 
     var body: some View {
         @Bindable var model = model
-        SettingsPage(SettingsSection.apps.title) {
-            SearchField(text: $query, prompt: String(localized: "Tìm ứng dụng"))
-                .frame(width: 180)
-            Button {
-                isAdding = true
-            } label: {
-                Image(systemName: "plus")
-            }
-            .settingsButton()
-            .help(Text("Thêm ứng dụng"))
-            .accessibilityLabel(Text("Thêm ứng dụng"))
-        } content: {
+        SettingsPage(SettingsSection.apps.title,
+                     actions: HeaderActions(query: $query, prompt: String(localized: "Tìm ứng dụng"),
+                                            addLabel: String(localized: "Thêm ứng dụng"),
+                                            onAdd: { isAdding = true })) {
             SettingsGroup(Text("Mặc định")) {
                 SettingsCard {
                     SettingsRow(Text("Nhớ chế độ theo từng ứng dụng"),

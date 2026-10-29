@@ -33,20 +33,33 @@ extension NSAppearance {
     var isDark: Bool { bestMatch(from: [.aqua, .darkAqua]) == .darkAqua }
 }
 
+/// Search field and + button on the trailing side of a page header (mockup
+/// "SettingsApps": a 180 pt search pill, 10 pt gap, a separate 30 pt round + button).
+struct HeaderActions {
+    var query: Binding<String>
+    var prompt: String
+    var addLabel: String
+    var onAdd: () -> Void
+}
+
 /// A Settings page. Its title is a toolbar item on the leading edge of the window's
 /// toolbar, in the title-bar row next to the traffic lights (mockup header, 15 bold);
-/// `accessory` goes on the trailing edge. Every page has the title item, so the
-/// toolbar keeps the same height and the title the same place in every section.
+/// `actions` go on the trailing edge. Every page has the title item, so the toolbar
+/// keeps the same height and the title the same place in every section.
 /// The scroll content has a fixed width, so a legacy scroll bar never narrows it.
-struct SettingsPage<Accessory: View, Content: View>: View {
+///
+/// On macOS 26 and later the toolbar groups adjacent items on one glass background; a
+/// fixed spacer splits the search field and the + button into two controls, as in
+/// the mockup. Their shapes are the system's (D9). macOS 14–15 have no glass: the
+/// two controls sit 10 pt apart in the toolbar.
+struct SettingsPage<Content: View>: View {
     let title: String
-    @ViewBuilder var accessory: Accessory
+    var actions: HeaderActions?
     @ViewBuilder var content: Content
 
-    init(_ title: String, @ViewBuilder accessory: () -> Accessory = { EmptyView() },
-         @ViewBuilder content: () -> Content) {
+    init(_ title: String, actions: HeaderActions? = nil, @ViewBuilder content: () -> Content) {
         self.title = title
-        self.accessory = accessory()
+        self.actions = actions
         self.content = content()
     }
 
@@ -69,15 +82,54 @@ struct SettingsPage<Accessory: View, Content: View>: View {
             if #available(macOS 26, *) {
                 ToolbarItem(placement: .navigation) { PageTitle(title: title) }
                     .sharedBackgroundVisibility(.hidden)
+                if let actions {
+                    // Two items with a fixed spacer: the toolbar draws them as two
+                    // separate controls instead of one shared glass group.
+                    ToolbarItem(placement: .primaryAction) { HeaderSearchField(actions: actions) }
+                    ToolbarSpacer(.fixed, placement: .primaryAction)
+                    ToolbarItem(placement: .primaryAction) { HeaderAddButton(actions: actions) }
+                }
             } else {
                 ToolbarItem(placement: .navigation) { PageTitle(title: title) }
-            }
-            if Accessory.self != EmptyView.self {
-                ToolbarItem(placement: .primaryAction) {
-                    HStack(spacing: 10) { accessory }
+                if let actions {
+                    ToolbarItem(placement: .primaryAction) {
+                        HStack(spacing: 10) {
+                            HeaderSearchField(actions: actions)
+                            HeaderAddButton(actions: actions)
+                        }
+                    }
                 }
             }
         }
+    }
+}
+
+/// The header search field: the system search field, 200 pt wide (the mockup's 180 pt
+/// field plus its 10 pt padding on each side).
+struct HeaderSearchField: View {
+    let actions: HeaderActions
+
+    var body: some View {
+        SearchField(text: actions.query, prompt: actions.prompt)
+            .frame(width: 200)
+            .layoutProbe("headerSearch")
+    }
+}
+
+/// The header + button: a system button with a 15 pt +.
+struct HeaderAddButton: View {
+    let actions: HeaderActions
+
+    var body: some View {
+        Button(action: actions.onAdd) {
+            Image(systemName: "plus")
+                .font(.system(size: 15, weight: .regular))
+        }
+        .controlSize(.large)
+        .buttonBorderShape(.circle)
+        .help(Text(verbatim: actions.addLabel))
+        .accessibilityLabel(Text(verbatim: actions.addLabel))
+        .layoutProbe("headerAdd")
     }
 }
 

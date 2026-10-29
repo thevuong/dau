@@ -13,6 +13,8 @@ struct SearchField: NSViewRepresentable {
         field.placeholderString = prompt
         field.setAccessibilityLabel(prompt)
         field.sendsSearchStringImmediately = true
+        // Mockup: 28 pt tall pill.
+        field.controlSize = .large
         field.delegate = context.coordinator
         field.target = context.coordinator
         field.action = #selector(Coordinator.changed(_:))
