@@ -96,6 +96,16 @@ struct SpellingTests {
     ])
     func englishWordsWithK(_ c: Case) { expectTyped(c.keys, c.expected) }
 
+    /// D31: final k is accepted only when ă already stands before it; a later breve
+    /// does not turn "ak" into "ăk", so these stay as typed.
+    @Test func breveMustPrecedeFinalK() {
+        expectTyped("lakws ", "lakws ")
+        expectTyped("lak81 ", "lak81 ", vni)
+        expectTyped("Lawks ", "Lắk ")
+        expectTyped("asks ", "asks ")
+        expectTyped("tasks ", "tasks ")
+    }
+
     /// Rhyme table spot checks: valid rhymes stay, invalid clusters are restored.
     @Test(arguments: [
         Case("khuyas ", "khuýa "), Case("oangf ", "oàng "), Case("hoawcj ", "hoặc "),
