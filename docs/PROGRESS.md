@@ -26,7 +26,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | M1 Engine | xong | ĐẠT (29/10, lần 2) | Telex, Telex đơn giản, VNI, 75 test; release ~0,15 µs/phím; 0 từ sai / 474 từ, 0 khôi phục nhầm / 15.796 âm tiết, fuzz 800k thao tác không crash |
 | M2 Bộ gõ tối thiểu | đang làm | — | TextEdit + Safari đạt; selectedRange p50 ~0,3 ms ≈ 6–7% thời gian phím có thay (insertText chiếm chủ yếu); còn 4 app |
 | M3 Độ tin cậy | chưa | — | |
-| M4 App Cài đặt | đang làm | — | app-ui-dev: DauShared settings model + cửa sổ Cài đặt 4 mục (song song, chờ M2) |
+| M4 App Cài đặt | đang làm | — | DauShared + cửa sổ 4 mục xong (2d6206e, c731c61; 25 test); đang: nối bộ gõ (imk-dev), ngôn ngữ app/sidebar/chế độ tối (app-ui-dev). Cần Team ID để App Group chia sẻ thật giữa 2 tiến trình |
 | M5 Onboarding, cài, gỡ | chưa | — | |
 | M6 Hiệu năng dưới tải | chưa | — | |
 | M7 Phát hành | chưa | — | |
@@ -81,3 +81,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 29/10/2026 — gõ thử TextEdit (người dùng): câu mẫu ra đúng, không gạch chân, không nhảy chữ — tiêu chí M2 còn Safari
 - 29/10/2026 — gõ thử Safari (người dùng): câu mẫu ra đúng, không gạch chân, không nhảy chữ → tiêu chí "TextEdit và Safari không gạch chân" của M2 đạt. Còn: đo Chrome, Slack, VS Code, Terminal để chốt A/B và câu hỏi Chrome/Terminal, rồi kiểm toán M2
 - 29/10/2026 — gõ thử Chrome (người dùng): câu mẫu ra đúng, không gạch chân, không nhảy chữ; selectedRange trả vị trí hợp lệ → Chrome không cần quyền Trợ năng/gạch chân. Còn Slack, VS Code, Terminal
+- 29/10/2026 — M4 model cài đặt chung + cửa sổ Cài đặt 4 mục — app-ui-dev — build universal, 25 test DauShared xanh, không quyền mạng (2d6206e, c731c61). Phiên chính đổi APP_GROUP_ID thành `.shared` (trùng bundle ID app chủ thì UserDefaults từ chối) (3ffaee1). Quyết định kỹ thuật: giữ `en.lproj` (D24) và ép ngôn ngữ app = vi bằng registration domain
