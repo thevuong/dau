@@ -2,6 +2,7 @@ import AppKit
 import Carbon
 import InputMethodKit
 import DauEngine
+import DauShared
 
 /// One instance per client session (IMKServer creates it). Each controller owns its own
 /// `VietEngine`, cursor tracker and mode: no global mutable state (ARCHITECTURE.md).
@@ -15,15 +16,18 @@ import DauEngine
 /// of trapping) if that ever stops being true (D18).
 @objc(DauInputController)
 final class DauInputController: IMKInputController {
-    /// D2: "Tiếng Việt" and "Tiếng Anh" are two input modes of the same input source.
-    enum Mode { case vietnamese, english }
-
-    private var engine = VietEngine(options: InputSettings.engineOptions())
+    /// Shared settings as last read from `SettingsStore.inputMethod` (M4). Re-read on
+    /// every change notification and at activation.
+    private var settings = SettingsStore.inputMethod.load()
+    private lazy var engine = VietEngine(options: settings.engineOptions)
     private var tracker = CursorTracker()
-    private var mode: Mode = .vietnamese
+    private var mode: InputMode = .vietnamese
+    /// Keeps the Darwin notification registration alive; dropped when the client closes.
+    private var settingsObserver: SettingsChangeObserver?
     /// Identity of the last client proxy seen, to reset when the client changes.
     private var clientID: ObjectIdentifier?
-    /// Bundle ID of the client app, for perf logs only (cached at activation, N3).
+    /// Bundle ID of the client app, for perf logs and per-app rules (D5, D13); read once
+    /// at activation, never while typing (N3).
     private var clientApp = "?"
     private let perf = PerfLog()
 
@@ -235,19 +239,26 @@ final class DauInputController: IMKInputController {
     override func activateServer(_ sender: Any!) {
         super.activateServer(sender)
         resetComposition()
-        // Pick up a typing method chosen from the menu in another controller.
-        let options = InputSettings.engineOptions()
-        if engine.options != options { engine.options = options }
+        startObservingSettings()
+        // Catch up on anything missed while no observer was registered (or if the
+        // registration failed). One small JSON decode per activation, not per key.
+        apply(SettingsStore.inputMethod.load())
+        var client: IMKTextInput?
         if let sender {
             clientID = ObjectIdentifier(sender as AnyObject)
-            clientApp = (sender as? IMKTextInput)?.bundleIdentifier() ?? "?"
+            client = sender as? IMKTextInput
+            clientApp = client?.bundleIdentifier() ?? "?"
         }
         syncModeFromCurrentInputSource()
         perf.note("activate", app: clientApp)
+        if let client { applyStartMode(client: client) }
+        noteAppRule()
     }
 
     override func deactivateServer(_ sender: Any!) {
         resetComposition()
+        // D5: remember the mode the app is left in (only kept when the setting is on).
+        if clientApp != "?" { ModeMemory.shared.record(mode, for: clientApp, settings: settings) }
         super.deactivateServer(sender)
     }
 
@@ -260,7 +271,78 @@ final class DauInputController: IMKInputController {
 
     override func inputControllerWillClose() {
         resetComposition()
+        settingsObserver = nil
         super.inputControllerWillClose()
+    }
+
+    // MARK: - Shared settings (M4)
+
+    /// Registers for the settings change notification once per controller. Each
+    /// controller re-reads the store itself, so there is no registry of live controllers
+    /// to keep in sync (no global mutable state).
+    private func startObservingSettings() {
+        guard settingsObserver == nil else { return }
+        let target = WeakController(self)
+        // Delivered on the main queue, where IMK also calls this controller, so the
+        // engine is never touched from two threads.
+        settingsObserver = SettingsStore.inputMethod.observeChanges(on: .main) {
+            guard Thread.isMainThread else { return }
+            target.controller?.settingsDidChange()
+        }
+        if settingsObserver == nil {
+            settingsLogger.error("event=observe-failed (changes apply at next activation)")
+        }
+    }
+
+    private func settingsDidChange() {
+        apply(SettingsStore.inputMethod.load())
+    }
+
+    /// Applies new settings to this controller. A change of engine options in the middle
+    /// of a word drops the word first (`EngineSettings.apply`).
+    private func apply(_ new: DauSettings) {
+        settings = new
+        if EngineSettings.apply(new, to: &engine) {
+            tracker.invalidate()
+            perf.note("options-changed", app: clientApp)
+        }
+        ModeMemory.shared.forgetRememberedIfDisabled(new)
+        // TODO(D20): "Thêm dấu cho từ đã gõ" (`settings.addMarksToTypedWords`). Off: never
+        // seed (current behavior). On: not implemented yet — seeding needs
+        // `attributedSubstring` for the word before the cursor and a UTF-16 count of the
+        // seeded (possibly NFD) text for `deleteCount` (PROGRESS.md, notes for M2). Until
+        // then the engine is never seeded, whatever the setting says.
+    }
+
+    /// D5: when the user switches to another app, select the mode its rule asks for, or
+    /// the mode remembered for it. Uses IMK's own `selectInputMode:` (Swift
+    /// `selectMode(_:)`: "allows an input method to change its mode directly",
+    /// IMKInputSession.h) rather than `TISSelectInputSource` (N1). One client call per
+    /// app switch, never while typing (N3).
+    ///
+    /// No loop: the system answers with `setValue(_:forTag:client:)`, which only updates
+    /// `mode` and never selects a mode itself; and a second activation of the same app is
+    /// a no-op in `AppModeMemory.activate`.
+    private func applyStartMode(client: IMKTextInput) {
+        guard clientApp != "?",
+              let target = ModeMemory.shared.activate(bundleID: clientApp, current: mode, settings: settings),
+              let base = Bundle.main.bundleIdentifier, !base.isEmpty else { return }
+        client.selectMode(target.identifier(base: base))
+        perf.note(target == .english ? "start-mode-en" : "start-mode-vi", app: clientApp)
+        // The system may already report the new source; if not, setValue(forTag:) will.
+        // Record it here too, in case the switch made IMK deactivate this controller
+        // (which records the old mode) without a setValue afterwards.
+        if syncModeFromCurrentInputSource() {
+            ModeMemory.shared.record(mode, for: clientApp, settings: settings)
+        }
+    }
+
+    /// D13: an app rule may ask for marked text (underlined) instead of in-place
+    /// replacement. Not implemented yet; log that the flag was seen, never any text.
+    private func noteAppRule() {
+        guard clientApp != "?", let rule = settings.rule(for: clientApp), rule.underline else { return }
+        // TODO(M3, D13): use setMarkedText for this client instead of replacing in place.
+        settingsLogger.notice("event=underline-rule-ignored app=\(self.clientApp, privacy: .public)")
     }
 
     // MARK: - Input modes (D2)
@@ -268,42 +350,41 @@ final class DauInputController: IMKInputController {
     override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
         super.setValue(value, forTag: tag, client: sender)
         guard tag == kTextServiceInputModePropertyTag, let modeID = value as? String else { return }
-        applyMode(modeID)
+        // D5: a mode the user picked while in this app is what it remembers.
+        if applyMode(modeID), clientApp != "?" {
+            ModeMemory.shared.record(mode, for: clientApp, settings: settings)
+        }
     }
 
     /// Mode IDs are the keys of `tsInputModeListKey` in Info.plist: bundle ID + ".vi"/".en".
-    private func applyMode(_ modeID: String) {
-        let base = Bundle.main.bundleIdentifier ?? ""
-        let newMode: Mode
-        if modeID == base + ".en" {
-            newMode = .english
-        } else if modeID == base + ".vi" {
-            newMode = .vietnamese
-        } else {
-            return
-        }
-        guard newMode != mode else { return }
+    @discardableResult
+    private func applyMode(_ modeID: String) -> Bool {
+        guard let newMode = InputMode(identifier: modeID, base: Bundle.main.bundleIdentifier ?? ""),
+              newMode != mode else { return false }
         mode = newMode
         resetComposition()
         perf.note(newMode == .english ? "mode-en" : "mode-vi", app: clientApp)
         // TODO(D17): VoiceOver announcement on mode change. Not added yet: switching modes
         // is an input source change the system may already announce (N1); check on a real
         // machine first (docs/M2-TESTING.md) to avoid speaking twice.
+        return true
     }
 
     /// At activation, read the selected input source so the mode is right even if IMK
     /// does not send `setValue(_:forTag:client:)` first.
-    private func syncModeFromCurrentInputSource() {
+    /// Returns true if the mode changed.
+    @discardableResult
+    private func syncModeFromCurrentInputSource() -> Bool {
         guard let source = TISCopyCurrentKeyboardInputSource()?.takeRetainedValue(),
-              let raw = TISGetInputSourceProperty(source, kTISPropertyInputSourceID) else { return }
+              let raw = TISGetInputSourceProperty(source, kTISPropertyInputSourceID) else { return false }
         let sourceID = Unmanaged<CFString>.fromOpaque(raw).takeUnretainedValue() as String
-        applyMode(sourceID)
+        return applyMode(sourceID)
     }
 
     // MARK: - Input menu
 
     override func menu() -> NSMenu! {
-        let current = InputSettings.typingMethod()
+        let current = settings.typingMethod
         return onMain { () -> NSMenu in
             let menu = NSMenu()
             menu.autoenablesItems = false
@@ -311,7 +392,7 @@ final class DauInputController: IMKInputController {
                                     action: nil, keyEquivalent: "")
             header.isEnabled = false
             menu.addItem(header)
-            let methods: [(String, EngineOptions.InputMethod, Selector)] = [
+            let methods: [(String, DauSettings.TypingMethod, Selector)] = [
                 (String(localized: "Telex", comment: "Input menu: typing method name."), .telex, #selector(selectTelex(_:))),
                 (String(localized: "VNI", comment: "Input menu: typing method name."), .vni, #selector(selectVNI(_:))),
                 (String(localized: "Telex đơn giản", comment: "Input menu: typing method name (D29)."), .simpleTelex, #selector(selectSimpleTelex(_:))),
@@ -337,10 +418,15 @@ final class DauInputController: IMKInputController {
     @objc func selectVNI(_ sender: Any?) { setTypingMethod(.vni) }
     @objc func selectSimpleTelex(_ sender: Any?) { setTypingMethod(.simpleTelex) }
 
-    private func setTypingMethod(_ method: EngineOptions.InputMethod) {
-        InputSettings.setTypingMethod(method)
-        engine.options.inputMethod = method
+    /// Writes through the shared store, so the Settings app (and every other controller)
+    /// reloads from the change notification.
+    private func setTypingMethod(_ method: DauSettings.TypingMethod) {
+        let store = SettingsStore.inputMethod
+        var new = store.load()
+        new.typingMethod = method
+        store.save(new)
         resetComposition()
+        apply(new)
     }
 
     @objc func openKeyboardSettings(_ sender: Any?) {
@@ -356,4 +442,11 @@ final class DauInputController: IMKInputController {
         MainActor.assumeIsolated { result = body() }
         return result
     }
+}
+
+/// Weak reference that can cross into the `@Sendable` settings handler. Only
+/// dereferenced on the main thread (see `startObservingSettings`).
+private final class WeakController: @unchecked Sendable {
+    weak var controller: DauInputController?
+    init(_ controller: DauInputController) { self.controller = controller }
 }
