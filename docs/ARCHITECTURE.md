@@ -32,7 +32,7 @@ dau/
 
 ### DauShared
 - Phụ thuộc DauEngine (để đổi cài đặt sang `EngineOptions` và chạy engine thật cho phần xem trước); không dùng trong đường nóng của engine.
-- `DauSettings` (Sendable, Codable, mặc định D15; `advanced` là một enum nên D22 không thể bật cả hai), `AppRule` (D5, D13), `startMode(for:remembered:)` theo D5.
+- `DauSettings` (Sendable, Codable, mặc định D15; `advanced` là một enum nên D22 không thể bật cả hai), `AppRule` (D5, D13: bundle ID, tên hiển thị, gạch chân, nguồn "Đề xuất"/người dùng; không có chế độ Việt/Anh). Giải mã dễ dãi: khoá lạ hoặc khoá cũ (`rememberModePerApp`, `mode` của quy tắc, từ bản trước 30/10/2026) bị bỏ qua, quy tắc cũ giữ lựa chọn gạch chân; lần lưu sau không ghi lại các khoá đó (D18).
 - `SettingsStore`: lưu cả cài đặt thành một JSON dưới khoá `settings` trong UserDefaults suite = App Group (`DauAppGroupIdentifier` trong Info.plist, giá trị `$(TeamIdentifierPrefix)$(BUNDLE_ID_PREFIX).shared`); sau mỗi lần lưu phát Darwin notification `<suite>.settingsDidChange`; `observeChanges` cho bộ gõ áp dụng ngay.
 - `TypingPreview`/`TypingExample`: chạy engine thật như bộ gõ. App chủ dùng chúng để dựng mọi ví dụ "phím → kết quả" trên giao diện (`SettingsSamples` trong `Apps/Dau`, có test ở `scripts/snapshot-settings`), nên mọi ví dụ đều do engine tính (N5).
 
@@ -41,10 +41,11 @@ dau/
 - `handle(_:client:)`: đưa phím vào engine; nếu `replace`, hỏi `selectedRange` một lần để có vị trí tuyệt đối rồi gọi `insertText(_:replacementRange:)` đúng một lần; phím đi thẳng không hỏi gì (N3, cách A đã chốt trong `DECISIONS.md`). Bản Debug có thêm một lần hỏi sau khi thay để chẩn đoán (`ReplaceDiag.swift`); số đo M2 làm trên Debug có lời gọi thừa này.
 - Reset engine khi: click chuột, `activateServer`/`deactivateServer`, `commitComposition`, phím di chuyển con trỏ, hoặc `selectedRange` khác dự đoán.
 - App trong danh sách tương thích cần gạch chân: dùng `setMarkedText` thay cho thay chữ tại chỗ (D13).
-- Hai input mode "Tiếng Việt" và "Tiếng Anh" khai báo trong Info.plist (`ComponentInputModeDict`); ở chế độ Anh, mọi phím đi thẳng (D2).
+- Một input mode duy nhất "Dấu – Tiếng Việt" (`….Dau.vi`) khai báo trong Info.plist (`ComponentInputModeDict`), để ID nguồn đã bật không đổi và nguồn nằm trong nhóm Tiếng Việt (D2). Gõ tiếng Anh bằng nguồn ABC/U.S. của macOS. Bộ gõ không giữ trạng thái chế độ: IMK báo mode nào (kể cả `….Dau.en` còn sót từ bản cũ) cũng xử lý như tiếng Việt; `setValue(_:forTag:client:)` chỉ reset từ đang gõ (D4, D18). Không tự đổi nguồn nhập liệu theo app, không nhớ chế độ theo app (D5), không tự thông báo VoiceOver (D17).
+- Quy tắc theo app: chỉ đọc lựa chọn gạch chân lúc `activateServer` (D13, chưa làm — ghi log `underline-rule-ignored`). Lúc khởi động, bộ gõ xoá khoá `rememberedInputModes` (nhớ chế độ theo app của bản cũ) khỏi defaults riêng của nó.
 - Đọc cài đặt và danh sách tương thích từ App Group; nghe thay đổi để áp dụng ngay.
 - Entitlements: App Sandbox, App Group, tạm thêm `temporary-exception.mach-register.global-name` cho tên kết nối IMK (theo mẫu IMK có sandbox). Chưa thử bỏ đi để biết có cần không: để M3. **Không** `com.apple.security.network.client`.
-- Khoá Info.plist đang dùng (chạy được trên macOS 27 ở M2): `InputMethodConnectionName`, `InputMethodServerControllerClass`, `LSBackgroundOnly`, `TISInputSourceID`, `TISIntendedLanguage`, `ComponentInputModeDict` (hai mode, mỗi mode một icon template), `tsInputMethodIconFileKey`, `TISIconIsTemplate`; thêm `DauHostAppBundleIdentifier`, `DauAppGroupIdentifier` của riêng Dấu.
+- Khoá Info.plist đang dùng (chạy được trên macOS 27 ở M2): `InputMethodConnectionName`, `InputMethodServerControllerClass`, `LSBackgroundOnly`, `TISInputSourceID`, `TISIntendedLanguage`, `ComponentInputModeDict` (một mode `.vi`, icon template V), `tsInputMethodIconFileKey`, `TISIconIsTemplate`; thêm `DauHostAppBundleIdentifier`, `DauAppGroupIdentifier` của riêng Dấu.
 
 ### Dau (app chủ)
 - **Cửa sổ Cài đặt:** scene SwiftUI `Window` (không dùng scene `Settings`), là cửa sổ chính của app. ⌘, mở lại cửa sổ. Cỡ mặc định 820×600, tối thiểu 760×520. Điểm vào là `main.swift`: nó ghim bản địa hoá `vi` trước khi AppKit chạy.

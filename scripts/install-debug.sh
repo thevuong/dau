@@ -89,8 +89,8 @@ cat <<'EOF'
      bấm "Sửa…" (Edit…).
   2. Bấm nút "+" ở góc dưới bên trái danh sách.
   3. Chọn ngôn ngữ "Tiếng Việt" (Vietnamese), chọn "Dấu – Tiếng Việt", bấm "Thêm".
-     "Dấu – Tiếng Anh" nằm trong ngôn ngữ "Tiếng Anh" (English); thêm nó theo cùng cách
-     nếu muốn thử chuyển chế độ Việt/Anh.
+     Dấu chỉ có nguồn này (D2). Gõ tiếng Anh bằng ABC/U.S. sẵn có của macOS; nếu
+     danh sách còn "Dấu – Tiếng Anh" từ bản cũ thì bấm "–" để bỏ nó.
   4. Nếu không thấy "Dấu" trong danh sách: đăng xuất rồi đăng nhập lại, sau đó làm lại
      từ bước 1 (lần cài đầu, hệ thống có thể chưa quét thư mục ~/Library/Input Methods).
   5. Chọn "Dấu – Tiếng Việt" trên menu nguồn nhập liệu ở thanh menu, hoặc bằng phím tắt

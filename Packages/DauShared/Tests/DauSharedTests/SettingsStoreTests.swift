@@ -29,7 +29,7 @@ struct SettingsStoreTests {
         let suite = TemporarySuite()
         let store = SettingsStore(defaults: suite.defaults, suiteName: suite.name)
         var s = DauSettings(typingMethod: .vni, advanced: .allowZFWJ)
-        s.upsert(AppRule(bundleID: "com.apple.Terminal", mode: .english, underline: true))
+        s.upsert(AppRule(bundleID: "com.apple.Terminal", underline: true))
         store.save(s)
         #expect(store.load() == s)
         // A second store on the same suite (the other process) sees it too.

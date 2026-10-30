@@ -55,9 +55,8 @@ struct EngineSettingsTests {
         #expect(t.engine.isComposing)
         // Settings that do not touch the engine (D5, D13, D20) are not an options change.
         var other = DauSettings.defaults
-        other.rememberModePerApp = true
         other.addMarksToTypedWords = false
-        other.upsert(AppRule(bundleID: "com.apple.Terminal", mode: .english, underline: true))
+        other.upsert(AppRule(bundleID: "com.apple.Terminal", underline: true))
         #expect(t.apply(other) == false)
         #expect(t.engine.isComposing)
         #expect(t.type("etj") == "việt")

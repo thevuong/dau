@@ -6,7 +6,7 @@ Danh sách việc người dùng làm trên máy để kiểm chứng mốc M2. 
 
 1. Thoát các bộ gõ tiếng Việt khác đang chạy (OpenKey, EVKey, GoTiengViet…), kể cả trong Mục đăng nhập.
 2. Trong Terminal, ở thư mục repo: `scripts/install-debug.sh`. Script build bản Debug, chép `DauInputMethod.app` vào `~/Library/Input Methods`, dừng tiến trình bộ gõ cũ và in các bước bật nguồn nhập liệu.
-3. Làm theo các bước script in ra: Cài đặt hệ thống › Bàn phím › Nguồn đầu vào › Sửa… › "+" › Tiếng Việt › "Dấu – Tiếng Việt" › Thêm. Thêm cả "Dấu – Tiếng Anh" (nằm trong ngôn ngữ Tiếng Anh). Không thấy "Dấu" thì đăng xuất, đăng nhập lại rồi làm lại.
+3. Làm theo các bước script in ra: Cài đặt hệ thống › Bàn phím › Nguồn đầu vào › Sửa… › "+" › Tiếng Việt › "Dấu – Tiếng Việt" › Thêm. Dấu chỉ có nguồn này (D2); gõ tiếng Anh bằng ABC/U.S. của macOS, nên giữ ABC (hoặc U.S.) trong danh sách. Nếu còn "Dấu – Tiếng Anh" từ bản cũ thì bỏ nó. Không thấy "Dấu" thì đăng xuất, đăng nhập lại rồi làm lại.
 4. Chọn "Dấu – Tiếng Việt" ở menu nguồn nhập liệu trên thanh menu. Nếu máy bật "Tự động chuyển sang nguồn đầu vào của tài liệu" (Cài đặt hệ thống › Bàn phím › Nguồn đầu vào), mỗi ứng dụng/cửa sổ nhớ nguồn riêng: phải chọn lại "Dấu – Tiếng Việt" **sau khi** chuyển sang từng ứng dụng thử, và nhìn biểu tượng V trên thanh menu trước khi gõ.
 5. (Tuỳ chọn, để xem lỗi nếu bộ gõ không chạy) mở một cửa sổ Terminal riêng:
    `/usr/bin/log stream --predicate 'process == "DauInputMethod"'` (trong zsh, `log` là lệnh có sẵn khác, phải gõ đường dẫn đầy đủ)
@@ -84,14 +84,14 @@ Làm trong TextEdit (và lặp lại ở ứng dụng nào có kết quả lạ 
 | 6 | Gõ `tooi`, nhấn ←, gõ `s` | thêm "s" ở vị trí con trỏ, không bỏ dấu vào "tôi" (D4: mũi tên chỉ reset) | |
 | 7 | Chọn một đoạn chữ bằng chuột, gõ `tooi` | đoạn chọn bị thay bằng "tôi" | |
 | 8 | Gõ `tooi`, nhấn ⌘Z | ứng dụng hoàn tác bình thường, không lỗi | |
-| 9 | Chuyển sang "Dấu – Tiếng Anh" bằng phím tắt nguồn nhập liệu, gõ `tooi` | "tooi" (D2) | |
-| 10 | Chuyển lại "Dấu – Tiếng Việt", gõ `tooi` | "tôi" | |
+| 9 | Chuyển sang ABC (hoặc U.S.) bằng phím tắt nguồn nhập liệu của macOS, gõ `tooi` | "tooi" (D2: tiếng Anh dùng nguồn của hệ thống) | |
+| 10 | Chuyển lại "Dấu – Tiếng Việt", gõ `tooi` | "tôi"; chữ đang gõ dở trước khi chuyển không bị sửa (D4: đổi nguồn chỉ reset) | |
 | 11 | Menu nguồn nhập liệu: có nhóm "Kiểu gõ" với Telex ✓ / VNI / Telex đơn giản và mục "Mở cài đặt Bàn phím…" | đúng như mô tả, chữ có dấu, tên "Dấu" | |
 | 12 | Chọn VNI trong menu, gõ `to6i` | "tôi"; mở menu lại thấy VNI ✓. Chọn lại Telex sau khi thử | |
 | 13 | Bấm "Mở cài đặt Bàn phím…" | Cài đặt hệ thống mở đúng mục Bàn phím (N4) | |
-| 14 | Biểu tượng trên thanh menu khi chọn từng chế độ | "V" cho Tiếng Việt, "E" cho Tiếng Anh, đơn sắc, đổi màu theo nền sáng/tối | |
+| 14 | Biểu tượng trên thanh menu khi chọn Dấu; danh sách "+" của Nguồn đầu vào | "V" đơn sắc, đổi màu theo nền sáng/tối. Dấu chỉ có "Dấu – Tiếng Việt" trong nhóm Tiếng Việt, không có "Dấu – Tiếng Anh" ở nhóm Tiếng Anh (D2) | |
 | 15 | Mở bảng Emoji (fn/🌐 E hoặc ⌃⌘Space), chèn một emoji, gõ tiếp `tooi` | không treo, không mất chữ (D18) | |
-| 16 | Bật VoiceOver (⌘F5), chuyển Tiếng Việt ↔ Tiếng Anh | ghi lại hệ thống có tự đọc tên chế độ không (để quyết định D17, tránh đọc hai lần) | |
+| 16 | Bật VoiceOver (⌘F5), chuyển "Dấu – Tiếng Việt" ↔ ABC bằng phím tắt nguồn nhập liệu | hệ thống tự đọc tên nguồn; Dấu không đọc thêm (D17). Hệ thống không đọc thì ghi lại để xét lại D17 | |
 | 17 | Gõ ở ô mật khẩu (ví dụ ô mật khẩu trong Safari) | ghi lại hành vi (macOS thường tự chuyển bàn phím ASCII ở ô bảo mật) | |
 
 ## 5. Gửi lại

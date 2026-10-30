@@ -17,6 +17,9 @@ guard let connectionName = Bundle.main.object(forInfoDictionaryKey: "InputMethod
 
 let server = IMKServer(name: connectionName, bundleIdentifier: Bundle.main.bundleIdentifier)
 
+// D2/D5 (30/10/2026): drop the per-app mode memory written by older builds.
+LegacyModeMemory.removeIfPresent()
+
 #if DEBUG
 // Debug only: log the settings at launch and on every change (SettingsReloadLog).
 let settingsReloadLog = SettingsReloadLog.start()

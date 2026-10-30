@@ -61,10 +61,14 @@
 	<string>ModeVietnamese.tiff</string>
 	<key>TISIconIsTemplate</key>
 	<true/>
-	<!-- Input mode IDs are literal: Xcode does not expand build settings in plist keys.
+	<!-- One input mode, "Dấu – Tiếng Việt" (D2, 30/10/2026; the old ".en" mode is gone,
+	     English is typed with the system's ABC/U.S. source). The mode is kept, rather than
+	     declaring the bundle alone, so the input source ID users already enabled
+	     ("….Dau.vi") does not change and the source stays in the Vietnamese group.
+	     Input mode IDs are literal: Xcode does not expand build settings in plist keys.
 	     They must start with this bundle's identifier. When BUNDLE_ID_PREFIX changes in
-	     project.yml, update every "com.example.dau.inputmethod.Dau.*" here AND the matching
-	     keys in Resources/InfoPlist.xcstrings (display names "Dấu – Tiếng Việt"/"Dấu – Tiếng Anh"). -->
+	     project.yml, update every "com.example.dau.inputmethod.Dau.vi" here AND the matching
+	     key in Resources/InfoPlist.xcstrings (display name "Dấu – Tiếng Việt"). -->
 	<key>ComponentInputModeDict</key>
 	<dict>
 		<key>tsInputModeListKey</key>
@@ -97,39 +101,10 @@
 				<key>tsInputModeIsVisibleKey</key>
 				<true/>
 			</dict>
-			<key>com.example.dau.inputmethod.Dau.en</key>
-			<dict>
-				<key>TISInputSourceID</key>
-				<string>com.example.dau.inputmethod.Dau.en</string>
-				<key>tsInputModeMenuIconFileKey</key>
-				<string>ModeEnglish.tiff</string>
-				<key>tsInputModeAlternateMenuIconFileKey</key>
-				<string>ModeEnglish.tiff</string>
-				<key>tsInputModePaletteIconFileKey</key>
-				<string>ModeEnglish.tiff</string>
-				<!-- Undocumented: Apple's TamilIM declares a text label per mode this way
-				     (macOS 27). Kept so the system can draw its own label if it prefers it. -->
-				<key>TISIconLabels</key>
-				<dict>
-					<key>Primary</key>
-					<string>E</string>
-				</dict>
-				<key>TISIntendedLanguage</key>
-				<string>en</string>
-				<key>tsInputModeScriptKey</key>
-				<string>smRoman</string>
-				<key>tsInputModePrimaryInScriptKey</key>
-				<false/>
-				<key>tsInputModeDefaultStateKey</key>
-				<true/>
-				<key>tsInputModeIsVisibleKey</key>
-				<true/>
-			</dict>
 		</dict>
 		<key>tsVisibleInputModeOrderedArrayKey</key>
 		<array>
 			<string>com.example.dau.inputmethod.Dau.vi</string>
-			<string>com.example.dau.inputmethod.Dau.en</string>
 		</array>
 	</dict>
 </dict>

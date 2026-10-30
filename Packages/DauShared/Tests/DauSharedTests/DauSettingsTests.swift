@@ -16,8 +16,6 @@ struct DauSettingsTests {
         #expect(s.advanced == .off)
         #expect(!s.consonantShortcuts)
         #expect(!s.allowZFWJ)
-        // D5: remembering the mode per app is off by default.
-        #expect(!s.rememberModePerApp)
         #expect(s.appRules.isEmpty)
     }
 
@@ -59,37 +57,18 @@ struct DauSettingsTests {
         #expect(s.advanced == .off)
     }
 
-    @Test("D5: an app's own rule wins over the remembered mode")
-    func ruleWinsOverRememberedMode() {
-        var s = DauSettings(rememberModePerApp: true)
-        s.upsert(AppRule(bundleID: "com.apple.Terminal", mode: .english))
-        #expect(s.startMode(for: "com.apple.Terminal", remembered: .vietnamese) == .english)
-        #expect(s.startMode(for: "com.apple.TextEdit", remembered: .english) == .english)
-        #expect(s.startMode(for: "com.apple.TextEdit", remembered: nil) == nil)
-    }
-
-    @Test("D5: remembered modes apply only when the option is on")
-    func rememberedModeNeedsOption() {
-        var s = DauSettings.defaults
-        s.upsert(AppRule(bundleID: "com.apple.Terminal", mode: .english))
-        #expect(s.startMode(for: "com.apple.TextEdit", remembered: .english) == nil)
-        // Rules apply even with the option off.
-        #expect(s.startMode(for: "com.apple.Terminal", remembered: nil) == .english)
-    }
-
     @Test("rules are unique per bundle ID and keep their order")
     func upsertReplacesInPlace() {
         var s = DauSettings.defaults
         s.upsert(AppRule(bundleID: "a"))
         s.upsert(AppRule(bundleID: "b"))
-        s.upsert(AppRule(bundleID: "a", mode: .english, underline: true))
+        s.upsert(AppRule(bundleID: "a", underline: true))
         #expect(s.appRules.map(\.bundleID) == ["a", "b"])
-        #expect(s.rule(for: "a")?.mode == .english)
         #expect(s.rule(for: "a")?.underline == true)
         s.removeRule(for: "a")
         #expect(s.appRules.map(\.bundleID) == ["b"])
-        let duplicated = DauSettings(appRules: [AppRule(bundleID: "x"), AppRule(bundleID: "x", mode: .english)])
-        #expect(duplicated.appRules == [AppRule(bundleID: "x", mode: .english)])
+        let duplicated = DauSettings(appRules: [AppRule(bundleID: "x"), AppRule(bundleID: "x", underline: true)])
+        #expect(duplicated.appRules == [AppRule(bundleID: "x", underline: true)])
     }
 }
 
@@ -103,11 +82,10 @@ struct DauSettingsCodingTests {
     func roundTrip() throws {
         var s = DauSettings(
             typingMethod: .simpleTelex, tonePlacement: .classic, freeMarking: false,
-            autoRestore: false, addMarksToTypedWords: false, advanced: .consonantShortcuts,
-            rememberModePerApp: true)
+            autoRestore: false, addMarksToTypedWords: false, advanced: .consonantShortcuts)
         s.upsert(AppRule(bundleID: "com.google.Chrome", displayName: "Google Chrome",
-                         mode: .vietnamese, underline: true, source: .suggested))
-        s.upsert(AppRule(bundleID: "com.apple.Terminal", mode: .english))
+                         underline: true, source: .suggested))
+        s.upsert(AppRule(bundleID: "com.apple.Terminal"))
         let data = try JSONEncoder().encode(s)
         #expect(try JSONDecoder().decode(DauSettings.self, from: data) == s)
     }
@@ -132,13 +110,38 @@ struct DauSettingsCodingTests {
     @Test("a malformed rule is dropped without losing the others")
     func lenientRules() throws {
         let s = try decode("""
-            {"appRules":[{"bundleID":"a","mode":"english"},{"mode":"english"},
-                         {"bundleID":""},{"bundleID":"b","mode":"klingon","underline":true}]}
+            {"appRules":[{"bundleID":"a","underline":"yes"},{"underline":true},
+                         {"bundleID":""},{"bundleID":"b","underline":true,"source":"klingon"}]}
             """)
         #expect(s.appRules == [
-            AppRule(bundleID: "a", mode: .english),
-            AppRule(bundleID: "b", mode: .vietnamese, underline: true),
+            AppRule(bundleID: "a"),
+            AppRule(bundleID: "b", underline: true),
         ])
+    }
+
+    @Test("D5/D18: settings saved before the single-mode change still load")
+    func legacyModeKeys() throws {
+        // Written by builds that had "Dấu – Tiếng Anh", a start mode per rule and
+        // "Nhớ chế độ theo từng ứng dụng" (before 30/10/2026).
+        let s = try decode("""
+            {"typingMethod":"vni","rememberModePerApp":true,
+             "appRules":[{"bundleID":"com.apple.Terminal","mode":"english","underline":true,
+                          "source":"suggested","displayName":"Terminal"},
+                         {"bundleID":"com.apple.Safari","mode":"english"},
+                         {"bundleID":"com.apple.Notes","mode":"vietnamese","underline":true}]}
+            """)
+        #expect(s.typingMethod == .vni)
+        // Every rule survives with its underline choice; the mode is dropped.
+        #expect(s.appRules == [
+            AppRule(bundleID: "com.apple.Terminal", displayName: "Terminal", underline: true,
+                    source: .suggested),
+            AppRule(bundleID: "com.apple.Safari"),
+            AppRule(bundleID: "com.apple.Notes", underline: true),
+        ])
+        // Re-saving drops the old keys.
+        let json = String(decoding: try JSONEncoder().encode(s), as: UTF8.self)
+        #expect(!json.contains("rememberModePerApp"))
+        #expect(!json.contains("\"mode\""))
     }
 
     @Test("encoded keys are stable (read by the input method)")
@@ -148,7 +151,7 @@ struct DauSettingsCodingTests {
         let json = String(decoding: try encoder.encode(DauSettings.defaults), as: UTF8.self)
         #expect(json == """
             {"addMarksToTypedWords":true,"advanced":"off","appRules":[],"autoRestore":true,\
-            "freeMarking":true,"rememberModePerApp":false,"tonePlacement":"modern","typingMethod":"telex"}
+            "freeMarking":true,"tonePlacement":"modern","typingMethod":"telex"}
             """)
     }
 }

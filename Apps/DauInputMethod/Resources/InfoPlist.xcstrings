@@ -37,24 +37,6 @@
         }
       }
     },
-    "com.example.dau.inputmethod.Dau.en" : {
-      "comment" : "Input mode name shown in the input source menu (D2, D24). Key = mode ID in Info.plist.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dấu – Tiếng Anh"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dấu – Tiếng Anh"
-          }
-        }
-      }
-    },
     "com.example.dau.inputmethod.Dau.vi" : {
       "comment" : "Input mode name shown in the input source menu (D2, D24). Key = mode ID in Info.plist.",
       "extractionState" : "manual",

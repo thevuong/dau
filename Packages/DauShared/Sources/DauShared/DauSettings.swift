@@ -45,9 +45,9 @@ public struct DauSettings: Sendable, Codable, Equatable {
     public var addMarksToTypedWords: Bool
     /// "Nâng cao" (D21, D22).
     public var advanced: Advanced
-    /// "Nhớ chế độ theo từng ứng dụng" (D5): only for apps without their own rule.
-    public var rememberModePerApp: Bool
     /// Per-app rules (D5, D13), at most one per bundle ID, in display order.
+    /// (No "Nhớ chế độ theo từng ứng dụng" since 30/10/2026, D5: an old
+    /// `"rememberModePerApp"` key is ignored when decoding and dropped on the next save.)
     public private(set) var appRules: [AppRule]
 
     /// D15 defaults.
@@ -58,7 +58,6 @@ public struct DauSettings: Sendable, Codable, Equatable {
         autoRestore: Bool = true,
         addMarksToTypedWords: Bool = true,
         advanced: Advanced = .off,
-        rememberModePerApp: Bool = false,
         appRules: [AppRule] = []
     ) {
         self.typingMethod = typingMethod
@@ -67,7 +66,6 @@ public struct DauSettings: Sendable, Codable, Equatable {
         self.autoRestore = autoRestore
         self.addMarksToTypedWords = addMarksToTypedWords
         self.advanced = advanced
-        self.rememberModePerApp = rememberModePerApp
         self.appRules = []
         for rule in appRules { upsert(rule) }
     }
@@ -101,7 +99,7 @@ public struct DauSettings: Sendable, Codable, Equatable {
         }
     }
 
-    // MARK: - App rules (D5)
+    // MARK: - App rules (D5, D13)
 
     /// The rule for `bundleID`, if any.
     public func rule(for bundleID: String) -> AppRule? {
@@ -122,19 +120,11 @@ public struct DauSettings: Sendable, Codable, Equatable {
         appRules.removeAll { $0.bundleID == bundleID }
     }
 
-    /// The mode to switch to when `bundleID` becomes active (D5): the app's own rule
-    /// always wins; otherwise the remembered mode if "Nhớ chế độ theo từng ứng dụng" is
-    /// on; otherwise `nil` (keep the current mode).
-    public func startMode(for bundleID: String, remembered: AppRule.Mode?) -> AppRule.Mode? {
-        if let rule = rule(for: bundleID) { return rule.mode }
-        return rememberModePerApp ? remembered : nil
-    }
-
     // MARK: - Codable (lenient)
 
     private enum CodingKeys: String, CodingKey {
         case typingMethod, tonePlacement, freeMarking, autoRestore, addMarksToTypedWords
-        case advanced, rememberModePerApp, appRules
+        case advanced, appRules
     }
 
     public init(from decoder: any Decoder) throws {
@@ -152,7 +142,6 @@ public struct DauSettings: Sendable, Codable, Equatable {
             autoRestore: value(.autoRestore, d.autoRestore),
             addMarksToTypedWords: value(.addMarksToTypedWords, d.addMarksToTypedWords),
             advanced: value(.advanced, d.advanced),
-            rememberModePerApp: value(.rememberModePerApp, d.rememberModePerApp),
             appRules: rules.compactMap(\.value)
         )
     }
@@ -165,7 +154,6 @@ public struct DauSettings: Sendable, Codable, Equatable {
         try c.encode(autoRestore, forKey: .autoRestore)
         try c.encode(addMarksToTypedWords, forKey: .addMarksToTypedWords)
         try c.encode(advanced, forKey: .advanced)
-        try c.encode(rememberModePerApp, forKey: .rememberModePerApp)
         try c.encode(appRules, forKey: .appRules)
     }
 }
