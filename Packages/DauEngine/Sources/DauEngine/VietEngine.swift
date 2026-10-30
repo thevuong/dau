@@ -40,6 +40,15 @@ public struct VietEngine: Sendable {
     /// Whether the engine is tracking a word (useful for the IMK layer).
     public var isComposing: Bool { word.count > 0 || overflow }
 
+    /// The last scalar of the word as the engine believes it is shown (nil when no
+    /// word is tracked, or after D33 overflow, when the rest passes through). The IMK
+    /// layer reads it before `backspace()`: that is the character the app's own Delete
+    /// removes when the key is not consumed.
+    public var lastShown: Unicode.Scalar? {
+        guard !overflow, screen.count > 0 else { return nil }
+        return screen[screen.count - 1]
+    }
+
     /// Forget the current word without restoring anything (D4): arrows, Esc, mouse
     /// clicks, ⌘/⌃/⌥ shortcuts, focus changes.
     public mutating func reset() {

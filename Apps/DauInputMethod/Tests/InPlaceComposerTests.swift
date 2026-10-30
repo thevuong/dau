@@ -31,6 +31,11 @@ private final class FakeDocument: InPlaceClient {
 
     var lag: TimeInterval = 0
     var staleText = false
+    /// Chromium/Electron (COMPATIBILITY.md 6.4): the app runs its own Delete for ⌫ even
+    /// when the input method consumed the key, after the input method's `insertText`
+    /// (`render_widget_host_view_cocoa.mm` forwards the raw key-down to the page after
+    /// `interpretKeyEvents:` unless there is marked text).
+    var deletesConsumedBackspace = false
     private var lastEdit: TimeInterval = -.infinity
     private var previous: (text: String, cursor: Int) = ("", 0)
     /// Current time of the scripted session.
@@ -112,6 +117,7 @@ private struct Session {
     var composer = InPlaceComposer()
     let doc: FakeDocument
     var kinds: [PerfLog.Kind] = []
+    var consumed: [Bool] = []
     /// Keys that made more than one `insertText` or `selectedRange`, or more than one read
     /// (must stay 0, N3).
     var overCalls = 0
@@ -134,7 +140,10 @@ private struct Session {
         let reads = made.filter { if case .read = $0 { true } else { false } }.count
         if inserts > 1 || selections > 1 || reads > 1 { overCalls += 1 }
         kinds.append(outcome.kind)
-        if !outcome.consumed { doc.defaultAction(route) }
+        consumed.append(outcome.consumed)
+        if !outcome.consumed || (route == .backspace && doc.deletesConsumedBackspace) {
+            doc.defaultAction(route)
+        }
     }
 
     /// `⌫` Backspace, `←` an arrow (reset), `⏎` Return; anything else is a character.
@@ -368,6 +377,119 @@ struct InPlaceComposerTests {
         t.doc.oddText = "h\u{1F600}"   // a surrogate pair: 3 UTF-16 units, not letters
         t.type("j")
         #expect(t.doc.text == "hocj")
+    }
+
+    // MARK: Backspace (D32) in apps that delete even a consumed ⌫ (COMPATIBILITY.md 6.4)
+
+    /// Both kinds of app: one that honours a consumed key (AppKit, WebKit, Firefox) and
+    /// one that runs its own Delete anyway (Chromium, Electron).
+    private static func sessions(_ text: String = "") -> [Session] {
+        var honours = Session(text)
+        honours.interval = 0.12
+        var chromium = Session(text)
+        chromium.interval = 0.12
+        chromium.doc.deletesConsumedBackspace = true
+        return [honours, chromium]
+    }
+
+    @Test("hoaf ⌫ → hò in both kinds of app; the ⌫ is left to the app, same calls (N3)")
+    func backspaceTone() {
+        for var s in Self.sessions() {
+            s.type("hoaf")
+            let before = s.doc.calls.count
+            s.type("⌫")
+            #expect(s.doc.text == "hò")
+            #expect(s.consumed.last == false)
+            #expect(s.kinds.last == .replace)
+            // The replacement keeps the last character for the app's own Delete.
+            #expect(Array(s.doc.calls[before...]) == [.selectedRange, .insert("òà", NSRange(location: 1, length: 2))])
+            s.type(" ")
+            #expect(s.doc.text == "hò ")
+            #expect(s.overCalls == 0)
+        }
+    }
+
+    @Test("old behaviour reproduced: a consumed ⌫ loses one more letter in Chromium")
+    func consumedBackspaceInChromium() {
+        // What 0ac50c3 did: replace "oà" with "ò" and consume the key. Chromium still
+        // deletes, giving the "h" measured in Chrome, Edge and VS Code.
+        let doc = FakeDocument("hoà")
+        doc.deletesConsumedBackspace = true
+        doc.insertText("ò", replacementRange: NSRange(location: 1, length: 2))
+        doc.defaultAction(.backspace)
+        #expect(doc.text == "h")
+    }
+
+    @Test("longer words: D32 with ⌫ that passes, ⌫ that re-places the tone, keys after it",
+          arguments: [
+            ("hoaf⌫ ", "hò "), ("hoaf⌫a ", "hoà "), ("vieetj⌫⌫ ", "vị "),
+            ("vieetj⌫s ", "việs "), ("tieengs⌫⌫ ", "tiế "), ("thuyr⌫ ", "thủ "),
+            ("hoaf⌫⌫⌫ ", " "),
+          ])
+    func backspaceWords(_ keys: String, _ expected: String) {
+        var engineOnly = VietEngine()
+        var shown = ""
+        for c in keys.unicodeScalars {
+            let action = c == "⌫" ? engineOnly.backspace() : engineOnly.handle(c)
+            switch action {
+            case .passThrough:
+                if c == "⌫" { if !shown.isEmpty { shown.unicodeScalars.removeLast() } } else { shown.unicodeScalars.append(c) }
+            case .replace(let n, let insert):
+                shown.unicodeScalars.removeLast(n)
+                shown += insert.description
+            }
+        }
+        // The engine's own answer (DauEngine tests check it against DECISIONS.md).
+        #expect(shown == expected)
+        for var s in Self.sessions() {
+            s.type(keys)
+            #expect(s.doc.text == expected, "deletesConsumedBackspace=\(s.doc.deletesConsumedBackspace)")
+            #expect(s.overCalls == 0)
+            #expect(!s.kinds.contains(.mismatch))
+        }
+    }
+
+    @Test("text after the cursor is kept")
+    func backspaceBeforeText() {
+        for var s in Self.sessions(" xyz") {
+            s.doc.cursor = 0
+            s.type("hoaf⌫ ")
+            #expect(s.doc.text == "hò  xyz")
+        }
+    }
+
+    @Test("a word read by D20 (decomposed in the app), then ⌫ that re-places the tone")
+    func backspaceAfterSeed() {
+        for var s in Self.sessions("xin cha\u{0300}o") {
+            s.type("←")
+            s.type("s")   // D20 reads "chào" (NFD) → "cháo", rewritten precomposed
+            #expect(s.kinds.last == .seed)
+            #expect(s.doc.text == "xin cháo")
+            s.type("⌫ ")  // "chá" is not a syllable: D4 restores what was shown after ⌫
+            #expect(s.doc.text == "xin chá ")
+            #expect(s.kinds.contains(.mismatch) == false)
+        }
+        for var s in Self.sessions("hoa") {
+            s.type("f⌫")  // D20 → "hoà", ⌫ → "hò"
+            #expect(s.kinds == [.seed, .replace])
+            #expect(s.doc.text == "hò")
+        }
+    }
+
+    @Test("stale snapshot right after a ⌫ the app deleted: mismatch, no letter lost beyond the key")
+    func backspaceStale() {
+        for var s in Self.sessions() {
+            s.type("vieetj")
+            #expect(s.doc.text == "việt")
+            // The app answers from a snapshot 50 ms old; the next two ⌫ come 10 ms apart.
+            s.doc.lag = 0.05
+            s.interval = 0.01
+            s.type("⌫⌫")
+            // The second ⌫ sees the cursor before the first deletion: D11 resets and the
+            // app deletes one letter, as typed. The tone is lost, never a letter.
+            #expect(s.kinds.suffix(2) == [.pass, .mismatch])
+            #expect(s.doc.text == "vi")
+        }
     }
 
     // MARK: Asynchronous apps: stale snapshot

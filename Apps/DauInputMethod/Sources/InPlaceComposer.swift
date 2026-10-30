@@ -19,6 +19,8 @@ protocol InPlaceClient {
 /// - key whose result only appends at the cursor: one `insertText` (replacementRange
 ///   NSNotFound), no `selectedRange`;
 /// - key that replaces text before the cursor: one `selectedRange`, one `insertText`;
+///   Backspace (D32) that re-places the tone also does, and is still left to the app,
+///   whose own Delete removes the last character (see `handle`);
 /// - D20 "Thêm dấu cho từ đã gõ" (see `addMarks`): on a tone or transform key typed with
 ///   no word in the engine and an unknown text before the cursor, one `selectedRange`
 ///   and one `text(in:)` (attributedSubstring), then at most one `insertText`.
@@ -118,6 +120,8 @@ struct InPlaceComposer {
 
         case .backspace:
             let wasComposing = engine.isComposing
+            // The character the app's own Delete removes (see below).
+            let lastShown = engine.lastShown
             var result = Outcome()
             switch engine.backspace() {
             case .passThrough:
@@ -128,11 +132,27 @@ struct InPlaceComposer {
                     tracker.invalidate()
                 }
             case .replace(let deleteCount, let insert):
-                result = replace(deleteCount: deleteCount, insert: insert, selection: nil, client: client)
-                if result.kind != .replace {
+                // D32 re-places the tone ("hoà" ⌫ → "hò"). Chromium and Electron run
+                // their own Delete for this key even when the input method consumes it
+                // (the raw key-down goes to the page after the input method's text;
+                // COMPATIBILITY.md 6.4), so a consumed ⌫ lost one letter more there
+                // ("h"). So the key is never consumed: every app deletes the last
+                // character itself, and the replacement puts that character back at the
+                // end ("hoà" → "hòà" → app's Delete → "hò"). Same calls as before (N3).
+                // A decomposed (NFD) last character, possible only on a word seeded by
+                // D20 and not yet rewritten, may be deleted mark by mark: no guess.
+                if let lastShown, lastShown.properties.generalCategory != .nonspacingMark, deleteCount >= 1 {
+                    result = replace(deleteCount: deleteCount, insert: insert, appending: lastShown,
+                                     selection: nil, client: client)
+                } else {
+                    result.kind = .reset
+                }
+                result.consumed = false
+                if result.kind == .replace {
+                    tracker.backspacePassedThrough()
+                } else {
                     // Let the app's own Delete run; the engine no longer knows the word.
                     reset(engine: &engine)
-                    result.consumed = false
                 }
             }
             if !engine.isComposing {
@@ -310,8 +330,9 @@ struct InPlaceComposer {
     /// Applies `.replace` with exactly one `insertText` call (N3). Method A: ask the
     /// client for `selectedRange` when text before the cursor must be replaced, unless
     /// this key already asked (`selection`).
-    private mutating func replace(deleteCount: Int, insert: TextBuffer, selection known: NSRange?,
-                                  client: some InPlaceClient) -> Outcome {
+    /// `appending`: one more scalar after `insert` (Backspace, see `handle`).
+    private mutating func replace(deleteCount: Int, insert: TextBuffer, appending extra: Unicode.Scalar? = nil,
+                                  selection known: NSRange?, client: some InPlaceClient) -> Outcome {
         var result = Outcome(consumed: true)
         if deleteCount == 0 {
             result.kind = .insert
@@ -321,7 +342,8 @@ struct InPlaceComposer {
         // Engine letters are BMP scalars, so deleteCount scalars == deleteCount UTF-16
         // units, also for a word seeded from decomposed (NFD) text (D20).
         let selection = known ?? client.selectedRange()
-        let text = insert.description
+        var text = insert.description
+        if let extra { text.unicodeScalars.append(extra) }
         var attempt = Attempt(deleteCount: deleteCount, selection: selection, expected: tracker.expected,
                               insertedLength: text.utf16.count)
         switch tracker.plan(selection: selection, deleteCount: deleteCount) {

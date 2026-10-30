@@ -141,7 +141,7 @@ HTML
 select_dau() { "$INPUT_SOURCE" select "$DAU_SOURCE"; sleep 0.3; }
 
 # Every keystroke goes through a check that the app under test is frontmost (and, for
-# browsers, that the test page is the front tab), in the same osascript as the keys: if
+# browsers, that the test page is the front tab of its focused window), in the same osascript as the keys: if
 # the user switches app while the script runs, nothing is typed into their window. A
 # failed check stops the whole run (exit 3).
 STOP_FILE=""   # set below, in $WORK
@@ -151,7 +151,13 @@ front_guard() { # process [window-title-substring] → AppleScript that errors i
     set fp to name of first process whose frontmost is true
     if fp is not "$1" then error "frontmost is " & fp & ", not $1"
     if "${2:-}" is not "" then
-      set fw to name of front window of process "$1"
+      -- The focused window is the one that receives keys. "front window" can be a
+      -- floating helper window instead (an Edge extension's popup, seen 30/10/2026).
+      try
+        set fw to name of (value of attribute "AXFocusedWindow" of process "$1")
+      on error
+        set fw to name of front window of process "$1"
+      end try
       if fw does not contain "${2:-}" then error "front window of $1 is " & fw & ", not the test page"
     end if
   end tell

@@ -44,6 +44,22 @@ struct EditingTests {
         do { let result = empty.backspace(); #expect(result == .passThrough) }
     }
 
+    /// `lastShown` is the character the app's own Delete would remove (IMK layer, D32).
+    @Test func lastShownTracksTheScreen() {
+        var engine = VietEngine()
+        #expect(engine.lastShown == nil)
+        for key in "hoaf".unicodeScalars { _ = engine.handle(key) }
+        #expect(engine.lastShown == "à")
+        _ = engine.backspace()
+        #expect(engine.lastShown == "ò")
+        _ = engine.handle(" ")
+        #expect(engine.lastShown == nil)
+        var seeded = VietEngine()
+        let seededOK = seeded.seed(displayed: "hoa\u{0300}".unicodeScalars)
+        #expect(seededOK)
+        #expect(seeded.lastShown == "\u{0300}")
+    }
+
     /// D33: 7 letters is the longest syllable ("nghiêng").
     @Test(arguments: [
         Case("nghieeng ", "nghiêng "), Case("nghieengf ", "nghiềng "),
