@@ -9,9 +9,19 @@
 #      which must already be enabled (the helper never enables or disables a source, N4),
 #      and if that is not enough, `open -g -j` launches the bundle in the background.
 #      The input source selected before the test is selected again at the end.
-#   3. Runs `Dau --set-typing-method vni` (Debug flag, in the app's real sandbox), waits,
+#   3. Waits for the input method's `event=settings-loaded` line: a process that has just
+#      been launched may take several seconds before it reads the settings and starts
+#      observing (measured 7 s on 30/10/2026), and a change saved before that is not
+#      reported as a reload.
+#   4. Runs `Dau --set-typing-method vni` (Debug flag, in the app's real sandbox), waits,
 #      and checks the input method's log (subsystem <IM bundle ID>, category settings)
-#      for `event=settings-reloaded … typingMethod=vni`. Then the same with telex.
+#      for `event=settings-reloaded … typingMethod=vni`. Then the same with telex, which
+#      also checks that a new app process reads vni back (`previous=vni`): the value
+#      reached disk, not only the first process's cache.
+#
+# `synchronize=failed` from the app is only reported, not a failure: on macOS 27 the
+# App Group suite's synchronize() returns false even when the write goes through
+# (measured 30/10/2026: the input method and a new app process both read it back).
 #
 # Prints PASS or FAIL; exit status 0 only on PASS.
 #
@@ -102,10 +112,20 @@ if ! im_running; then
   fi
 fi
 im_running || fail "bộ gõ vẫn chưa chạy sau khi chọn nguồn Dấu"
-echo "    bộ gõ đang chạy (pid $(pgrep -f "$IM_APP/Contents/MacOS/" | head -1))"
-# The Debug input method starts observing right after its event=settings-loaded line;
-# give a just-launched process a moment so the first notification is not missed.
-sleep 1
+IM_PID="$(pgrep -f "$IM_APP/Contents/MacOS/" | head -1)"
+echo "    bộ gõ đang chạy (pid $IM_PID)"
+# The Debug input method starts observing right after its event=settings-loaded line.
+loaded=0
+for _ in $(seq 1 30); do
+  if "$LOG" show --last 10m --style compact --predicate \
+      "subsystem == \"$SUBSYSTEM\" AND category == \"settings\" AND processID == $IM_PID" \
+      2>/dev/null | grep -q 'event=settings-loaded'; then
+    loaded=1; break
+  fi
+  sleep 0.5
+done
+[[ "$loaded" == 1 ]] || fail "bộ gõ (pid $IM_PID) chưa nạp cài đặt sau 15 giây"
+echo "    bộ gõ đã nạp cài đặt, bắt đầu thử"
 
 # Prints the settings log lines of the input method since $1 ("YYYY-MM-DD HH:MM:SS").
 im_settings_log() {
@@ -127,6 +147,7 @@ explain() {
 }
 
 PASS=1
+VNI_OK=0
 for method in vni telex; do
   echo "==> Dau --set-typing-method $method"
   start="$(date '+%Y-%m-%d %H:%M:%S')"
@@ -139,14 +160,23 @@ for method in vni telex; do
   echo "    bộ gõ:"
   if [[ -n "$lines" ]]; then echo "$lines" | sed 's/^.*\] /      /'; else echo "      (không có dòng nào)"; fi
   if [[ "$out" == *"synchronize=failed"* ]]; then
-    echo "    LỖI: cfprefsd từ chối ghi (synchronize=failed): giá trị chỉ nằm trong bộ nhớ của app"
-    PASS=0
+    echo "    ghi chú: synchronize() trả về false (không phải lỗi, xem đầu script)"
+  fi
+  if [[ "$method" == telex ]]; then
+    if [[ "$out" == *"previous=vni "* ]]; then
+      echo "    OK: tiến trình app mới đọc lại được vni"
+    else
+      echo "    LỖI: tiến trình app mới không đọc lại được vni (giá trị không được lưu)"
+      PASS=0
+    fi
   fi
   if echo "$lines" | grep -q "event=settings-reloaded .*typingMethod=$method"; then
-    if [[ "$method" == telex && "$PASS" == 0 ]]; then
+    if [[ "$method" == telex && "$VNI_OK" == 0 ]]; then
       echo "    bộ gõ đọc typingMethod=telex, nhưng telex cũng là mặc định khi không đọc được store: không phải bằng chứng"
+      PASS=0
     else
       echo "    OK: bộ gõ đọc được typingMethod=$method"
+      [[ "$method" == vni ]] && VNI_OK=1
     fi
   else
     echo "    LỖI: bộ gõ không đọc được typingMethod=$method"
