@@ -34,6 +34,13 @@ final class DauInputController: IMKInputController {
     /// at activation, never while typing (N3).
     private var clientApp = "?"
     private let perf = PerfLog()
+    /// Underline mode (D13) for the current client: the word is marked text, committed
+    /// at its end. Decided at activation and on settings changes, never per key.
+    private var underline = false
+    private var composer = MarkedComposer()
+    /// The client the marked text was sent to, so a reset that arrives with another
+    /// client (or none) still commits it where it is shown.
+    private weak var markedClient: AnyObject?
 
     // MARK: - Keys
 
@@ -55,8 +62,10 @@ final class DauInputController: IMKInputController {
         case .keyDown:
             break
         case .leftMouseDown, .rightMouseDown, .otherMouseDown:
-            resetComposition()
-            record(KeyResult(kind: .reset), start: start)
+            // Underline mode: commit the word where it is shown before the click moves
+            // the cursor (D4: reset, no restore).
+            let committed = resetComposition(client: sender)
+            record(KeyResult(kind: committed ? .commit : .reset), start: start)
             return false
         default:
             return false
@@ -72,7 +81,7 @@ final class DauInputController: IMKInputController {
         let route = KeyRouter.route(keyCode: event.keyCode,
                                     modifiers: event.modifierFlags,
                                     characters: event.characters)
-        let result = process(route, client: client)
+        let result = underline ? processMarked(route, client: client) : process(route, client: client)
         record(result, start: start)
         #if DEBUG
         // After the timing is recorded, so the extra selectedRange is not measured.
@@ -168,6 +177,25 @@ final class DauInputController: IMKInputController {
         }
     }
 
+    /// Underline mode (D13): at most one `setMarkedText` or `insertText` per key, both
+    /// with replacementRange NSNotFound; never `selectedRange` (N3). See `MarkedComposer`.
+    private func processMarked(_ route: KeyRoute, client: IMKTextInput) -> KeyResult {
+        let timed = TimedClient(client)
+        let outcome = composer.handle(route, engine: &engine, client: timed)
+        markedClient = composer.isComposing ? (client as AnyObject) : nil
+        var result = KeyResult(consumed: outcome.consumed)
+        switch outcome.call {
+        case .none:
+            if case .ignore = route { result.kind = .reset }
+        case .setMarkedText:
+            result.kind = .mark
+        case .insertText:
+            result.kind = .commit
+        }
+        result.insertTextNs = timed.callNs
+        return result
+    }
+
     /// Applies `.replace` with exactly one `insertText` call (N3). Method A: ask the
     /// client for `selectedRange` when text before the cursor must be replaced.
     private func replace(deleteCount: Int, insert: TextBuffer, client: IMKTextInput) -> KeyResult {
@@ -236,9 +264,25 @@ final class DauInputController: IMKInputController {
 
     // MARK: - Session state (D11 resets)
 
-    private func resetComposition() {
-        engine.reset()
+    /// Ends the word without restoring it (D4). In underline mode the marked word is
+    /// committed as shown, never dropped: to the client it was shown in if still alive,
+    /// else to `client`. Returns true if text was committed.
+    @discardableResult
+    private func resetComposition(client: Any? = nil) -> Bool {
         tracker.invalidate()
+        guard composer.isComposing else {
+            composer.abandon(engine: &engine) // resets the engine; no text to keep
+            return false
+        }
+        let target = (markedClient as? IMKTextInput) ?? (client as? IMKTextInput)
+        markedClient = nil
+        guard let target else {
+            // D18: no client to commit to; the app keeps or drops its marked text.
+            composer.abandon(engine: &engine)
+            perf.note("marked-abandoned", app: clientApp)
+            return false
+        }
+        return composer.commit(engine: &engine, client: TimedClient(target)) == .insertText
     }
 
     /// Resets when the client proxy changes under this controller.
@@ -246,6 +290,7 @@ final class DauInputController: IMKInputController {
         let id = ObjectIdentifier(sender as AnyObject)
         if clientID != id {
             if clientID != nil {
+                // The marked word (if any) is committed to the old client.
                 resetComposition()
                 perf.note("client-changed", app: clientApp)
             }
@@ -255,29 +300,45 @@ final class DauInputController: IMKInputController {
 
     override func activateServer(_ sender: Any!) {
         super.activateServer(sender)
-        resetComposition()
+        resetComposition(client: sender)
         startObservingSettings()
-        // Catch up on anything missed while no observer was registered (or if the
-        // registration failed). One small JSON decode per activation, not per key.
-        apply(SettingsStore.inputMethod.load())
         if let sender {
             clientID = ObjectIdentifier(sender as AnyObject)
-            clientApp = (sender as? IMKTextInput)?.bundleIdentifier() ?? "?"
+            clientApp = clientBundleID(sender)
         }
+        // Catch up on anything missed while no observer was registered (or if the
+        // registration failed). One small JSON decode per activation, not per key.
+        // After `clientApp` is known, so the app's underline rule applies (D13).
+        apply(SettingsStore.inputMethod.load())
         perf.note("activate", app: clientApp)
-        noteAppRule()
+        if underline {
+            settingsLogger.notice("event=underline-on app=\(self.clientApp, privacy: .public)")
+        }
+    }
+
+    /// The client app's bundle ID, read once at activation. Chrome sometimes activates
+    /// the input method through a client whose `bundleIdentifier()` is nil (seen
+    /// 30/10/2026 in the D13 trial: the Chrome rule then did not apply); the frontmost
+    /// app is the one receiving keys, so it stands in. "?" if neither is known (D18).
+    private func clientBundleID(_ sender: Any) -> String {
+        if let id = (sender as? IMKTextInput)?.bundleIdentifier(), !id.isEmpty { return id }
+        let frontmost = onMain { NSWorkspace.shared.frontmostApplication?.bundleIdentifier } ?? nil
+        guard let frontmost, !frontmost.isEmpty else { return "?" }
+        perf.note("client-bundle-id-frontmost", app: frontmost)
+        return frontmost
     }
 
     override func deactivateServer(_ sender: Any!) {
-        resetComposition()
+        resetComposition(client: sender)
         super.deactivateServer(sender)
     }
 
-    /// The client wants the composition ended now. Dấu has no marked text in M2, so there
-    /// is nothing to insert: forget the word. (super is not called on purpose: its default
-    /// would insert `composedString`, which Dấu does not use.)
+    /// The client wants the composition ended now (click elsewhere, focus change…).
+    /// Underline mode commits the marked word as shown; in-place mode has nothing to
+    /// insert and forgets the word. (super is not called on purpose: its default would
+    /// insert `composedString`, which Dấu does not use.)
     override func commitComposition(_ sender: Any!) {
-        resetComposition()
+        resetComposition(client: sender)
     }
 
     override func inputControllerWillClose() {
@@ -312,7 +373,15 @@ final class DauInputController: IMKInputController {
     /// Applies new settings to this controller. A change of engine options in the middle
     /// of a word drops the word first (`EngineSettings.apply`).
     private func apply(_ new: DauSettings) {
+        let newUnderline = UnderlineMode.isOn(settings: new, bundleID: clientApp,
+                                              debugForced: Self.debugForcedUnderline())
+        if newUnderline != underline || new.engineOptions != engine.options {
+            // D4: a settings change ends the word without restoring it; a marked word is
+            // committed as shown before the engine is reset or the mode switches.
+            resetComposition(client: client())
+        }
         settings = new
+        underline = newUnderline
         if EngineSettings.apply(new, to: &engine) {
             tracker.invalidate()
             perf.note("options-changed", app: clientApp)
@@ -324,12 +393,20 @@ final class DauInputController: IMKInputController {
         // then the engine is never seeded, whatever the setting says.
     }
 
-    /// D13: an app rule may ask for marked text (underlined) instead of in-place
-    /// replacement. Not implemented yet; log that the flag was seen, never any text.
-    private func noteAppRule() {
-        guard clientApp != "?", let rule = settings.rule(for: clientApp), rule.underline else { return }
-        // TODO(M3, D13): use setMarkedText for this client instead of replacing in place.
-        settingsLogger.notice("event=underline-rule-ignored app=\(self.clientApp, privacy: .public)")
+    /// Debug builds only: bundle IDs forced into underline mode for trials
+    /// (`UnderlineMode.debugForceKey` in the global defaults domain; see
+    /// scripts/selftest-typing/run.sh `--underline`). Read at activation and on settings
+    /// changes, never per key. Release builds never read it.
+    private static func debugForcedUnderline() -> [String] {
+        #if DEBUG
+        let any = kCFPreferencesAnyApplication
+        // Pick up a `defaults write -g` made since the last read.
+        CFPreferencesAppSynchronize(any)
+        let value = CFPreferencesCopyAppValue(UnderlineMode.debugForceKey as CFString, any)
+        return (value as? [Any])?.compactMap { $0 as? String } ?? []
+        #else
+        return []
+        #endif
     }
 
     // MARK: - Input mode (D2)
@@ -340,7 +417,7 @@ final class DauInputController: IMKInputController {
     override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
         super.setValue(value, forTag: tag, client: sender)
         guard tag == kTextServiceInputModePropertyTag else { return }
-        resetComposition()
+        resetComposition(client: sender)
     }
 
     // MARK: - Input menu
@@ -388,7 +465,7 @@ final class DauInputController: IMKInputController {
         var new = store.load()
         new.typingMethod = method
         store.save(new)
-        resetComposition()
+        resetComposition(client: client())
         apply(new)
     }
 
@@ -424,6 +501,31 @@ final class DauInputController: IMKInputController {
         nonisolated(unsafe) var result: T?
         MainActor.assumeIsolated { result = body() }
         return result
+    }
+}
+
+/// `IMKTextInput` as a `MarkedTextClient`, timing the one call of the key for the perf
+/// log (D8: durations only).
+private final class TimedClient: MarkedTextClient {
+    let client: IMKTextInput
+    private(set) var callNs: Int64 = -1
+
+    init(_ client: IMKTextInput) { self.client = client }
+
+    func setMarkedText(_ text: String, selectionRange: NSRange, replacementRange: NSRange) {
+        let start = PerfLog.now()
+        let signpost = PerfLog.signposter.beginInterval("setMarkedText")
+        client.setMarkedText(text, selectionRange: selectionRange, replacementRange: replacementRange)
+        PerfLog.signposter.endInterval("setMarkedText", signpost)
+        callNs = Int64(PerfLog.now() &- start)
+    }
+
+    func insertText(_ text: String, replacementRange: NSRange) {
+        let start = PerfLog.now()
+        let signpost = PerfLog.signposter.beginInterval("insertText")
+        client.insertText(text, replacementRange: replacementRange)
+        PerfLog.signposter.endInterval("insertText", signpost)
+        callNs = Int64(PerfLog.now() &- start)
     }
 }
 

@@ -40,9 +40,16 @@ dau/
 - Lớp con `IMKInputController`, mỗi client một instance và một `VietEngine` riêng (không có trạng thái toàn cục — khác OpenKey).
 - `handle(_:client:)`: đưa phím vào engine; nếu `replace`, hỏi `selectedRange` một lần để có vị trí tuyệt đối rồi gọi `insertText(_:replacementRange:)` đúng một lần; phím đi thẳng không hỏi gì (N3, cách A đã chốt trong `DECISIONS.md`). Bản Debug có thêm một lần hỏi sau khi thay để chẩn đoán (`ReplaceDiag.swift`); số đo M2 làm trên Debug có lời gọi thừa này.
 - Reset engine khi: click chuột, `activateServer`/`deactivateServer`, `commitComposition`, phím di chuyển con trỏ, hoặc `selectedRange` khác dự đoán.
-- App trong danh sách tương thích cần gạch chân: dùng `setMarkedText` thay cho thay chữ tại chỗ (D13).
+- **Chế độ gạch chân (D13)**, bật khi quy tắc của app có `underline` (`MarkedComposer.swift`): từ đang gõ hiện bằng `setMarkedText` (app tự vẽ gạch chân), chốt bằng `insertText` khi kết thúc từ. Mọi lời gọi dùng `replacementRange` = NSNotFound (vùng marked hoặc con trỏ của app), nên **không bao giờ hỏi `selectedRange`** và không cần vị trí tuyệt đối — đó là lý do chế độ này đúng với app áp phím bất đồng bộ. Lời gọi mỗi phím (tối đa một, N3):
+  - chữ cái/chữ số trong từ, Backspace trong từ (D32): một `setMarkedText` với cả từ (chuỗi rỗng = xoá marked text khi xoá hết từ);
+  - ký tự kết thúc từ (D4): một `insertText` gồm từ (đã khôi phục nếu D4 bảo vậy) + ký tự đó, phím được nuốt;
+  - Return, Tab, Enter bàn phím số: một `insertText` của từ rồi để app xử lý phím (ứng dụng chat vẫn gửi tin);
+  - mũi tên, Esc, tổ hợp ⌘/⌃/⌥ và các sự kiện reset (click, `deactivateServer`, `commitComposition`, đổi nguồn/mode, đổi client, đổi cài đặt): một `insertText` của **đúng chữ đang hiện**, không khôi phục (D4), không làm mất chữ; rồi phím đi tiếp tới app. Chốt vào client đã nhận marked text nếu nó còn, không thì client của sự kiện; không còn client nào thì bỏ trạng thái (D18);
+  - không có từ đang gõ: không gọi gì, phím đi thẳng.
+  - Gõ đúp (D26), khôi phục (D4), độ dài từ (D33) giống hệt chế độ thay tại chỗ: `MarkedComposer` giữ bản sao chữ engine đang hiển thị và áp nguyên `Action` lên đó (test so khớp ngẫu nhiên với thay tại chỗ). Chuỗi chữ dài hơn 32 ký tự không dấu cách (chỉ xảy ra sau D33) được chốt sớm, phần còn lại của từ đi thẳng.
+  - Đo 30/10/2026 (`scripts/selftest-typing/run.sh --underline`): Chrome, VS Code đúng ở 0, 5, 10, 30 ms/phím (thay tại chỗ sai ở 0 ms, VS Code sai cả 5 ms); Terminal đúng từ 5 ms, ở 0 ms chữ chốt đúng nhưng Terminal còn vẽ marked text cũ của từ cuối sau khi chốt cho tới phím kế tiếp.
 - Một input mode duy nhất "Dấu – Tiếng Việt" (`….Dau.vi`) khai báo trong Info.plist (`ComponentInputModeDict`), để ID nguồn đã bật không đổi và nguồn nằm trong nhóm Tiếng Việt (D2). Gõ tiếng Anh bằng nguồn ABC/U.S. của macOS. Bộ gõ không giữ trạng thái chế độ: IMK báo mode nào (kể cả `….Dau.en` còn sót từ bản cũ) cũng xử lý như tiếng Việt; `setValue(_:forTag:client:)` chỉ reset từ đang gõ (D4, D18). Không tự đổi nguồn nhập liệu theo app, không nhớ chế độ theo app (D5), không tự thông báo VoiceOver (D17).
-- Quy tắc theo app: chỉ đọc lựa chọn gạch chân lúc `activateServer` (D13, chưa làm — ghi log `underline-rule-ignored`). Lúc khởi động, bộ gõ xoá khoá `rememberedInputModes` (nhớ chế độ theo app của bản cũ) khỏi defaults riêng của nó.
+- Quy tắc theo app: lựa chọn gạch chân đọc lúc `activateServer` và khi cài đặt đổi, không đọc theo phím. Đổi chế độ giữa chừng một từ thì chốt từ trước. Bundle ID của app lấy từ client lúc `activateServer`; Chrome đôi khi đưa client có `bundleIdentifier()` nil, khi đó dùng app đang ở trước (`NSWorkspace.frontmostApplication`). Bản Debug có thêm khoá `DauDebugForceUnderline` (mảng bundle ID, miền global `defaults write -g`) để ép gạch chân khi thử mà không đụng cài đặt người dùng; bản Release không đọc khoá này. Lúc khởi động, bộ gõ xoá khoá `rememberedInputModes` (nhớ chế độ theo app của bản cũ) khỏi defaults riêng của nó.
 - Đọc cài đặt và danh sách tương thích từ App Group; nghe thay đổi để áp dụng ngay.
 - Entitlements: App Sandbox, App Group, tạm thêm `temporary-exception.mach-register.global-name` cho tên kết nối IMK (theo mẫu IMK có sandbox). Chưa thử bỏ đi để biết có cần không: để M3. **Không** `com.apple.security.network.client`.
 - Khoá Info.plist đang dùng (chạy được trên macOS 27 ở M2): `InputMethodConnectionName`, `InputMethodServerControllerClass`, `LSBackgroundOnly`, `TISInputSourceID`, `TISIntendedLanguage`, `ComponentInputModeDict` (một mode `.vi`, icon template V), `tsInputMethodIconFileKey`, `TISIconIsTemplate`; thêm `DauHostAppBundleIdentifier`, `DauAppGroupIdentifier` của riêng Dấu.
@@ -74,6 +81,8 @@ dau/
    - `passThrough` → trả `false`.
    - `replace(n, s)` → `client.insertText(s, replacementRange: vùng n ký tự trước con trỏ)`, trả `true`.
 4. Ký tự kết thúc từ (Space, dấu câu, Enter, Tab — D4) → nếu từ không phải âm tiết tiếng Việt hợp lệ thì khôi phục phím gốc (D4), commit, reset.
+
+Ở chế độ gạch chân (D13) bước 3–4 khác: chữ của từ đi vào marked text (`setMarkedText`) thay cho thay chữ tại chỗ, không hỏi `selectedRange`; kết thúc từ và mọi sự kiện reset chốt marked text bằng một `insertText` (xem mục DauInputMethod).
 
 ## Đo lường
 

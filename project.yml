@@ -113,7 +113,7 @@ targets:
       - sdk: InputMethodKit.framework
 
   # Logic tests for the input method's pure helpers (key routing, cursor tracking,
-  # settings → engine options, host app lookup, legacy cleanup).
+  # settings → engine options, host app lookup, legacy cleanup, underline mode).
   # No host app: the files are compiled straight into the test bundle.
   DauInputMethodTests:
     type: bundle.unit-test
@@ -122,6 +122,7 @@ targets:
       - path: Apps/DauInputMethod/Tests
       - path: Apps/DauInputMethod/Sources/KeyRouter.swift
       - path: Apps/DauInputMethod/Sources/CursorTracker.swift
+      - path: Apps/DauInputMethod/Sources/MarkedComposer.swift
       - path: Apps/DauInputMethod/Sources/EngineSettings.swift
       - path: Apps/DauInputMethod/Sources/HostApp.swift
       - path: Apps/DauInputMethod/Sources/LegacyModeMemory.swift

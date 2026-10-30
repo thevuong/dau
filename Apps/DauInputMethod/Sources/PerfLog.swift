@@ -28,6 +28,11 @@ struct PerfLog {
         case unsupported
         /// Shortcut, navigation key, mouse click: engine reset (D4).
         case reset
+        /// Underline mode (D13): setMarkedText with the word, no selectedRange.
+        case mark
+        /// Underline mode (D13): insertText of the marked word (word end or reset event),
+        /// replacementRange NSNotFound, no selectedRange.
+        case commit
     }
 
     let enabled: Bool
@@ -46,7 +51,8 @@ struct PerfLog {
 
     /// - Parameters:
     ///   - selectedRangeNs: duration of the `selectedRange()` call, or -1 if not called.
-    ///   - insertTextNs: duration of the `insertText` call, or -1 if not called.
+    ///   - insertTextNs: duration of the `insertText` call (or, for `mark`, of the
+    ///     `setMarkedText` call), or -1 if not called.
     func record(_ kind: Kind, handleNs: UInt64, selectedRangeNs: Int64, insertTextNs: Int64, app: String) {
         guard enabled else { return }
         PerfLog.logger.notice(
