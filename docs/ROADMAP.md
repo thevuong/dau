@@ -20,7 +20,7 @@ Mỗi mốc kết thúc khi: test xanh, đã tự rà soát với `DECISIONS.md`
 - Xong khi: người dùng gõ được tiếng Việt trong TextEdit và Safari không gạch chân.
 
 ## M3 — Độ tin cậy
-- Reset khi lệch ngữ cảnh, phòng thủ đầu vào IMK (D18), fallback marked text theo danh sách tương thích (D13), quy tắc theo ứng dụng (D5), thông báo VoiceOver (D17).
+- Reset khi lệch ngữ cảnh, phòng thủ đầu vào IMK (D18), fallback marked text theo danh sách tương thích (D13), quy tắc theo ứng dụng (D5), kiểm chứng bằng VoiceOver rằng hệ thống tự đọc tên nguồn nhập liệu khi chuyển (D17).
 - Ma trận tương thích: bảng app × kết quả, lưu trong `docs/COMPATIBILITY.md`.
 
 ## M4 — App Cài đặt

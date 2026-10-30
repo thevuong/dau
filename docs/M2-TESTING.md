@@ -37,14 +37,16 @@ Mỗi ứng dụng: mở một ô soạn thảo trống, gõ câu mẫu, ghi l�
 - **Gạch chân:** chữ đang gõ có bị gạch chân không. Dấu không dùng marked text ở M2, nên gạch chân (nếu có) là điều bất thường cần ghi lại.
 - **Nhảy chữ:** có ký tự bị lặp, mất, đảo thứ tự, con trỏ nhảy, hoặc chữ bị thay sai chỗ không.
 
+Kết quả (30/10/2026): agent tự gõ câu mẫu qua System Events, 30 ms/phím, bản Debug. Số đo là phím có thay (n=12 mỗi app ở 5 app đầu), chép từ `docs/PROGRESS.md` mục "Số đo". "—" ở cột `count_unsupported`: lượt đo 29/10 không ghi riêng số này.
+
 | Ứng dụng | Bundle ID (cho `--app`) | Kết quả thực tế | Gạch chân? | Nhảy chữ? | `selectedRange` p50 / p99 (µs) | `count_unsupported` / `count_mismatch` | Ghi chú |
 |---|---|---|---|---|---|---|---|
-| TextEdit | `com.apple.TextEdit` | | | | | | |
-| Safari (ô tìm kiếm + một ô soạn thảo trên web) | `com.apple.Safari` | | | | | | |
-| Chrome (thanh địa chỉ + một ô soạn thảo trên web) | `com.google.Chrome` | | | | | | |
-| Telegram (thay Slack) | `ru.keepcoder.Telegram` | | | | | | |
-| VS Code | `com.microsoft.VSCode` | | | | | | |
-| Terminal | `com.apple.Terminal` | | | | | | |
+| TextEdit | `com.apple.TextEdit` | Đúng ở 30 ms/phím | Không | Không | 327 / 606 | — / 0 | `scripts/selftest-typing`, 29/10. Người dùng gõ tay 29/10 cũng đúng |
+| Safari (ô tìm kiếm + một ô soạn thảo trên web) | `com.apple.Safari` | Đúng ở 30 ms/phím | Không | Không | 622 / 1.057 | — / 0 | `scripts/selftest-typing`, 29/10. Người dùng gõ tay 29/10 cũng đúng |
+| Chrome (thanh địa chỉ + một ô soạn thảo trên web) | `com.google.Chrome` | Đúng ở 30 ms/phím | Không | Không ở 30 ms; có khi phím đến dồn | 415 / 694 | — / 0 | `scripts/selftest-typing`, 29/10. Sai khi phím đến cách nhau < 10 ms (app áp phím bất đồng bộ; M3 thử D13). Người dùng gõ tay 29/10 đúng |
+| Telegram (thay Slack) | `ru.keepcoder.Telegram` | "tôi yêu tiếng Việt, windows Hasaki car" | Không | Không | 240 / 1.670 | 0 / 0 | 30/10, tự gõ 30 ms/phím trong Saved Messages, chỉ gõ, không gửi. `insertText` p50 1.830 / p99 3.491 µs; cả phím có thay p50 2.171 / p99 5.313 µs; replace 12, pass 34 |
+| VS Code | `com.microsoft.VSCode` | Đúng ở 30 ms/phím | Không | Không ở 30 ms; có khi phím đến dồn | 230 / 885 | — / 0 | `scripts/selftest-typing`, 29/10. Sai khi phím đến cách nhau < 20 ms (Electron áp phím bất đồng bộ; M3 thử D13) |
+| Terminal | `com.apple.Terminal` | Đúng ở 30 ms/phím | Không | Không ở 30 ms; có khi phím đến dồn | 408 / 637 | — / 0 | `scripts/selftest-typing`, 29/10. Sai khi phím đến cách nhau < 10 ms (chờ shell echo; M3 thử D13) |
 
 Bundle ID thật mà bộ gõ nhận được có thể khác cột trên (ví dụ tiến trình con của trình duyệt). `--app` nhận tên app hoặc một phần bundle ID, không phân biệt hoa thường (`--app TextEdit`, `--app chrome`), **không nhận PID**. Nếu `--app` không ra số, script in danh sách app có số đo trong khoảng thời gian đó.
 
@@ -74,25 +76,27 @@ Các dòng cần chép vào bảng: `selectedRange_us` (chi phí của cách A),
 
 Làm trong TextEdit (và lặp lại ở ứng dụng nào có kết quả lạ ở mục 2).
 
+Kết quả (30/10/2026): agent tự gõ qua System Events. Chưa chạy: 9, 10 (chạy lại sau khi bỏ chế độ Anh ở 9680c68), 16 (VoiceOver, cần người); 3 bỏ qua; 14 mới xong một phần.
+
 | # | Thao tác | Mong đợi | Kết quả |
 |---|---|---|---|
-| 1 | Gõ `hoaf`, rồi ⌫ | "hoà" rồi "hò" (D32) | |
-| 2 | Gõ `windows` rồi nhấn Return | "windows" rồi xuống dòng | |
-| 3 | Trong Telegram (Saved Messages): gõ `carr` rồi nhấn Return | tin nhắn gửi đi là "car" (thay chữ xong trước khi Return được xử lý) | |
-| 4 | Gõ `to`, click chuột vào chỗ khác trong văn bản, gõ `o` | chỉ thêm "o" ở chỗ mới; chữ "to" cũ không đổi | |
-| 5 | Gõ `tooi`, click vào chỗ khác, gõ `s` | chỉ thêm "s" ở chỗ mới; "tôi" cũ không đổi | |
-| 6 | Gõ `tooi`, nhấn ←, gõ `s` | thêm "s" ở vị trí con trỏ, không bỏ dấu vào "tôi" (D4: mũi tên chỉ reset) | |
-| 7 | Chọn một đoạn chữ bằng chuột, gõ `tooi` | đoạn chọn bị thay bằng "tôi" | |
-| 8 | Gõ `tooi`, nhấn ⌘Z | ứng dụng hoàn tác bình thường, không lỗi | |
-| 9 | Chuyển sang ABC (hoặc U.S.) bằng phím tắt nguồn nhập liệu của macOS, gõ `tooi` | "tooi" (D2: tiếng Anh dùng nguồn của hệ thống) | |
-| 10 | Chuyển lại "Dấu – Tiếng Việt", gõ `tooi` | "tôi"; chữ đang gõ dở trước khi chuyển không bị sửa (D4: đổi nguồn chỉ reset) | |
-| 11 | Menu nguồn nhập liệu: có nhóm "Kiểu gõ" với Telex ✓ / VNI / Telex đơn giản và mục "Mở cài đặt Bàn phím…" | đúng như mô tả, chữ có dấu, tên "Dấu" | |
-| 12 | Chọn VNI trong menu, gõ `to6i` | "tôi"; mở menu lại thấy VNI ✓. Chọn lại Telex sau khi thử | |
-| 13 | Bấm "Mở cài đặt Bàn phím…" | Cài đặt hệ thống mở đúng mục Bàn phím (N4) | |
-| 14 | Biểu tượng trên thanh menu khi chọn Dấu; danh sách "+" của Nguồn đầu vào | "V" đơn sắc, đổi màu theo nền sáng/tối. Dấu chỉ có "Dấu – Tiếng Việt" trong nhóm Tiếng Việt, không có "Dấu – Tiếng Anh" ở nhóm Tiếng Anh (D2) | |
-| 15 | Mở bảng Emoji (fn/🌐 E hoặc ⌃⌘Space), chèn một emoji, gõ tiếp `tooi` | không treo, không mất chữ (D18) | |
-| 16 | Bật VoiceOver (⌘F5), chuyển "Dấu – Tiếng Việt" ↔ ABC bằng phím tắt nguồn nhập liệu | hệ thống tự đọc tên nguồn; Dấu không đọc thêm (D17). Hệ thống không đọc thì ghi lại để xét lại D17 | |
-| 17 | Gõ ở ô mật khẩu (ví dụ ô mật khẩu trong Safari) | ghi lại hành vi (macOS thường tự chuyển bàn phím ASCII ở ô bảo mật) | |
+| 1 | Gõ `hoaf`, rồi ⌫ | "hoà" rồi "hò" (D32) | ĐẠT: "hoà" → ⌫ → "hò" |
+| 2 | Gõ `windows` rồi nhấn Return | "windows" rồi xuống dòng | ĐẠT: lúc gõ hiện "ưindows", Return → "Windows⏎" (chữ hoa do TextEdit tự viết hoa đầu dòng, không phải Dấu) |
+| 3 | Trong Telegram (Saved Messages): gõ `carr` rồi nhấn Return | tin nhắn gửi đi là "car" (thay chữ xong trước khi Return được xử lý) | Bỏ qua: người dùng không cho gửi tin nhắn |
+| 4 | Gõ `to`, click chuột vào chỗ khác trong văn bản, gõ `o` | chỉ thêm "o" ở chỗ mới; chữ "to" cũ không đổi | ĐẠT |
+| 5 | Gõ `tooi`, click vào chỗ khác, gõ `s` | chỉ thêm "s" ở chỗ mới; "tôi" cũ không đổi | ĐẠT |
+| 6 | Gõ `tooi`, nhấn ←, gõ `s` | thêm "s" ở vị trí con trỏ, không bỏ dấu vào "tôi" (D4: mũi tên chỉ reset) | ĐẠT. Ghi chú: lần ← đầu sau một từ gõ dở bị macOS/TextEdit nuốt (với U.S. cũng vậy); lần ← thứ hai mới chạy, Dấu ghi log reset |
+| 7 | Chọn một đoạn chữ bằng chuột, gõ `tooi` | đoạn chọn bị thay bằng "tôi" | ĐẠT |
+| 8 | Gõ `tooi`, nhấn ⌘Z | ứng dụng hoàn tác bình thường, không lỗi | ĐẠT (⌘Z hoàn tác bình thường) |
+| 9 | Chuyển sang ABC (hoặc U.S.) bằng phím tắt nguồn nhập liệu của macOS, gõ `tooi` | "tooi" (D2: tiếng Anh dùng nguồn của hệ thống) | Chưa chạy lại sau 9680c68 (đã thử khi Dấu còn chế độ Anh) |
+| 10 | Chuyển lại "Dấu – Tiếng Việt", gõ `tooi` | "tôi"; chữ đang gõ dở trước khi chuyển không bị sửa (D4: đổi nguồn chỉ reset) | Chưa chạy lại sau 9680c68 (đã thử khi Dấu còn chế độ Anh) |
+| 11 | Menu nguồn nhập liệu: có nhóm "Kiểu gõ" với Telex ✓ / VNI / Telex đơn giản và mục "Mở cài đặt Bàn phím…" | đúng như mô tả, chữ có dấu, tên "Dấu" | ĐẠT: Kiểu gõ Telex ✓ / VNI / Telex đơn giản, "Cài đặt Dấu…", "Mở cài đặt Bàn phím…"; chữ có dấu đúng |
+| 12 | Chọn VNI trong menu, gõ `to6i` | "tôi"; mở menu lại thấy VNI ✓. Chọn lại Telex sau khi thử | ĐẠT: `to6i` → "tôi", menu VNI ✓, đã chọn lại Telex |
+| 13 | Bấm "Mở cài đặt Bàn phím…" | Cài đặt hệ thống mở đúng mục Bàn phím (N4) | ĐẠT |
+| 14 | Biểu tượng trên thanh menu khi chọn Dấu; danh sách "+" của Nguồn đầu vào | "V" đơn sắc, đổi màu theo nền sáng/tối. Dấu chỉ có "Dấu – Tiếng Việt" trong nhóm Tiếng Việt, không có "Dấu – Tiếng Anh" ở nhóm Tiếng Anh (D2) | Một phần: không chụp được thanh menu; bundle khai báo biểu tượng V. Danh sách "+" chưa xem lại sau 9680c68 |
+| 15 | Mở bảng Emoji (fn/🌐 E hoặc ⌃⌘Space), chèn một emoji, gõ tiếp `tooi` | không treo, không mất chữ (D18) | ĐẠT: "❤️ tôi", không treo |
+| 16 | Bật VoiceOver (⌘F5), chuyển "Dấu – Tiếng Việt" ↔ ABC bằng phím tắt nguồn nhập liệu | hệ thống tự đọc tên nguồn; Dấu không đọc thêm (D17). Hệ thống không đọc thì ghi lại để xét lại D17 | Chưa chạy (cần người) |
+| 17 | Gõ ở ô mật khẩu (ví dụ ô mật khẩu trong Safari) | ghi lại hành vi (macOS thường tự chuyển bàn phím ASCII ở ô bảo mật) | Ghi lại: ở ô bảo mật macOS giữ `com.apple.keylayout.US`, Dấu không nhận phím nào |
 
 ## 5. Gửi lại
 

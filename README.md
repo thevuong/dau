@@ -56,7 +56,7 @@ Với Command Line Tools (Swift 6.4), `swift test` báo lỗi không tìm thấy
 
 ## Định danh tạm thời
 
-Bundle ID và Team ID chưa chốt. `project.yml` đang dùng `BUNDLE_ID_PREFIX = com.example.dau` và `DEVELOPMENT_TEAM` để trống; mọi cấu hình đang ký ad-hoc. Khi đổi `BUNDLE_ID_PREFIX`, phải sửa cả ID của các input mode (`com.example.dau.inputmethod.Dau.vi`, `.en`) trong `Apps/DauInputMethod/Info.plist` và `Apps/DauInputMethod/Resources/InfoPlist.xcstrings`, vì Xcode không thay biến trong khoá plist.
+Bundle ID chưa chốt: `project.yml` đang dùng `BUNDLE_ID_PREFIX = com.example.dau`. `DEVELOPMENT_TEAM` là Personal Team miễn phí `M58DANM3ZP`; mọi cấu hình ký tự động "Apple Development" (App Group cần Team ID thật, xem đầu `project.yml`). Build dưới team khác: truyền `DEVELOPMENT_TEAM=<team>` cho `xcodebuild`. Bản phát hành ký Developer ID ở M7. Bộ gõ chỉ có một input mode, `com.example.dau.inputmethod.Dau.vi` (D2). Khi đổi `BUNDLE_ID_PREFIX`, phải sửa cả ID này trong `Apps/DauInputMethod/Info.plist` và `Apps/DauInputMethod/Resources/InfoPlist.xcstrings`, vì Xcode không thay biến trong khoá plist.
 
 ## Giấy phép
 

@@ -44,7 +44,7 @@ Tài liệu tham khảo cho mốc M1. Viết bằng lời của Dấu, **không 
 | 14 | Viết hoa chữ đầu câu (`vUpperCaseFirstChar`) | Không làm | D3 |
 | 15 | Bảng mã: Unicode, TCVN3, VNI-Windows, Unicode tổ hợp, CP1258 (`vCodeTable`) | Không làm, chỉ xuất NFC | D3 |
 | 16 | Công cụ chuyển mã (`ConvertTool.cpp`) và phím tắt của nó | Không làm | D3 |
-| 17 | Smart switch: nhớ Việt/Anh theo ứng dụng (`vUseSmartSwitchKey`, `SmartSwitchKey.cpp`) | Làm khác: quy tắc riêng luôn thắng, "Nhớ chế độ" mặc định tắt | D5 |
+| 17 | Smart switch: nhớ Việt/Anh theo ứng dụng (`vUseSmartSwitchKey`, `SmartSwitchKey.cpp`) | Không làm, cố ý khác OpenKey: Dấu không nhớ Việt/Anh theo app; nhớ nguồn nhập liệu theo cửa sổ để cho tuỳ chọn macOS "Tự động chuyển sang nguồn đầu vào của tài liệu" | D5, D2 |
 | 18 | Nhớ bảng mã theo ứng dụng (`vRememberCode`) | Không làm (vì không có bảng mã) | D3 |
 | 19 | Phím chuyển Việt/Anh riêng, có tiếng bíp | Không làm | D2 |
 | 20 | Tạm tắt chính tả bằng nhấn-nhả ⌃ (`vTempOffSpelling`) | Không làm (kiểm tra chính tả luôn chạy, D30) | D30, mục "Đã cân nhắc và loại bỏ" |
@@ -279,7 +279,7 @@ Tất cả đều reset bộ đệm. Mũi tên thì còn khôi phục (3.16). Ch
 
 - Lưu Việt/Anh (cùng bảng mã) theo bundle ID. Ứng dụng gặp lần đầu được ghi theo chế độ hiện tại, và mỗi lần người dùng đổi chế độ thì cập nhật cho ứng dụng đang dùng (`SmartSwitchKey.cpp`; `OpenKey.mm`, phần đổi ứng dụng).
 - Độ dài bundle ID lưu trong 1 byte, nên ID dài hơn 255 bị cắt (lỗi nhỏ).
-- Dấu: D5 (quy tắc riêng luôn thắng, "Nhớ chế độ" mặc định tắt). Chuyển chế độ qua input mode của hệ thống (D2), không tự đổi biến toàn cục.
+- Dấu: cố ý khác OpenKey, không làm (D5). Dấu chỉ có một input mode Tiếng Việt; gõ tiếng Anh bằng ABC/U.S. của macOS (D2). Nhớ nguồn nhập liệu theo từng cửa sổ là việc của tuỳ chọn macOS "Tự động chuyển sang nguồn đầu vào của tài liệu" (N1); quy tắc theo ứng dụng của Dấu chỉ còn lựa chọn gạch chân (D13).
 
 ### 3.20 Macro, viết hoa đầu câu, bảng mã, chuyển mã
 

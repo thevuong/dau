@@ -3,7 +3,7 @@
 Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị nén) tiếp tục đúng chỗ. Phiên chính cập nhật file này sau mỗi bước.
 
 ## Trạng thái hiện tại
-- Mốc đang làm: M2 — A/B đã chốt (cách A); kiểm toán M2 lần 1 (30/10) CHƯA ĐẠT chỉ vì tài liệu (DECISIONS D11, tỉ lệ selectedRange, câu hỏi Accessibility, Slack chưa đo), chờ người dùng duyệt sửa DECISIONS; mục 4 của M2-TESTING chưa có kết quả. M4 — App Group chạy với Team ID; đang tự thử M4-TESTING bước 3–10. M0, M1 đã đóng.
+- Mốc đang làm: M2 — A/B đã chốt (cách A); kiểm toán M2 lần 2 (30/10) CHƯA ĐẠT chỉ vì tài liệu và bằng chứng → đã sửa README, ROADMAP, OPENKEY-NOTES, điền M2-TESTING; mục 4 còn dòng 9, 10 (chạy lại sau khi bỏ chế độ Anh), 16 (VoiceOver, cần người), 14 một phần. M4 — App Group chạy với Team ID (958a5a8), bỏ chế độ Anh (9680c68, ea676ae); M4-TESTING bước 1–4 ĐẠT, 9–10 một phần, 5–8 chưa chạy, 11 cần người. Test hiện tại: engine 76, DauShared 21, IMK 25, snapshot-settings 10. M0, M1 đã đóng.
 - Việc đang chờ người dùng: Bundle ID (placeholder `com.example.dau`). Team ID: Personal Team miễn phí `M58DANM3ZP` (30/10/2026), ký tự động "Apple Development"; bản phát hành dùng Developer ID ở M7.
 - M1a xong: `docs/OPENKEY-NOTES.md` (commit b0739c7).
 - M0: khung xong (commit b2a331d, 06f0dcb, 6fe660b), phiên chính đã kiểm chứng lại: xcodegen + build Debug 2 target với `-destination 'generic/platform=macOS'` ra `x86_64 arm64`, swift test 2 package xanh, bộ gõ không có network.client. Tên hiển thị "Dấu" cho locale `en` đã sửa (0b188dd). **Kiểm toán M0: ĐẠT.**
@@ -24,9 +24,9 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 |---|---|---|---|
 | M0 Khung dự án | xong | ĐẠT (29/10) | build Debug universal cần `-destination generic/platform=macOS` |
 | M1 Engine | xong | ĐẠT (29/10, lần 2) | Telex, Telex đơn giản, VNI, 75 test; release ~0,15 µs/phím; 0 từ sai / 474 từ, 0 khôi phục nhầm / 15.796 âm tiết, fuzz 800k thao tác không crash |
-| M2 Bộ gõ tối thiểu | đang làm | lần 1 CHƯA ĐẠT (30/10, tài liệu) | cách A; tự gõ 30 ms/phím đúng ở TextEdit, Safari, Chrome, VS Code, Terminal; Sublime gõ tay; Slack chưa đo (máy không cài); selectedRange p50 0,2–0,6 ms (Debug) |
+| M2 Bộ gõ tối thiểu | đang làm | lần 1 CHƯA ĐẠT (30/10, tài liệu); lần 2 CHƯA ĐẠT (30/10, chỉ tài liệu và bằng chứng) | cách A; tự gõ 30 ms/phím đúng ở TextEdit, Safari, Chrome, VS Code, Terminal, Telegram (thay Slack); Sublime gõ tay; selectedRange p50 0,2–0,6 ms (Debug). M2-TESTING mục 4: 11 ĐẠT, 0 hỏng; 9, 10, 16 chưa chạy, 14 một phần, 3 bỏ qua. Test engine 76, IMK 25 |
 | M3 Độ tin cậy | chưa | — | |
-| M4 App Cài đặt | đang làm | lần 1 CHƯA ĐẠT (N5 gạch chân/D20 trên UI, menu "Cài đặt Dấu…", mã chết, ngoại lệ màu D9/D25) | DauShared + cửa sổ 4 mục xong (2d6206e, c731c61; 22 test sau khi gỡ SettingsExamples); bộ gõ đọc cài đặt chung + D5 (0aa4872, 30 test IMK); cách hiểu D5 đã chốt. App Group chạy với Team ID M58DANM3ZP (958a5a8); M4-TESTING bước 1–2 ĐẠT |
+| M4 App Cài đặt | đang làm | lần 1 CHƯA ĐẠT (N5 gạch chân/D20 trên UI, menu "Cài đặt Dấu…", mã chết, ngoại lệ màu D9/D25); lần 2 CHƯA ĐẠT (30/10, tài liệu và bằng chứng) | DauShared + cửa sổ 4 mục (2d6206e, c731c61); bộ gõ đọc cài đặt chung (0aa4872). App Group chạy với Team ID M58DANM3ZP (958a5a8). Bỏ chế độ Anh, quy tắc theo app chỉ còn gạch chân (9680c68, ea676ae). M4-TESTING: 1–4 ĐẠT; 9 ĐẠT trên máy en-VN, máy tiếng Anh hẳn cần người; 10 một phần (sheet chưa xem); 5–8 chưa chạy; 11 cần người. Test DauShared 21, IMK 25, snapshot-settings 10 |
 | M5 Onboarding, cài, gỡ | chưa | — | |
 | M6 Hiệu năng dưới tải | chưa | — | |
 | M7 Phát hành | chưa | — | |
@@ -63,6 +63,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | 29/10/2026 | Cấp phát bộ nhớ trong `handle` | 0 lần / 41.600 phím | chương trình ngoài repo móc `malloc_logger`, có đối chứng dương; chưa có trong CI |
 | 29/10/2026 | Cách A theo tốc độ gõ (Debug), câu mẫu `tooi yeeu tieengs Vieetj, windows Hasaki carr ` | 0 ms/phím (System Events gõ cả chuỗi, ~1–2 ms): TextEdit, Safari đúng; Chrome, VS Code, Terminal SAI (mismatch 3–4, thay nhầm vùng ở lần thay đầu của từ). 5 và 10 ms: Chrome, Terminal đúng; VS Code sai từ đầu ("ôoi"). 20, 30, 60, 120 ms: cả 5 app đúng | `scripts/selftest-typing/run.sh --delay N all`, log `diag` |
 | 29/10/2026 | Cách A, 30 ms/phím, phím có thay (n=12 mỗi app) | `selectedRange` p50/p99 µs: TextEdit 327/606, Safari 622/1.057, Chrome 415/694, VS Code 230/885, Terminal 408/637; cả phím có thay p50/p99 µs: 3.406/7.617, 1.494/4.731, 1.081/5.296, 617/1.236, 1.165/1.669; mismatch 0 | như trên |
+| 30/10/2026 | IMK cách A, Telegram (Debug, tự gõ 30 ms/phím) | `selectedRange` p50 240 / p99 1.670 µs; `insertText` p50 1.830 / p99 3.491 µs; cả phím có thay p50 2.171 / p99 5.313 µs; replace 12, pass 34; mismatch 0, unsupported 0; câu mẫu đúng, không gạch chân, không nhảy chữ | `scripts/perf-report.sh --app Telegram`; agent tự gõ qua System Events trong Saved Messages (`ru.keepcoder.Telegram`), chỉ gõ, không gửi |
 
 ## Nhật ký
 (ngày — việc — agent — kết quả — commit)
@@ -112,3 +113,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 30/10/2026 — Team ID `M58DANM3ZP` (Personal Team) vào project.yml, ký tự động; `scripts/selftest-app-group.sh` PASS (cả khi bộ gõ vừa khởi động). Sửa script: chờ `settings-loaded` thay cho `sleep 1` (bộ gõ mới chạy mất ~7 s mới nạp cài đặt), `synchronize=failed` chỉ ghi chú, thêm kiểm tra tiến trình app mới đọc lại giá trị. M4-TESTING bước 1 (store=appGroup, không hộp thoại) và bước 2 (app đặt VNI, gõ `Vie65t` trong TextEdit ra "Việt") ĐẠT — phiên chính
 - 30/10/2026 — kiểm toán M2 lần 1 — auditor — CHƯA ĐẠT chỉ vì tài liệu (mã khớp N1–N5, D4, D5, D8, D13, D24). Người dùng duyệt: D11 theo cách A, sửa tỉ lệ selectedRange theo số đo từng app, trả lời câu Accessibility (không cần), D4 thêm các sự kiện chỉ reset; thay Slack bằng Telegram. Đã sửa DECISIONS, ROADMAP, M2-TESTING, ghi chú canvas — phiên chính
 - 30/10/2026 — người dùng duyệt bỏ chế độ "Dấu – Tiếng Anh" (D2). Thử TIS từ bộ gõ có sandbox (imk-dev): `TISSelectInputSource` đổi được nguồn nhưng bước báo app đang gõ bị chặn (`deny mach-lookup com.apple.tsm.portname`, temporary-exception không gỡ được) → theo phương án dự phòng đã duyệt: quy tắc theo app chỉ còn gạch chân, bỏ nhớ chế độ theo app, dùng tuỳ chọn macOS "Tự động chuyển sang nguồn đầu vào của tài liệu". Sửa D2, D5, D14, D17 và ghi chú canvas. M2-TESTING mục 4: 11 ĐẠT, 0 hỏng (agent tự gõ); Telegram tự gõ 30 ms đúng, selectedRange p50 240 / p99 1.670 µs, insertText p50 1.830 µs, mismatch 0; test IMK 34 xanh — phiên chính
+- 30/10/2026 — kiểm toán lại M2+M4 — auditor — CHƯA ĐẠT (tài liệu, bằng chứng); sửa README, ROADMAP, OPENKEY-NOTES, điền M2/M4-TESTING — general-purpose (agent tài liệu) — xong (commit này)
