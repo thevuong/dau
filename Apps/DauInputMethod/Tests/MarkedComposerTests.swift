@@ -93,8 +93,8 @@ struct MarkedComposerTests {
     @Test("the sample sentence: restore (D4), doubled key (D26), punctuation")
     func sample() {
         var s = Session()
-        s.type("windows carr tooi yeeu tieengs Vieetj, Codefastlabs ")
-        #expect(s.app.document == "windows car tôi yêu tiếng Việt, Codefastlabs ")
+        s.type("windows carr tooi yeeu tieengs Vieetj, Sunrise ")
+        #expect(s.app.document == "windows car tôi yêu tiếng Việt, Sunrise ")
         #expect(s.app.marked == "")
         #expect(s.app.onlyNotFound)
         #expect(s.overCalls == 0)
@@ -104,11 +104,11 @@ struct MarkedComposerTests {
     @Test("D4: every printable word end restores the same way")
     func punctuation() {
         var s = Session()
-        s.type("Swift! (windows) as")
-        #expect(s.app.document == "Swift! (windows) ")
+        s.type("Sunrise! (windows) as")
+        #expect(s.app.document == "Sunrise! (windows) ")
         #expect(s.app.marked == "á")
         s.type("?")
-        #expect(s.app.document == "Swift! (windows) á?")
+        #expect(s.app.document == "Sunrise! (windows) á?")
     }
 
     @Test("punctuation or Space with no word goes to the app, no call")

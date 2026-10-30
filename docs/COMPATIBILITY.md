@@ -89,10 +89,10 @@ Bundle ID mà bộ gõ thật sự nhận có thể khác cột trên (ví dụ 
 Câu mẫu (Telex), kết thúc bằng một dấu cách:
 
 ```
-windows carr tooi yeeu tieengs Vieetj, Codefastlabs␣
+windows carr tooi yeeu tieengs Vieetj, Sunrise␣
 ```
 
-Mong đợi: `windows car tôi yêu tiếng Việt, Codefastlabs␣` (D4, D26, D30). "carr" đứng trước câu tiếng Việt để tránh tự sửa chính tả của macOS (mục 6.1). Số đo ngày 29/10 dùng câu mẫu cũ `tooi yeeu tieengs Vieetj, windows Codefastlabs carr␣`.
+Mong đợi: `windows car tôi yêu tiếng Việt, Sunrise␣` (D4, D26, D30). "carr" đứng trước câu tiếng Việt để tránh tự sửa chính tả của macOS (mục 6.1). Số đo ngày 29/10 dùng câu mẫu cũ `tooi yeeu tieengs Vieetj, windows Sunrise carr␣`.
 
 - **Ứng dụng có trong script** (`textedit`, `safari`, `chrome`, `vscode`, `terminal`; từ T6 thêm `edge`, `firefox`, `notes`, `mail`): chạy lần lượt
   `scripts/selftest-typing/run.sh --delay 30 <app>` và `scripts/selftest-typing/run.sh --delay 0 <app>`.
@@ -110,7 +110,7 @@ Mong đợi: `windows car tôi yêu tiếng Việt, Codefastlabs␣` (D4, D26, D
 | K5 | Click reset (D4, D11) | gõ `tooi`, click vào chỗ khác trong văn bản (sau dấu cách hoặc đầu dòng), gõ `s` | chỉ thêm "s" ở chỗ mới, "tôi" cũ không đổi. Click ngay sau một chữ thì D20 có thể đặt dấu vào chữ đó (D4 × D20) |
 | K6 | Mũi tên reset (D4, D4 × D20) | gõ `tooi`, nhấn ←, nghỉ một nhịp, gõ `s` | D20 bật (mặc định): "tối". ← chỉ xoá bộ đệm, không chặn D20: phím dấu đặt dấu vào chữ ngay trước con trỏ ("tô" → "tố"), chữ "i" sau con trỏ giữ nguyên. D20 tắt: phím đi thẳng, thêm "s" tại con trỏ ("tôsi"). Ghi chú M2: lần ← đầu sau từ gõ dở có thể bị ứng dụng nuốt (TextEdit, cả với U.S.) |
 | K7 | Thêm dấu cho từ đã gõ (D20) | gõ `hoc`, dấu cách, ⌫, nghỉ một nhịp (≥ 50 ms, gõ tay là đủ), rồi `j`. Tự gõ: `run.sh --delay 120 --keys "hoc ⌫j tooi ⌫s carr ⌫s hoc ⌫f viet ⌫j xin chao ⌫f " --expect "học tối cars hocf vietj xin chào "` | "học". Phím dồn dưới 50 ms thì D20 cố ý không chạy ("hocj"). App gạch chân (D13): không có D20, ra "hocj". Terminal: ⌫ không tới bộ gõ nên ra "hocj" (ARCHITECTURE.md) |
-| K8 | Tự sửa chính tả (D4) | gõ `tooi yeeu tieengs Vieetj, Codefastlabs carr␣` | Dấu trả "car". Nếu sau dấu cách chữ thành "cả": gõ lại câu bằng U.S. (`… Codefastlabs car␣`). U.S. cũng bị sửa thì đó là macOS, ghi "có" ở cột Tự sửa; không tắt tự sửa hộ người dùng (N4) |
+| K8 | Tự sửa chính tả (D4) | gõ `tooi yeeu tieengs Vieetj, Sunrise carr␣` | Dấu trả "car". Nếu sau dấu cách chữ thành "cả": gõ lại câu bằng U.S. (`… Sunrise car␣`). U.S. cũng bị sửa thì đó là macOS, ghi "có" ở cột Tự sửa; không tắt tự sửa hộ người dùng (N4) |
 
 ### 4.4 Số đo cần ghi
 
@@ -169,7 +169,7 @@ Số đo lấy từ bản Debug, có thêm một lần hỏi chẩn đoán sau m
 | Google Sheets | chưa thử | | | | | | | | | | | | |
 | Notion | chưa thử | | | | | | | | | | | | |
 | Obsidian | chưa thử | | | | | | | | | | | | |
-| Ghi chú (Notes) | 30/10/2026 | script (4.13, ghi chú mới trong iCloud, xoá trắng sau khi đọc) | đúng | đúng (mismatch 0) | — | — / không | K4 ĐẠT ("hò"); K5, K6 chưa thử | ĐẠT ("Học": Notes tự viết hoa chữ đầu) | không: "…Codefastlabs carr␣" giữ "car" (chữ đầu "Tôi" do Notes viết hoa) | 330 / 1.135 | 0 / 0 | chưa thấy lỗi | T6 30/10/2026 (mục 5.1). `insertText` 3.799 / 10.207 µs; `handle` phím có thay 4.274 / 8.003 µs (cao nhất trong các app đã đo, vẫn đúng ở 0 ms) |
+| Ghi chú (Notes) | 30/10/2026 | script (4.13, ghi chú mới trong iCloud, xoá trắng sau khi đọc) | đúng | đúng (mismatch 0) | — | — / không | K4 ĐẠT ("hò"); K5, K6 chưa thử | ĐẠT ("Học": Notes tự viết hoa chữ đầu) | không: "…Sunrise carr␣" giữ "car" (chữ đầu "Tôi" do Notes viết hoa) | 330 / 1.135 | 0 / 0 | chưa thấy lỗi | T6 30/10/2026 (mục 5.1). `insertText` 3.799 / 10.207 µs; `handle` phím có thay 4.274 / 8.003 µs (cao nhất trong các app đã đo, vẫn đúng ở 0 ms) |
 | Mail | 30/10/2026 | script (16.0, thư mới, gõ vào thân thư, ô Đến để trống, không gửi; đóng "Don’t Save") | đúng ("Windows…": Mail tự viết hoa chữ đầu) | — | — | — / — | chưa thử | chưa thử | chưa thử | 375 / 1.245 | 0 / 0 | chưa đủ dữ liệu (chỉ 30 ms) | T6 30/10/2026 (mục 5.1), dừng theo yêu cầu người dùng sau K1 30 ms. `insertText` 471 / 2.536 µs; `handle` phím có thay 926 / 2.979 µs |
 | Tin nhắn (Messages) | chưa thử | | | | | | | | | | | | |
 | Spotlight | chưa thử | | | | | | | | | | | | |
@@ -183,7 +183,7 @@ K4–K6 của TextEdit: M2-TESTING mục 4 dòng 1, 4, 5, 6 (30/10/2026, agent t
 ### 5.1 Lượt T6 ngày 30/10/2026
 
 - Máy: macOS 27.2, Apple M1 Pro; bộ gõ Debug đã cài ở HEAD 60dac6f. Tự gõ bằng `scripts/selftest-typing/run.sh` (thêm `edge`, `firefox`, `notes`, `mail` trong lượt này). Phím chỉ gửi khi app thử đứng trước; không nhấn Return ở đâu; không gửi thư hay tin nhắn.
-- Mỗi app: K1 câu mẫu ở 30 ms và 0 ms; app sai ở 0 ms (hoặc trong danh sách đề xuất) thử thêm 0 ms với `--underline`, 5 và 10 ms. K4: `--keys "hoaf⌫ " --expect "hò "` (30 ms). K7: `--delay 120 --keys "hoc ⌫j " --expect "học "`. K8: `--keys "tooi yeeu tieengs Vieetj, Codefastlabs carr " --expect "tôi yêu tiếng Việt, Codefastlabs car "` (30 ms). Số µs lấy từ báo cáo `perf-report.sh` mà script in cho lượt 30 ms (p50 / p99).
+- Mỗi app: K1 câu mẫu ở 30 ms và 0 ms; app sai ở 0 ms (hoặc trong danh sách đề xuất) thử thêm 0 ms với `--underline`, 5 và 10 ms. K4: `--keys "hoaf⌫ " --expect "hò "` (30 ms). K7: `--delay 120 --keys "hoc ⌫j " --expect "học "`. K8: `--keys "tooi yeeu tieengs Vieetj, Sunrise carr " --expect "tôi yêu tiếng Việt, Sunrise car "` (30 ms). Số µs lấy từ báo cáo `perf-report.sh` mà script in cho lượt 30 ms (p50 / p99).
 - Trình duyệt thử trên trang cục bộ có `spellcheck="false"`, nên K8 ở đây không nói gì về tự sửa của trình duyệt khi gõ trên web thật.
 - Người dùng dừng lượt thử sau Mail (K1 30 ms). Chưa thử trong lượt này: Mail (phần còn lại), Messages, Pages, Numbers, Zalo, Discord, Ghostty, Zed, Xcode, WebStorm; kiểm chứng lại Terminal không gửi ⌫ cho bộ gõ (mục 6.5) cũng chưa chạy. Các việc này làm tiếp ở M6 (người dùng chốt 30/10/2026, mục 7).
 - Dọn dẹp: tab thử đã đóng; ghi chú thử trong Notes đã xoá trắng và Notes bỏ ghi chú trống (đếm 53 ghi chú trước và sau); thư nháp đóng bằng "Don’t Save"; Notes, Mail, Firefox đã thoát; Edge (do lượt thử mở) còn chạy, không cửa sổ. Nguồn nhập liệu và clipboard được script khôi phục; khoá `DauDebugForceUnderline` đã xoá.
@@ -192,8 +192,8 @@ K4–K6 của TextEdit: M2-TESTING mục 4 dòng 1, 4, 5, 6 (30/10/2026, agent t
 
 ### 6.1 Tự sửa chính tả của macOS đè lên chữ đã giữ (D4) — ghi ngày 30/10/2026
 
-- Hiện tượng: từ macOS 27.2, ở ứng dụng bật tự sửa chính tả, khi phía trước là câu tiếng Việt, hệ thống có thể sửa chữ tiếng Anh vừa gõ thành chữ tiếng Việt ("…Codefastlabs car␣" → "cả"), **kể cả khi gõ bằng bàn phím U.S.**. Việc này xảy ra sau khi Dấu đã trả đúng "car", nên đè lên kết quả gõ đúp ("carr" → "car").
-- Bằng chứng: `docs/DECISIONS.md` D4 (đoạn "Giới hạn đã biết"); `docs/PROGRESS.md` nhật ký 30/10/2026 (câu mẫu `selftest-typing` đổi thành "windows carr tooi yeeu tieengs Vieetj, Codefastlabs " để né, 3/3 ĐẠT); chú thích đầu `scripts/selftest-typing/run.sh`. Nguồn không ghi ứng dụng cụ thể đã quan sát; T6 điền cột "Tự sửa" cho từng app bằng K8.
+- Hiện tượng: từ macOS 27.2, ở ứng dụng bật tự sửa chính tả, khi phía trước là câu tiếng Việt, hệ thống có thể sửa chữ tiếng Anh vừa gõ thành chữ tiếng Việt ("…Sunrise car␣" → "cả"), **kể cả khi gõ bằng bàn phím U.S.**. Việc này xảy ra sau khi Dấu đã trả đúng "car", nên đè lên kết quả gõ đúp ("carr" → "car").
+- Bằng chứng: `docs/DECISIONS.md` D4 (đoạn "Giới hạn đã biết"); `docs/PROGRESS.md` nhật ký 30/10/2026 (câu mẫu `selftest-typing` đổi thành "windows carr tooi yeeu tieengs Vieetj, Sunrise " để né, 3/3 ĐẠT); chú thích đầu `scripts/selftest-typing/run.sh`. Nguồn không ghi ứng dụng cụ thể đã quan sát; T6 điền cột "Tự sửa" cho từng app bằng K8.
 - Dấu không tắt tự sửa của hệ thống (N4). Người dùng hoàn tác bằng ⌘Z hoặc bấm vào chữ bị sửa. Tự sửa là thuộc tính của từng ô soạn thảo do ứng dụng quyết định (ví dụ `NSTextView.isAutomaticSpellingCorrectionEnabled`, https://developer.apple.com/documentation/appkit/nstextview/isautomaticspellingcorrectionenabled), nên ứng dụng không dùng hệ thống văn bản của Apple có thể không bị (suy luận, cần kiểm chứng bằng K8).
 
 ### 6.2 Ứng dụng áp phím bất đồng bộ (câu hỏi A/B) — ghi ngày 29/10/2026

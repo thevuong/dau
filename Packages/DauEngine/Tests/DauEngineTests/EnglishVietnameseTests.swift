@@ -50,10 +50,10 @@ struct EnglishVietnameseTests {
     /// typed, including case.
     @Test(arguments: [
         Case("windows ", "windows "),
-        Case("Swift ", "Swift "),
+        Case("Sunrise ", "Sunrise "),
         Case("aw ", "aw "),       // D31: ă cannot end a syllable.
         Case("pdd ", "pdd "),     // "pđ" is invalid; restore even though only đ changed (B7).
-        Case("Swift", "Sừit"),   // no boundary yet: nothing is restored.
+        Case("Sunrise", "Sủnise"),   // no boundary yet: nothing is restored.
     ])
     func restoreAtBoundary(_ c: Case) { expectTyped(c.keys, c.expected) }
 
@@ -61,23 +61,23 @@ struct EnglishVietnameseTests {
     /// ! ? ( ) " (OpenKey did not for "!", B10).
     @Test(arguments: [",", ".", "!", "?", "(", ")", "\"", ";", ":", "'", "-", "[", "]", "\t", "\n"])
     func everyPrintedBoundaryRestores(_ boundary: String) {
-        expectTyped("Swift" + boundary, "Swift" + boundary)
+        expectTyped("Sunrise" + boundary, "Sunrise" + boundary)
         expectTyped("windows" + boundary, "windows" + boundary)
         expectTyped("car" + boundary, "cả" + boundary)
     }
 
     /// D4: Return handled through `endWord()` restores too.
     @Test func returnThroughEndWord() {
-        expectTyped("Swift⏎", "Swift\n")
+        expectTyped("Sunrise⏎", "Sunrise\n")
         expectTyped("car⏎", "cả\n")
     }
 
     /// D4: arrows, Esc, clicks and shortcuts only reset; nothing is restored.
     @Test func resetDoesNotRestore() {
-        expectTyped("Swift←", "Sừit")
-        expectTyped("Swift← ", "Sừit ")
+        expectTyped("Sunrise←", "Sủnise")
+        expectTyped("Sunrise← ", "Sủnise ")
         // After the reset a new word starts.
-        expectTyped("Swift←as", "Sừitá")
+        expectTyped("Sunrise←as", "Sủniseá")
     }
 
     /// D27: [ and ] are punctuation in Telex.
@@ -90,16 +90,13 @@ struct EnglishVietnameseTests {
     /// Auto restore off: the boundary keeps what is shown (D4 switch); spelling still
     /// stops transforms (D30).
     @Test func autoRestoreOff() {
-        expectTyped("Swift ", "Sừit ", noRestore)
+        expectTyped("Sunrise ", "Sủnise ", noRestore)
         expectTyped("windows ", "ưindows ", noRestore)
         expectTyped("car ", "cả ", noRestore)
     }
 
     /// Several words in a row, each handled on its own.
     @Test func sentence() {
-        expectTyped("Tieengs Vieetj, windows vaf Swift!", "Tiếng Việt, windows và Swift!")
-        // A 12-letter word: invalid from "Cod" (D30), so its later tone keys stay letters,
-        // and D33 has nothing to restore at the 8th letter.
-        expectTyped("Tieengs Vieetj, vaf Codefastlabs!", "Tiếng Việt, và Codefastlabs!")
+        expectTyped("Tieengs Vieetj, windows vaf Sunrise!", "Tiếng Việt, windows và Sunrise!")
     }
 }

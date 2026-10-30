@@ -11,7 +11,7 @@ struct PerformanceTests {
         vawn hoas. Hoom nay trowif ddepj quas, chungs tooi ddi chowi coong vieen vaf awn kem. \
         Muoons gox tieengs Vieetj nhanh thif phair luyeenj taapj thuwowngf xuyeen; khuyeen, \
         nguyeenx, quaanf, quoocs, giuwax, gioongs, nghieeng, khoer, thuowr, huowu, ruowuj. \
-        The quick brown fox jumps over the lazy dog: windows, Swift, test, carr, sexx, email! \
+        The quick brown fox jumps over the lazy dog: windows, Sunrise, test, carr, sexx, email! \
         Backspace⌫⌫ (ddaay laf ⌫ thuwr) 2024 vaf h2o.
 
         """
@@ -21,7 +21,7 @@ struct PerformanceTests {
         va8n hoa1. Ho6m nay tro7i2 d9ep5 qua1, chu1ng to6i d9i cho7i co6ng vie6n va2 a8n kem. \
         Muo6n1 go4 tie6ng1 Vie6t5 nhanh thi2 pha3i luye6n5 ta6p5 thu7o7ng2 xuye6n; khuye6n, \
         nguye6n4, qua6n2, quo6c1, giu7a4, gio6ng1, nghie6ng, khoe3, thuo73, huo7u, ruou75. \
-        The quick brown fox jumps over the lazy dog: windows, Swift, a11, mp3, Win10, email! \
+        The quick brown fox jumps over the lazy dog: windows, Sunrise, a11, mp3, Win10, email! \
         Backspace⌫⌫ (d9a6y la2 ⌫ thu73) 2024 va2 h2o.
 
         """
