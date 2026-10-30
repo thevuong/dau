@@ -48,11 +48,11 @@ struct OutputTests {
 
     @Test func endWordDoesNotIncludeAKey() {
         var engine = VietEngine()
-        for k in "Hasaki".unicodeScalars { _ = engine.handle(k) }
+        for k in "Swift".unicodeScalars { _ = engine.handle(k) }
         guard case .replace(_, let insert) = engine.endWord() else {
             Issue.record("expected replace"); return
         }
-        #expect(insert.description == "asaki")
+        #expect(insert.description == "wift")   // "Sừit" → "Swift"
     }
 
     @Test func controlAndFunctionKeysReset() {

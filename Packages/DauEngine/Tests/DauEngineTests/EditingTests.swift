@@ -71,23 +71,23 @@ struct EditingTests {
     /// boundary) and the rest of the word passes through; nothing is lost.
     @Test func overflowRestoresImmediately() {
         var t = Typist()
-        t.type("Hasakiaaa")         // "Hấki" + "aaa" → 7 letters, still transformed
-        #expect(t.string == "Hấkiaaa")
+        t.type("Swiftaaa")          // "Sừit" + "aaa" → 7 letters (8 keys), still transformed
+        #expect(t.string == "Sừitaaa")
         t.type("a")                 // 8th letter
-        #expect(t.string == "Hasakiaaaa")
+        #expect(t.string == "Swiftaaaa")
         t.type("ss ")
-        #expect(t.string == "Hasakiaaaass ")
+        #expect(t.string == "Swiftaaaass ")
     }
 
     /// D33 with auto restore off: the word only stops transforming.
     @Test func overflowWithoutAutoRestore() {
         var t = Typist(noRestore)
-        t.type("Hasakiaaa")
-        #expect(t.string == "Hấkiaaa")
+        t.type("Swiftaaa")
+        #expect(t.string == "Sừitaaa")
         t.type("a")
-        #expect(t.string == "Hấkiaaaa")
+        #expect(t.string == "Sừitaaaa")
         t.type("ss ")
-        #expect(t.string == "Hấkiaaaass ")
+        #expect(t.string == "Sừitaaaass ")
     }
 
     @Test func longWordsLoseNothing() {
@@ -102,8 +102,8 @@ struct EditingTests {
         Case("VIEETJ", "VIỆT"), Case("Vieetj", "Việt"), Case("Dd", "Đ"), Case("DD", "Đ"),
         Case("dD", "đ"), Case("aA", "â"), Case("Aa", "Â"), Case("aW", "ă"), Case("W", "Ư"),
         Case("NGUOIWF", "NGƯỜI"), Case("NguoiWF", "Người"), Case("Hoaf", "Hoà"),
-        Case("THUOWR", "THUỞ"), Case("ViEeTj", "ViỆT"), Case("HASAKI ", "HASAKI "),
-        Case("Hasaki ", "Hasaki "),
+        Case("THUOWR", "THUỞ"), Case("ViEeTj", "ViỆT"), Case("SWIFT ", "SWIFT "),
+        Case("Swift ", "Swift "),
     ])
     func letterCase(_ c: Case) { expectTyped(c.keys, c.expected) }
 

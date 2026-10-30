@@ -65,8 +65,8 @@ LOG=/usr/bin/log
 
 # "carr" comes first: after Vietnamese text, macOS 27.2 autocorrect turns a typed "car"
 # into "cả" (D4, known limit), which would hide what Dấu did.
-KEYS='windows carr tooi yeeu tieengs Vieetj, Hasaki '
-EXPECT='windows car tôi yêu tiếng Việt, Hasaki '
+KEYS='windows carr tooi yeeu tieengs Vieetj, Codefastlabs '
+EXPECT='windows car tôi yêu tiếng Việt, Codefastlabs '
 DELAY_MS=30
 UNDERLINE=0
 FORCE_KEY=DauDebugForceUnderline

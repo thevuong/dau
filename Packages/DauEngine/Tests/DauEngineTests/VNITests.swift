@@ -88,10 +88,10 @@ struct VNITests {
 
     /// D4 in VNI: restore what was typed, Vietnamese wins on overlaps.
     @Test(arguments: [
-        Case("windows ", "windows "), Case("Hasaki ", "Hasaki "), Case("test ", "test "),
-        Case("Ha1saki", "Hásaki"), Case("Ha1saki ", "Ha1saki "), Case("Ha1saki!", "Ha1saki!"),
+        Case("windows ", "windows "), Case("Codefastlabs ", "Codefastlabs "), Case("test ", "test "),
+        Case("Ko1tlin", "Kótlin"), Case("Ko1tlin ", "Ko1tlin "), Case("Ko1tlin!", "Ko1tlin!"),
         Case("ca3 ", "cả "), Case("car3 ", "car3 "), Case("aw ", "aw "), Case("a8 ", "a8 "), Case("ca8n ", "căn "),
-        Case("Ha1saki←", "Hásaki"),
+        Case("Ko1tlin←", "Kótlin"),
     ])
     func restore(_ c: Case) { expectTyped(c.keys, c.expected, vni) }
 

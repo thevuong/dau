@@ -18,16 +18,17 @@ Bản Debug ghi một dòng log cho mỗi phím, category `perf`, chỉ gồm lo
 Gõ đúng chuỗi phím sau (Telex), kết thúc bằng một dấu cách:
 
 ```
-tooi yeeu tieengs Vieetj, windows Hasaki carr␣
+tooi yeeu tieengs Vieetj, windows Codefastlabs carr␣
 ```
 
 Kết quả mong đợi (theo D4, D26, D30):
 
 ```
-tôi yêu tiếng Việt, windows Hasaki car␣
+tôi yêu tiếng Việt, windows Codefastlabs car␣
 ```
 
-- "windows", "Hasaki": trong lúc gõ có thể thấy chữ bị biến đổi tạm (ví dụ "ư…", "Há…"); khi nhấn dấu cách hoặc dấu câu, từ trở về đúng như đã gõ (D4).
+- "windows": trong lúc gõ có thể thấy chữ bị biến đổi tạm ("ư…"); khi nhấn dấu cách hoặc dấu câu, từ trở về đúng như đã gõ (D4).
+- "Codefastlabs": không bị biến đổi, vì từ "Cod" đã không thể thành âm tiết hợp lệ nên các phím f, s sau đó là chữ thường (D30); từ dài hơn 7 chữ cái nên phần còn lại đi thẳng (D33).
 - "carr" → "car" (gõ đúp phím dấu giữ chữ gốc, D4/D26).
 
 ## 2. Từng ứng dụng
@@ -44,7 +45,7 @@ Kết quả (30/10/2026): agent tự gõ câu mẫu qua System Events, 30 ms/ph�
 | TextEdit | `com.apple.TextEdit` | Đúng ở 30 ms/phím | Không | Không | 327 / 606 | — / 0 | `scripts/selftest-typing`, 29/10. Người dùng gõ tay 29/10 cũng đúng |
 | Safari (ô tìm kiếm + một ô soạn thảo trên web) | `com.apple.Safari` | Đúng ở 30 ms/phím | Không | Không | 622 / 1.057 | — / 0 | `scripts/selftest-typing`, 29/10. Người dùng gõ tay 29/10 cũng đúng |
 | Chrome (thanh địa chỉ + một ô soạn thảo trên web) | `com.google.Chrome` | Đúng ở 30 ms/phím | Không | Không ở 30 ms; có khi phím đến dồn | 415 / 694 | — / 0 | `scripts/selftest-typing`, 29/10. Sai khi phím đến cách nhau < 10 ms (app áp phím bất đồng bộ; M3 thử D13). Người dùng gõ tay 29/10 đúng |
-| Telegram (thay Slack) | `ru.keepcoder.Telegram` | "tôi yêu tiếng Việt, windows Hasaki car" | Không | Không | 240 / 1.670 | 0 / 0 | 30/10, tự gõ 30 ms/phím trong Saved Messages, chỉ gõ, không gửi. `insertText` p50 1.830 / p99 3.491 µs; cả phím có thay p50 2.171 / p99 5.313 µs; replace 12, pass 34 |
+| Telegram (thay Slack) | `ru.keepcoder.Telegram` | "tôi yêu tiếng Việt, windows Codefastlabs car" | Không | Không | 240 / 1.670 | 0 / 0 | 30/10, tự gõ 30 ms/phím trong Saved Messages, chỉ gõ, không gửi. `insertText` p50 1.830 / p99 3.491 µs; cả phím có thay p50 2.171 / p99 5.313 µs; replace 12, pass 34 |
 | VS Code | `com.microsoft.VSCode` | Đúng ở 30 ms/phím | Không | Không ở 30 ms; có khi phím đến dồn | 230 / 885 | — / 0 | `scripts/selftest-typing`, 29/10. Sai khi phím đến cách nhau < 20 ms (Electron áp phím bất đồng bộ; M3 thử D13) |
 | Terminal | `com.apple.Terminal` | Đúng ở 30 ms/phím | Không | Không ở 30 ms; có khi phím đến dồn | 408 / 637 | — / 0 | `scripts/selftest-typing`, 29/10. Sai khi phím đến cách nhau < 10 ms (chờ shell echo; M3 thử D13) |
 

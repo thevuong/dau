@@ -64,7 +64,7 @@ struct SeedTests {
 
     @Test func rejectsWhatCannotBeAWord() {
         var engine = VietEngine()
-        do { let result = engine.seed(displayed: "Hasakiii".unicodeScalars); #expect(!result) }   // 8 letters (D33)
+        do { let result = engine.seed(displayed: "Codefast".unicodeScalars); #expect(!result) }   // 8 letters (D33)
         do { let result = engine.seed(displayed: "a-b".unicodeScalars); #expect(!result) }
         do { let result = engine.seed(displayed: "".unicodeScalars); #expect(!result) }
         do { let result = engine.seed(displayed: "\u{0301}a".unicodeScalars); #expect(!result) }

@@ -169,8 +169,8 @@ struct InPlaceComposerTests {
     @Test("the sample sentence, one insertText and at most one selectedRange per key")
     func sample() {
         var s = Session()
-        s.type("windows carr tooi yeeu tieengs Vieetj, Hasaki ")
-        #expect(s.doc.text == "windows car tôi yêu tiếng Việt, Hasaki ")
+        s.type("windows carr tooi yeeu tieengs Vieetj, Codefastlabs ")
+        #expect(s.doc.text == "windows car tôi yêu tiếng Việt, Codefastlabs ")
         #expect(s.overCalls == 0)
         // Words start after a Space typed here: no D20 read at all.
         #expect(s.reads == 0)

@@ -43,7 +43,7 @@ struct SpellingTests {
 
     /// D30: once the word cannot become a syllable, later keys are plain letters.
     @Test(arguments: [
-        Case("Hasaki", "Hấki"), Case("windows", "ưindows"), Case("banana", "bânna"),
+        Case("Swift", "Sừit"), Case("Codefastlabs", "Codefastlabs"), Case("windows", "ưindows"), Case("banana", "bânna"),
         Case("banana ", "banana "), Case("lazy ", "lazy "), Case("fanf", "fanf"),
         Case("jas", "jas"), Case("zas", "zas"),
     ])

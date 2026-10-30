@@ -188,7 +188,7 @@ Xem B5, B6. **Dấu:** kiểm tra chính tả luôn chạy, không có công t�
 ### 3.9 Khôi phục khi sai chính tả (Restore if wrong spelling)
 
 - Chỉ hoạt động khi bật cả kiểm tra chính tả. Diễn ra khi nhấn Space (`vKeyHandleEvent`, nhánh Space) hoặc một phím ranh giới từ (mục 3.16).
-- Nếu cờ tạm tắt đang bật (từ sai chính tả, hoặc vừa gõ đúp), engine thay cả từ bằng chuỗi phím gốc, rồi tầng macOS gõ thêm phím vừa nhấn. Ví dụ "Hasaki␣": trong lúc gõ hiện "Hấki", nhấn Space thì thành "Hasaki␣".
+- Nếu cờ tạm tắt đang bật (từ sai chính tả, hoặc vừa gõ đúp), engine thay cả từ bằng chuỗi phím gốc, rồi tầng macOS gõ thêm phím vừa nhấn. Ví dụ "Swift␣": trong lúc gõ hiện chữ đã biến đổi (ở Dấu là "Sừit"), nhấn Space thì thành "Swift␣".
 - **Điều kiện ẩn** (`checkRestoreIfWrongSpelling`): chỉ khôi phục nếu **có ít nhất một nguyên âm** đang mang dấu thanh, mũ hoặc móc. Từ sai chính tả mà chỉ bị đổi phụ âm (đ, Quick Telex) thì **không** được khôi phục (B7).
 - Từ trùng giữa Anh và Việt (car → cả, sex → sẽ, test → tét, as → á, has → há) là tiếng Việt hợp lệ nên không bị khôi phục. Kết quả này khớp D4.
 - Khi đã gõ đúp thì không có gì để khôi phục, vì chữ trên màn hình đã là chữ gốc.
@@ -229,7 +229,7 @@ Xem B5, B6. **Dấu:** kiểm tra chính tả luôn chạy, không có công t�
 - Phím biến đổi (aa, w, dd, phím dấu) **không** đổi kiểu hoa của chữ bị biến đổi: chữ giữ kiểu hoa của chính nó.
   - "Dd" → "Đ"; "dD" → "đ"; "VIEETJ" → "VIỆT"; "Vieetj" → "Việt".
   - Riêng w đứng riêng thì lấy kiểu hoa của chính phím w ("W" → "Ư").
-- Khi khôi phục, chữ hoa giữ nguyên như đã gõ ("Hasaki").
+- Khi khôi phục, chữ hoa giữ nguyên như đã gõ ("Swift").
 - Lỗi phân biệt hoa thường: B4 ("thuowr" → "thuở" nhưng "THUOWR" → "THƯỞ"), B14.
 
 ### 3.14 Chữ số
@@ -254,12 +254,12 @@ Lấy từ `_breakCode` và nhánh đầu của `vKeyHandleEvent`.
   - 4 phím mũi tên;
   - các phím , . / ; ' \ - = và phím dấu huyền ngược (backtick) (kể cả khi giữ Shift: ? : " | _ + ~ < >);
   - nhấn chuột (chỉ reset, vì tầng macOS bỏ qua kết quả trả về).
-- **Ranh giới từ không kèm khôi phục**: Shift+số (! @ # $ % ^ & * ( )) và mọi tổ hợp có ⌘, ⌃, ⌥, Fn. Ví dụ "Hasaki!" vẫn là "Hấki!" (B10).
+- **Ranh giới từ không kèm khôi phục**: Shift+số (! @ # $ % ^ & * ( )) và mọi tổ hợp có ⌘, ⌃, ⌥, Fn. Ví dụ "Swift!" vẫn giữ chữ đã biến đổi, không về "Swift!" (B10).
 - `[` và `]` ở Telex là phím biến đổi. Ở Simple Telex chúng kết thúc từ, nhưng không khôi phục.
 - Space không reset bộ đệm ngay. Nó đếm số dấu cách để Backspace có thể quay lại (3.17). Từ mới chỉ bắt đầu khi gõ chữ tiếp theo.
 - Khôi phục kích hoạt bởi phím không in ra ký tự (Tab, mũi tên…): tầng macOS gõ chuỗi khôi phục rồi gửi lại chính phím đó.
 - **Dấu (đã chốt, D4 phần "Ranh giới từ"; D21):**
-  - Khôi phục (D4) và gõ tắt phụ âm (D21) chạy ở **mọi ký tự kết thúc từ có in ra**: Space, Enter, Tab và **mọi** dấu câu/ký hiệu, kể cả ! ? ( ) " ("Hasaki!" → "Hasaki!").
+  - Khôi phục (D4) và gõ tắt phụ âm (D21) chạy ở **mọi ký tự kết thúc từ có in ra**: Space, Enter, Tab và **mọi** dấu câu/ký hiệu, kể cả ! ? ( ) " ("Swift!" → "Swift!").
   - Mũi tên, Esc, click chuột và tổ hợp ⌘/⌃/⌥ chỉ reset bộ đệm, **không** khôi phục, vì lúc đó con trỏ có thể đã đi chỗ khác.
 
 ### 3.17 Backspace và lịch sử từ
@@ -306,7 +306,7 @@ Mọi mục đều từ đọc mã. Mục có ghi "(suy luận)" chưa được 
 - **B7.** Chỉ khôi phục khi có nguyên âm mang dấu/mũ/móc. Từ sai chính tả mà chỉ có đ, hoặc chỉ bị Quick Telex đổi, thì giữ nguyên chữ đã biến đổi. Ví dụ "pdd␣" → "pđ␣" (suy luận). Với Quick Telex: "connect␣" → "congect␣".
 - **B8.** Khi bật gõ tắt phụ âm, nhánh xử lý dấu câu (, . / …) gọi gõ tắt **thay vì** kiểm tra chính tả ở chế độ ép. Từ có tổ hợp nguyên âm sai mà theo sau là dấu phẩy sẽ không được khôi phục, trong khi theo sau là Space thì có (suy luận).
 - **B9.** Gõ tắt phụ âm chạy trước và chặn khôi phục. Kiểm tra chính tả bị nới lỏng nên kết quả không hợp lệ vẫn được giữ: "big" → "bing" (D21 đã ghi).
-- **B10.** Tập phím kết thúc từ không nhất quán: "Hasaki," được khôi phục, "Hasaki!" thì không (3.16).
+- **B10.** Tập phím kết thúc từ không nhất quán: "Swift," được khôi phục, "Swift!" thì không (3.16).
 - **B11.** Tổ hợp ⌘ với phím dấu câu (⌘, ⌘. ⌘/) sau một từ sai chính tả vẫn chạy khôi phục và gõ thêm ký tự dấu câu, trong khi phím tắt gốc có thể bị nuốt (suy luận từ `vKeyHandleEvent` và `OpenKeyCallback`).
 - **B12.** Lấy từ trong lịch sử ra (Backspace qua dấu cách) không khôi phục bộ đệm phím gốc. Ví dụ: gõ "nhaf␣x", ⌫ ⌫ để về "nhà", gõ `k` rồi Space. Khôi phục xoá "nhàk" nhưng chỉ ghi lại "k", mất chữ (suy luận). Bài học cho D20: khi sửa một từ không có phím gốc, mốc để khôi phục phải là **chữ đang hiển thị + phím mới gõ**.
 - **B13.** VNI: 7 sau "a", hoặc 8 sau "o"/"u", làm bộ đệm lệch với màn hình (3.4, suy luận). Ví dụ "a71" có thể cho kết quả mất ký tự.
@@ -363,9 +363,9 @@ Cột "Ghi chú" dẫn số quyết định khi kết quả do quyết định �
 | `test␣` | `tét␣` | "tét" hợp lệ (t cuối + sắc) | |
 | `tesst␣` | `test␣` | | |
 | `windows␣` | `windows␣` | không hợp lệ → khôi phục | |
-| `Hasaki␣` | `Hasaki␣` | giữ chữ hoa như đã gõ | |
-| `Hasaki,` | `Hasaki,` | | |
-| `Hasaki!` | `Hasaki!` | mọi dấu câu là ranh giới từ (D4) | **Khác (cố ý)**. OpenKey: "Hấki!" |
+| `Swift␣` | `Swift␣` | giữ chữ hoa như đã gõ (trong lúc gõ hiện "Sừit") | |
+| `Swift,` | `Swift,` | | |
+| `Swift!` | `Swift!` | mọi dấu câu là ranh giới từ (D4) | **Khác (cố ý)**. OpenKey giữ chữ đã biến đổi, không khôi phục (B10) |
 | `vieetj␣` | `việt␣` | | |
 | `did␣` (bỏ dấu tự do bật) | `đi␣` | d sau nguyên âm biến d đầu từ thành đ; "đi" hợp lệ nên tiếng Việt thắng (D28, D4) | |
 | `pdd␣` | `pdd␣` | "pđ" không hợp lệ → khôi phục | Khác (cố ý), B7, B19 |
@@ -538,7 +538,7 @@ Ban đầu chỉ liệt kê. Đến 29/10/2026 (commit `495544d`) M1–M17 đã 
   - **Đã chốt: D28.** Theo nghĩa (a); "did" → "đi" khi bật; tắt thì phím dấu chỉ có tác dụng ngay sau nguyên âm.
 - **M3. "Telex đơn giản" chưa được định nghĩa.** OpenKey có hai biến thể (3.5). Đề xuất: Telex bỏ w đứng riêng và bỏ `[ ]`. Cần chốt thêm: D23 có áp dụng cho Telex đơn giản không. Với định nghĩa đề xuất, w đầu từ là chữ w, nên câu hỏi là có cho gõ tắt w → qu hay không.
   - **Đã chốt: D29.** Simple Telex 1, không `[ ]`, không w → qu.
-- **M4. Không có công tắc "kiểm tra chính tả" riêng.** Khi người dùng tắt "Tự khôi phục từ không phải tiếng Việt": engine có còn ngừng biến đổi sau khi từ đã sai chính tả không ("Hasaki" hiện "Hấki" hay "Hấsaki"…)? Đề xuất: luôn kiểm tra chính tả bên trong, công tắc chỉ điều khiển việc khôi phục khi kết thúc từ.
+- **M4. Không có công tắc "kiểm tra chính tả" riêng.** Khi người dùng tắt "Tự khôi phục từ không phải tiếng Việt": engine có còn ngừng biến đổi sau khi từ đã sai chính tả không ("Swift" dừng ở "Sừit" hay phím dấu sau đó vẫn biến đổi tiếp…)? Đề xuất: luôn kiểm tra chính tả bên trong, công tắc chỉ điều khiển việc khôi phục khi kết thúc từ.
   - **Đã chốt: D30.** Kiểm tra chính tả luôn chạy; công tắc chỉ điều khiển khôi phục.
 - **M5. "Âm tiết tiếng Việt hợp lệ" chưa được định nghĩa**, trong khi D4, D20 và D21 đều dựa vào nó. Cần chốt:
   - (a) có áp phân bố c/k/q, g/gh, ng/ngh không;
