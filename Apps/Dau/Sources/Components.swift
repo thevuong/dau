@@ -412,43 +412,93 @@ struct WrappingHStack: Layout {
 /// "SettingsNotEnabled"), first on every page while Dấu is not among the enabled
 /// input sources: orange tile with a white warning symbol, title, subtitle,
 /// prominent button, on a system-orange tint.
+///
+/// "Bật lại" enables Dấu (N4: the user's click, read back from Text Input Sources) and
+/// the banner then turns into a green confirmation with "Hoàn tác". When macOS keeps
+/// Dấu off it opens Keyboard settings with the steps; when Dấu is not installed or not
+/// listed yet it opens the onboarding window, which installs it or explains the logout.
 struct NotEnabledBanner: View {
     @Environment(InputSourceStatus.self) private var status
+    @Environment(\.inputMethodActions) private var actions
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        if status.isEnabled == false {
-            HStack(alignment: .center, spacing: 12) {
-                // Mockup "SettingsNotEnabled": a 28 pt orange tile, radius 8, white
-                // warning symbol; an orange-tinted banner. System orange only (D9).
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 28, height: 28)
-                    .background(Color.orange, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Dấu chưa được bật trong Nguồn nhập liệu")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.primary)
-                    Hint(Text("Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt."))
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                // TODO(M5): register and enable the input source here (D14 step 2,
-                // with undo). Until then the button opens Keyboard settings, where the
-                // user adds Dấu back (N4).
-                Button("Bật lại") { SystemSettings.openKeyboard() }
-                    .buttonStyle(.borderedProminent)
+        let state = actions?.banner ?? .idle
+        if state == .enabled {
+            banner(tint: .green, symbol: "checkmark",
+                   title: Text("Đã bật Dấu trong Nguồn nhập liệu"),
+                   hint: Text("Bấm Hoàn tác nếu bạn đổi ý.")) {
+                Button("Hoàn tác") { Task { await actions?.undoBannerEnable() } }
                     .settingsButton()
             }
-            .padding(.vertical, 12)
-            .padding(.horizontal, 14)
-            .background(Color.orange.quaternary, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .strokeBorder(Color.orange.tertiary, lineWidth: 1)
+        } else if status.isEnabled == false {
+            banner(tint: .orange, symbol: "exclamationmark.triangle.fill",
+                   title: Text("Dấu chưa được bật trong Nguồn nhập liệu"), hint: hint(state)) {
+                if state == .notEnabled || state == .failed {
+                    OpenKeyboardSettingsButton()
+                } else {
+                    Button("Bật lại") { enable() }
+                        .buttonStyle(.borderedProminent)
+                        .settingsButton()
+                        .disabled(state == .working)
+                }
             }
-            .accessibilityElement(children: .contain)
+            .onChange(of: status.isEnabled) { _, isEnabled in actions?.inputSourcesChanged(isEnabled: isEnabled) }
         }
+    }
+
+    private func hint(_ state: InputMethodActions.BannerState) -> Text {
+        switch state {
+        case .notEnabled:
+            Text("macOS chưa bật Dấu. Trong Cài đặt Bàn phím › Nguồn đầu vào, bấm Sửa…, bấm +, chọn “Dấu – Tiếng Việt” trong nhóm Tiếng Việt rồi bấm Thêm.")
+        case .failed:
+            Text("Chưa bật được Dấu. Bạn có thể tự thêm “Dấu – Tiếng Việt” trong Cài đặt Bàn phím › Nguồn đầu vào.")
+        default:
+            Text("Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt.")
+        }
+    }
+
+    private func enable() {
+        guard let actions else {
+            // Snapshots and previews: no installer, only guide (N4).
+            SystemSettings.openKeyboard()
+            return
+        }
+        Task {
+            if await actions.enableFromBanner() {
+                openWindow(id: OnboardingScene.id)
+            }
+        }
+    }
+
+    private func banner<Buttons: View>(tint: Color, symbol: String, title: Text, hint: Text,
+                                       @ViewBuilder buttons: () -> Buttons) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            // Mockup "SettingsNotEnabled": a 28 pt tile, radius 8, white symbol, on a
+            // tinted banner. System colors only (D9).
+            Image(systemName: symbol)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 28, height: 28)
+                .background(tint, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                title
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.primary)
+                Hint(hint)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            buttons()
+        }
+        .padding(.vertical, 12)
+        .padding(.horizontal, 14)
+        .background(tint.quaternary, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(tint.tertiary, lineWidth: 1)
+        }
+        .accessibilityElement(children: .contain)
     }
 }
 

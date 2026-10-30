@@ -8,9 +8,8 @@ import SwiftUI
 /// `<section>-<mode>.png` (title bar included) plus `frames.json`: the layout probes,
 /// the traffic lights, and system colors resolved in that window. The hand-made window
 /// of `scripts/snapshot-settings` does not reproduce the SwiftUI scene's chrome and
-/// colors exactly, so this is the reference for the real app. The sandbox only allows
-/// writing inside the app's container: run it on a copy signed without the sandbox
-/// entitlement.
+/// colors exactly, so this is the reference for the real app. scripts/check-settings-window
+/// runs it on a copy re-signed ad hoc without entitlements.
 @MainActor
 enum DebugCapture {
     static let directory: URL? = {
@@ -99,8 +98,9 @@ enum DebugCapture {
 
     /// `--capture-onboarding <dir>`: like `--capture-window`, for the onboarding window
     /// on fixed services (OpenKey running, Dấu installed but not enabled). Writes
-    /// `onboarding-<step>-<mode>.png` for steps 1, 2, 2 after "Bật Dấu" (`2-enabled`) and
-    /// 3, light and dark, plus `frames.json`.
+    /// `onboarding-<step>-<mode>.png` for steps 1, 2, 2 when "Bật Dấu" leaves Dấu off
+    /// (`2-not-enabled`), 2 when macOS does not list Dấu (`2-logout`), 2 after "Bật Dấu"
+    /// (`2-enabled`) and 3, light and dark, plus `frames.json`.
     static let onboardingDirectory: URL? = {
         let args = CommandLine.arguments
         guard let i = args.firstIndex(of: "--capture-onboarding"), i + 1 < args.count else { return nil }
@@ -120,6 +120,7 @@ enum DebugCapture {
 
     static var onboardingFlow: OnboardingFlow?
     static var onboardingDetector: FakeInputMethodDetector?
+    static var onboardingInstaller: FakeInputMethodInstaller?
 
     static func startOnboarding() {
         guard let directory = onboardingDirectory else { return }
@@ -159,7 +160,19 @@ enum DebugCapture {
                     ("1", { flow.show(.oldInputMethods) }),
                     // As in the mockup: the user quit OpenKey, step 1 is done.
                     ("2", { onboardingDetector?.found = []; flow.refresh(); flow.show(.enable) }),
-                    ("2-enabled", { await flow.enable() }),
+                    ("2-not-enabled", {
+                        onboardingInstaller?.enableOutcome = .notEnabled
+                        onboardingDetector?.otherSources = ["Tiếng Việt – Telex"]
+                        flow.refresh()
+                        await flow.enable()
+                    }),
+                    ("2-logout", {
+                        onboardingInstaller?.enableOutcome = .notListed
+                        onboardingDetector?.otherSources = []
+                        flow.refresh()
+                        await flow.enable()
+                    }),
+                    ("2-enabled", { onboardingInstaller?.enableOutcome = .enabled; await flow.enable() }),
                     ("3", { flow.tryText = "Tôi yêu tiếng Việt"; flow.show(.typing) }),
                 ]
                 for (key, setUp) in shots {
@@ -193,6 +206,62 @@ enum DebugCapture {
                 }
                 await flow.undoEnable()
                 onboardingDetector?.found = openKey
+            }
+            if let data = try? JSONSerialization.data(withJSONObject: report, options: [.sortedKeys, .prettyPrinted]) {
+                try? data.write(to: directory.appendingPathComponent("frames.json"))
+            }
+            print("captured to \(directory.path)")
+            exit(0)
+        }
+    }
+
+    // MARK: Uninstall alert
+
+    /// `--capture-uninstall <dir>`: opens the Settings window off screen, lays out the
+    /// "Gỡ Dấu khỏi máy?" alert and the result alert off screen without running
+    /// anything, and writes `uninstall-confirm-<mode>.png`, `uninstall-done-<mode>.png`
+    /// plus `frames.json` (sheet sizes).
+    static let uninstallDirectory: URL? = {
+        let args = CommandLine.arguments
+        guard let i = args.firstIndex(of: "--capture-uninstall"), i + 1 < args.count else { return nil }
+        return URL(fileURLWithPath: args[i + 1], isDirectory: true)
+    }()
+
+    static func startUninstall() {
+        guard let directory = uninstallDirectory else { return }
+        NSApp.setActivationPolicy(.accessory)
+        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(600))
+            guard let window = NSApp.windows.first(where: { $0.isVisible && $0.contentView != nil }) else {
+                print("no window"); exit(1)
+            }
+            window.setFrame(NSRect(x: -9000, y: -9000, width: 820, height: 600), display: false)
+            NotificationCenter.default.post(name: selectSection, object: SettingsSection.updates.rawValue)
+            var report: [String: [String: [Double]]] = [:]
+            for (mode, name) in [("light", NSAppearance.Name.aqua), ("dark", .darkAqua)] {
+                NSApp.appearance = NSAppearance(named: name)
+                let sample = UninstallReport(switchedTo: "ABC", movedToTrash: true, stillEnabled: false, dataDeleted: true)
+                let alerts: [(String, NSAlert)] = [
+                    ("confirm", UninstallAlert.confirmation().0),
+                    ("done", UninstallAlert.done(sample)),
+                ]
+                for (key, alert) in alerts {
+                    // The window `runModal` would show, without the modal loop.
+                    alert.layout()
+                    let panel = alert.window
+                    panel.appearance = NSAppearance(named: name)
+                    panel.setFrameOrigin(NSPoint(x: -9000, y: -9000))
+                    panel.orderFront(nil)
+                    try? await Task.sleep(for: .milliseconds(900))
+                    // The alert's glass is transparent off screen: put it on the
+                    // window background, roughly what it covers on screen.
+                    capture(panel, to: directory.appendingPathComponent("uninstall-\(key)-\(mode).png"),
+                            background: .windowBackgroundColor)
+                    report["uninstall-\(key)-\(mode)"] = ["sheet": [0, 0, Double(panel.frame.width), Double(panel.frame.height)]]
+                    panel.orderOut(nil)
+                    try? await Task.sleep(for: .milliseconds(300))
+                }
             }
             if let data = try? JSONSerialization.data(withJSONObject: report, options: [.sortedKeys, .prettyPrinted]) {
                 try? data.write(to: directory.appendingPathComponent("frames.json"))
@@ -304,18 +373,34 @@ enum DebugCapture {
         return create(.null, 8, UInt32(window.windowNumber), 1 | 8)?.takeRetainedValue()
     }
 
-    private static func capture(_ window: NSWindow, to url: URL) {
-        if let image = compositedImage(window) {
-            let rep = NSBitmapImageRep(cgImage: image)
-            try? rep.representation(using: .png, properties: [:])?.write(to: url)
-            return
+    private static func capture(_ window: NSWindow, to url: URL, background: NSColor? = nil) {
+        var image = compositedImage(window)
+        if image == nil, let frameView = window.contentView?.superview {
+            frameView.display()
+            if let rep = frameView.bitmapImageRepForCachingDisplay(in: frameView.bounds) {
+                frameView.cacheDisplay(in: frameView.bounds, to: rep)
+                image = rep.cgImage
+            }
         }
-        guard let frameView = window.contentView?.superview else { return }
-        frameView.display()
-        let bounds = frameView.bounds
-        guard let rep = frameView.bitmapImageRepForCachingDisplay(in: bounds) else { return }
-        frameView.cacheDisplay(in: bounds, to: rep)
-        try? rep.representation(using: .png, properties: [:])?.write(to: url)
+        guard var image else { return }
+        if let background, let flat = flatten(image, on: background, appearance: window.effectiveAppearance) {
+            image = flat
+        }
+        try? NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:])?.write(to: url)
+    }
+
+    /// `image` drawn over `color` (resolved in `appearance`).
+    private static func flatten(_ image: CGImage, on color: NSColor, appearance: NSAppearance) -> CGImage? {
+        guard let context = CGContext(data: nil, width: image.width, height: image.height, bitsPerComponent: 8,
+                                      bytesPerRow: 0, space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
+        var fill: CGColor?
+        appearance.performAsCurrentDrawingAppearance { fill = color.cgColor }
+        let rect = CGRect(x: 0, y: 0, width: image.width, height: image.height)
+        context.setFillColor(fill ?? .white)
+        context.fill(rect)
+        context.draw(image, in: rect)
+        return context.makeImage()
     }
 
     /// System colors resolved under the window's appearance, as sRGB + alpha.

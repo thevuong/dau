@@ -10,14 +10,19 @@ import DauShared
 struct OnboardingFlowTests {
     let openKey = FakeInputMethodDetector.running("OpenKey", bundleID: "com.tuyenmai.openkey")
 
+    final class Opened { var count = 0 }
+    let opened = Opened()
+
     func flow(_ found: [DetectedInputMethod] = [], status: InputMethodStatus = .notInstalled,
               failure: InputMethodInstallerError? = nil,
               shortcut: InputSourceShortcut.Reading = .unknown)
         -> (OnboardingFlow, FakeInputMethodDetector, FakeInputMethodInstaller) {
         let detector = FakeInputMethodDetector(found)
         let installer = FakeInputMethodInstaller(status, failure: failure)
+        let opened = self.opened
         let flow = OnboardingFlow(detector: detector, installer: installer,
-                                  shortcut: { shortcut }, englishLayout: { "ABC" })
+                                  shortcut: { shortcut }, englishLayout: { "ABC" },
+                                  openKeyboardSettings: { opened.count += 1 })
         return (flow, detector, installer)
     }
 
@@ -103,6 +108,51 @@ struct OnboardingFlowTests {
         #expect(flow.step == .enable)
     }
 
+    @Test("enable read back as off: guidance, Keyboard settings opened, no success claimed (N4, N5)")
+    func enableStillOff() async {
+        let (flow, _, installer) = flow(status: .installed(version: nil))
+        installer.enableOutcome = .notEnabled
+        flow.start()
+        await flow.enable()
+        #expect(flow.problem == .notEnabled)
+        #expect(!flow.enabledHere)
+        #expect(opened.count == 1)
+        flow.next()
+        #expect(flow.step == .enable)
+        // macOS turns it on later (the user allowed it): enabled here, with undo.
+        installer.current = .enabled
+        flow.refresh()
+        #expect(flow.problem == nil)
+        #expect(flow.enabledHere)
+        await flow.undoEnable()
+        #expect(installer.calls.suffix(1) == ["undoEnable"])
+    }
+
+    @Test("not listed by macOS: the logout guidance, nothing opened")
+    func enableNeedsLogout() async {
+        let (flow, _, installer) = flow(status: .notInstalled)
+        installer.enableOutcome = .notListed
+        flow.start()
+        await flow.enable()
+        #expect(installer.calls == ["install", "enable"])
+        #expect(flow.problem == .needsLogout)
+        #expect(opened.count == 0)
+        #expect(!flow.enabledHere)
+        // Added by the user in Settings without "Bật Dấu" pending: not "enabled here".
+        installer.current = .enabled
+        flow.refresh()
+        #expect(!flow.enabledHere)
+    }
+
+    @Test("other Vietnamese input sources are a soft note, not step 1")
+    func otherSources() {
+        let (flow, detector, _) = flow()
+        detector.otherSources = ["Tiếng Việt – Telex"]
+        flow.start()
+        #expect(flow.step == .enable)
+        #expect(flow.otherSources == ["Tiếng Việt – Telex"])
+    }
+
     @Test("already enabled: step 2 is done and goes straight on")
     func alreadyEnabled() async {
         let (flow, _, installer) = flow(status: .selected)
@@ -153,10 +203,16 @@ struct OnboardingFlowTests {
     func knownList() {
         let ids = KnownInputMethods.all.flatMap(\.bundleIDs)
         #expect(Set(ids).count == ids.count)
-        #expect(KnownInputMethods.all.contains { $0.bundleIDs.contains("com.tuyenmai.openkey") })
+        // Bundle IDs from the released apps (docs/research/M5-INSTALL.md section 5).
+        #expect(Set(ids) == ["com.tuyenmai.openkey", "com.lamquangminh.evkey", "com.trankynam.GoTiengViet",
+                             "com.codetay.XKey", "com.phamhungtien.phtv", "org.gonhanh.GoNhanh", "com.goxkey.app"])
+        // XKey's IMK input method is an input source (soft note), not a conflict.
+        #expect(!ids.contains("com.codetay.inputmethod.XKey"))
         for entry in KnownInputMethods.all {
             #expect(KnownInputMethods.quitSteps(for: entry.name).allSatisfy { $0.contains(entry.name) })
         }
+        // Unverified apps get the generic steps, which name no menu item (N5).
+        #expect(KnownInputMethods.quitSteps(for: "EVKey").count == 2)
     }
 }
 

@@ -466,37 +466,62 @@ struct OpenKeyboardSettingsButton: View {
     }
 }
 
-/// Under the card: the result of the last action, or the room kept for macOS's
-/// confirmation (open question, verified in M5).
+/// Under the card: the result of the last action, read back from Text Input Sources
+/// (N4, N5), or the room kept for macOS's confirmation (checked in M5 T4); then a soft
+/// note about other Vietnamese input sources (D14).
 struct EnableResult: View {
     @Environment(OnboardingFlow.self) private var flow
 
     var body: some View {
-        if flow.failed {
-            HStack(alignment: .center, spacing: 10) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(Color.orange)
-                    .accessibilityHidden(true)
-                Text("Chưa bật được Dấu. Bạn có thể tự thêm “Dấu – Tiếng Việt” trong Cài đặt Bàn phím › Nguồn đầu vào.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(alignment: .leading, spacing: 10) {
+            switch flow.problem {
+            case .failed?:
+                problemRow(Text("Chưa bật được Dấu. Bạn có thể tự thêm “Dấu – Tiếng Việt” trong Cài đặt Bàn phím › Nguồn đầu vào."),
+                           settingsButton: true)
+            case .notEnabled?:
+                problemRow(Text("macOS chưa bật Dấu. Trong Cài đặt Bàn phím › Nguồn đầu vào, bấm Sửa…, bấm +, chọn “Dấu – Tiếng Việt” trong nhóm Tiếng Việt rồi bấm Thêm."),
+                           settingsButton: true)
+                Hint(Text("[Nếu macOS yêu cầu xác nhận, hướng dẫn sẽ hiện ở đây — kiểm chứng ở M5]"))
+            case .needsLogout?:
+                // D37: a first install shows up in the input sources after one logout.
+                problemRow(Text("macOS chưa thấy Dấu trong danh sách nguồn nhập liệu. Lần cài đầu cần đăng xuất rồi đăng nhập lại một lần (menu Apple › Đăng xuất), sau đó mở lại Dấu để bật."),
+                           settingsButton: false)
+            case nil:
+                if flow.enabledHere {
+                    Label {
+                        Text("Đã bật Dấu. Bấm Hoàn tác nếu bạn đổi ý.")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+                    } icon: {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(Color.green)
+                    }
+                } else if !flow.status.isEnabled {
+                    Hint(Text("[Nếu macOS yêu cầu xác nhận, hướng dẫn sẽ hiện ở đây — kiểm chứng ở M5]"))
+                }
+            }
+            if !flow.otherSources.isEmpty {
+                let names = flow.otherSources.map { "“\($0)”" }.formatted(.list(type: .and))
+                Hint(Text("Đang bật nguồn nhập liệu tiếng Việt khác: \(names). Bạn có thể bỏ bớt trong Cài đặt Bàn phím cho gọn danh sách."))
+            }
+        }
+    }
+
+    private func problemRow(_ text: Text, settingsButton: Bool) -> some View {
+        HStack(alignment: .center, spacing: 10) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(Color.orange)
+                .accessibilityHidden(true)
+            text
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            if settingsButton {
                 OpenKeyboardSettingsButton()
             }
-            .accessibilityElement(children: .contain)
-        } else if flow.enabledHere {
-            Label {
-                Text("Đã bật Dấu. Bấm Hoàn tác nếu bạn đổi ý.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-            } icon: {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(Color.green)
-            }
-        } else if !flow.status.isEnabled {
-            Hint(Text("[Nếu macOS yêu cầu xác nhận, hướng dẫn sẽ hiện ở đây — kiểm chứng ở M5]"))
         }
+        .accessibilityElement(children: .contain)
     }
 }
 

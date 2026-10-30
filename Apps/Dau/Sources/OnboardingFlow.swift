@@ -9,7 +9,9 @@ import Observation
 /// Steps:
 /// 1. "Tắt bộ gõ cũ trước đã": only while another Vietnamese input method is running.
 ///    Rechecked when the window becomes active; skipping is allowed.
-/// 2. "Bật Dấu": install if needed, then enable, with undo.
+/// 2. "Bật Dấu": install if needed, then enable, with undo. The result is read back from
+///    Text Input Sources (N4, N5): still off → Keyboard settings and the steps; not
+///    listed at all → log out and in once (first install, D37).
 /// 3. "Chọn kiểu gõ và gõ thử".
 @MainActor
 @Observable
@@ -29,11 +31,27 @@ final class OnboardingFlow {
     private(set) var shortcut: InputSourceShortcut.Reading = .unknown
     /// Name of the keyboard layout used for English, e.g. "ABC"; nil if unknown.
     private(set) var englishLayout: String?
+    /// Other Vietnamese input sources enabled in the system (soft note, step 2).
+    private(set) var otherSources: [String] = []
     /// Dấu was enabled from this window, so "Hoàn tác" is offered.
     private(set) var enabledHere = false
     private(set) var isWorking = false
-    /// The last action failed; the window says so and offers Keyboard settings (N4).
-    private(set) var failed = false
+    /// What went wrong with the last action, shown under step 2's card.
+    private(set) var problem: Problem?
+    /// "Bật Dấu" went through but macOS kept Dấu off; if it turns on later (the user
+    /// allowed it, or added it in Keyboard settings) it still counts as enabled here.
+    private(set) var awaitingSystem = false
+
+    enum Problem: Equatable, Sendable {
+        /// An error: the copy, the signature, the registration…
+        case failed
+        /// Text Input Sources still reports Dấu off after "Bật Dấu".
+        case notEnabled
+        /// Text Input Sources does not list Dấu: log out and in once (D37).
+        case needsLogout
+    }
+
+    var failed: Bool { problem != nil }
     /// Text of the try-it field (step 3).
     var tryText = ""
     /// Step to open at instead of the usual first step, once (debug flag `--onboarding`).
@@ -43,20 +61,24 @@ final class OnboardingFlow {
     @ObservationIgnored private let installer: InputMethodInstaller
     @ObservationIgnored private let readShortcut: () -> InputSourceShortcut.Reading
     @ObservationIgnored private let readEnglishLayout: () -> String?
+    @ObservationIgnored private let openKeyboardSettings: () -> Void
 
     init(detector: OldInputMethodDetector, installer: InputMethodInstaller,
          shortcut: @escaping () -> InputSourceShortcut.Reading = InputSourceShortcut.read,
-         englishLayout: @escaping () -> String? = InputSourceStatus.englishLayoutName) {
+         englishLayout: @escaping () -> String? = InputSourceStatus.englishLayoutName,
+         openKeyboardSettings: @escaping () -> Void = SystemSettings.openKeyboard) {
         self.detector = detector
         self.installer = installer
         self.readShortcut = shortcut
         self.readEnglishLayout = englishLayout
+        self.openKeyboardSettings = openKeyboardSettings
     }
 
     /// Starts over: step 1 if another input method is running, else step 2.
     func start() {
         enabledHere = false
-        failed = false
+        awaitingSystem = false
+        problem = nil
         readSystem()
         step = conflicts.isEmpty ? .enable : .oldInputMethods
         if let forced = forcedStartStep {
@@ -70,6 +92,11 @@ final class OnboardingFlow {
     func refresh() {
         readSystem()
         if step == .oldInputMethods && conflicts.isEmpty { step = .enable }
+        if awaitingSystem && status.isEnabled {
+            awaitingSystem = false
+            enabledHere = true
+            problem = nil
+        }
     }
 
     /// Step 1, "Kiểm tra lại".
@@ -91,14 +118,14 @@ final class OnboardingFlow {
 
     func back() {
         guard canGoBack, let previous = Step(rawValue: step.rawValue - 1) else { return }
-        failed = false
+        problem = nil
         step = previous
     }
 
     /// Step 2 → 3, once Dấu is enabled.
     func next() {
         guard step == .enable, status.isEnabled else { return }
-        failed = false
+        problem = nil
         step = .typing
     }
 
@@ -106,29 +133,44 @@ final class OnboardingFlow {
     func enable() async {
         guard step == .enable, !isWorking, !status.isEnabled else { return }
         isWorking = true
-        failed = false
+        problem = nil
         defer { isWorking = false }
         do {
             if status == .notInstalled { try await installer.install() }
-            try await installer.enable()
-            enabledHere = true
+            switch try await installer.enable() {
+            case .enabled:
+                enabledHere = true
+                awaitingSystem = false
+            case .notEnabled:
+                // N4: guide, in the right pane of System Settings.
+                problem = .notEnabled
+                awaitingSystem = true
+                openKeyboardSettings()
+            case .notListed:
+                problem = .needsLogout
+            }
         } catch {
-            failed = true
+            problem = .failed
         }
         status = installer.status()
+        if awaitingSystem && status.isEnabled {
+            awaitingSystem = false
+            enabledHere = true
+            problem = nil
+        }
     }
 
     /// Step 2, "Hoàn tác" after `enable()`.
     func undoEnable() async {
         guard enabledHere, !isWorking else { return }
         isWorking = true
-        failed = false
+        problem = nil
         defer { isWorking = false }
         do {
             try await installer.undoEnable()
             enabledHere = false
         } catch {
-            failed = true
+            problem = .failed
         }
         status = installer.status()
     }
@@ -153,6 +195,7 @@ final class OnboardingFlow {
 
     private func readSystem() {
         conflicts = detector.detect().filter(\.isRunning)
+        otherSources = detector.otherVietnameseSources()
         status = installer.status()
         shortcut = readShortcut()
         englishLayout = readEnglishLayout()

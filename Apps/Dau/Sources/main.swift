@@ -20,7 +20,7 @@ private func pinVietnameseLocalization() {
 pinVietnameseLocalization()
 
 #if DEBUG
-// Debug checks that run inside the sandboxed build without opening a window: each
+// Debug checks that run in the built app without opening a window: each
 // prints one value and exits.
 DebugSettingsCommand.runIfRequested()
 if CommandLine.arguments.contains("--print-localizations") {
@@ -44,7 +44,7 @@ if CommandLine.arguments.contains("--print-input-shortcut") {
     exit(0)
 }
 if CommandLine.arguments.contains("--print-installed-apps") {
-    // Apps the add-rule sheet can list from the Applications folders in the sandbox.
+    // Apps the add-rule sheet can list from the Applications folders.
     print(AppListing.installed().count)
     exit(0)
 }

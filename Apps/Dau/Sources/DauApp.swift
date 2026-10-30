@@ -10,27 +10,53 @@ import DauShared
 /// reopens it after it was closed. At launch, while Dấu is not installed or not enabled,
 /// the onboarding window opens instead (`LaunchRouter`); "Trợ giúp › Hướng dẫn thiết
 /// lập…" opens it at any time.
+///
+/// At launch, an older input method in ~/Library/Input Methods is replaced by the one
+/// inside the app (D7, D37: `upgradeIfNeeded`); nothing happens when none is installed.
 struct DauApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var model = SettingsModel.appGroup()
     @State private var inputSource = DauApp.makeInputSourceStatus()
     @State private var onboarding: OnboardingFlow
+    @State private var actions: InputMethodActions
     private let opensOnboarding: Bool
 
     init() {
-        let (flow, opens) = DauApp.makeOnboarding()
+        let installer = SystemInputMethodInstaller.standard()
+        let (flow, opens) = DauApp.makeOnboarding(installer)
         _onboarding = State(initialValue: flow)
+        _actions = State(initialValue: InputMethodActions(installer: installer))
         opensOnboarding = opens
+        DauApp.upgradeAtLaunch(installer)
+    }
+
+    /// D7: replace an older installed input method. The user just opened Dấu (or the
+    /// updater relaunched it), so no word is being typed; the input method still ends
+    /// its word before it quits (InputMethodLifecycle).
+    @MainActor
+    private static func upgradeAtLaunch(_ installer: InputMethodInstaller) {
+        #if DEBUG
+        // Window captures and debug commands never touch the installed input method.
+        if DebugCapture.directory != nil || DebugCapture.onboardingDirectory != nil
+            || DebugCapture.uninstallDirectory != nil { return }
+        #endif
+        Task { @MainActor in
+            do {
+                let outcome = try await installer.upgradeIfNeeded()
+                installLogger.notice("event=launch-upgrade outcome=\(String(describing: outcome), privacy: .public)")
+            } catch {
+                installLogger.error("event=launch-upgrade-failed error=\(String(describing: error), privacy: .public)")
+            }
+        }
     }
 
     /// The onboarding flow on the real services, and whether it opens at launch.
     @MainActor
-    private static func makeOnboarding() -> (OnboardingFlow, Bool) {
-        let installer = ReadOnlyInputMethodInstaller()
+    private static func makeOnboarding(_ installer: InputMethodInstaller) -> (OnboardingFlow, Bool) {
         var flow = OnboardingFlow(detector: WorkspaceInputMethodDetector(), installer: installer)
         var opens = LaunchRouter.opensOnboarding(installer.status())
         #if DEBUG
-        if DebugCapture.directory != nil { opens = false }
+        if DebugCapture.directory != nil || DebugCapture.uninstallDirectory != nil { opens = false }
         if let step = DebugCapture.onboardingStep {
             // `--onboarding <1|2|3>`: open onboarding at that step.
             flow.forcedStartStep = step
@@ -39,11 +65,14 @@ struct DauApp: App {
         if DebugCapture.onboardingDirectory != nil {
             // `--capture-onboarding <dir>`: fixed services, so every step has content.
             let detector = FakeInputMethodDetector([FakeInputMethodDetector.running("OpenKey", bundleID: "com.tuyenmai.openkey")])
+            let fake = FakeInputMethodInstaller(.installed(version: nil))
             DebugCapture.onboardingDetector = detector
+            DebugCapture.onboardingInstaller = fake
             flow = OnboardingFlow(
                 detector: detector,
-                installer: FakeInputMethodInstaller(.installed(version: nil)),
-                shortcut: DebugCapture.shortcutOverride ?? InputSourceShortcut.read)
+                installer: fake,
+                shortcut: DebugCapture.shortcutOverride ?? InputSourceShortcut.read,
+                openKeyboardSettings: {})
             opens = true
         }
         DebugCapture.onboardingFlow = flow
@@ -64,6 +93,7 @@ struct DauApp: App {
             SettingsWindow()
                 .environment(model)
                 .environment(inputSource)
+                .environment(\.inputMethodActions, actions)
                 #if DEBUG
                 .environment(\.layoutProbe, DebugCapture.probe)
                 #endif
@@ -79,6 +109,7 @@ struct DauApp: App {
             OnboardingWindow()
                 .environment(onboarding)
                 .environment(model)
+                .environment(\.inputMethodActions, actions)
                 #if DEBUG
                 .environment(\.layoutProbe, DebugCapture.probe)
                 #endif
@@ -133,6 +164,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         #if DEBUG
         DebugCapture.start()
         DebugCapture.startOnboarding()
+        DebugCapture.startUninstall()
         #endif
     }
 

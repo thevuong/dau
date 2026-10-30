@@ -110,8 +110,7 @@ struct AddAppRuleSheet: View {
                                 suggested: list.suggestion(for: $0.bundleID) != nil) }
     }
 
-    /// Picks any app with the system open panel. The sandbox only shows the panel with the
-    /// `files.user-selected.read-only` entitlement; only the bundle ID is kept.
+    /// Picks any app with the system open panel; only the bundle ID is kept.
     private func chooseApp() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.application]
@@ -162,7 +161,7 @@ struct AppListing: Sendable {
     static let folders = ["/Applications", "/Applications/Utilities",
                           "/System/Applications", "/System/Applications/Utilities"]
 
-    /// Apps in the standard Applications folders. Folders the sandbox cannot read are
+    /// Apps in the standard Applications folders. Folders that cannot be read are
     /// skipped; running apps and the open panel cover the rest.
     static func installed() -> [AppListing] {
         let fm = FileManager.default

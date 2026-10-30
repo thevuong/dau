@@ -10,7 +10,7 @@ Tài liệu dự án nằm trong `docs/`: bắt đầu từ `docs/DECISIONS.md` 
 
 | Thư mục | Nội dung |
 |---|---|
-| `Apps/Dau` | app chủ SwiftUI (Cài đặt, cài bộ gõ, cập nhật) |
+| `Apps/Dau` | app chủ SwiftUI, không sandbox (D37): Cài đặt, cài/gỡ bộ gõ, cập nhật |
 | `Apps/DauInputMethod` | bộ gõ (input method IMK), sandbox, không có quyền mạng |
 | `Packages/DauEngine` | engine xử lý phím, Swift thuần, không dùng Foundation/AppKit |
 | `Packages/DauShared` | phần dùng chung giữa app chủ và bộ gõ |

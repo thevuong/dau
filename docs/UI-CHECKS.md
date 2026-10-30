@@ -12,7 +12,8 @@ Danh sách phải chạy hết trước khi báo xong bất kỳ thay đổi gia
    - Ảnh lấy từ window server nên có material, vibrancy và hiệu ứng mép cuộn.
    - Kiểm (a)–(e) bên dưới. Ghi `matrix-grid.png` (mỗi hàng một tổ hợp). Thoát với mã 0 chỉ khi mọi kiểm tra đạt.
    - Cửa sổ được đưa ra ngoài màn hình nhưng vẫn tồn tại vài giây mỗi lần chạy.
-   - Chụp thêm cửa sổ onboarding (`Dau --capture-onboarding <thư-mục>`, dịch vụ giả: OpenKey đang chạy, Dấu đã cài chưa bật): bước 1, 2, 2 sau "Bật Dấu", 3 × {sáng, tối} vào `onboarding/`, và một lượt `--shortcut none` vào `onboarding-no-shortcut/`; kèm `onboarding-<bước>-accessibility.txt` (cây trợ năng đọc qua AX API, cần quyền Trợ năng của Terminal). Kiểm (f).
+   - Chụp thêm cửa sổ onboarding (`Dau --capture-onboarding <thư-mục>`, dịch vụ giả: OpenKey đang chạy, Dấu đã cài chưa bật): bước 1, 2, 2 khi macOS vẫn để tắt (`2-not-enabled`, kèm nhắc nguồn tiếng Việt khác), 2 khi macOS chưa liệt kê Dấu (`2-logout`), 2 sau "Bật Dấu", 3 × {sáng, tối} vào `onboarding/`, và một lượt `--shortcut none` vào `onboarding-no-shortcut/`; kèm `onboarding-<bước>-accessibility.txt` (cây trợ năng đọc qua AX API, cần quyền Trợ năng của Terminal). Kiểm (f).
+   - Chụp alert gỡ cài đặt (`Dau --capture-uninstall <thư-mục>`: dựng alert ngoài màn hình, không gỡ gì) vào `uninstall/`: `uninstall-confirm-*`, `uninstall-done-*` × {sáng, tối}, nền alert đặt trên màu nền cửa sổ (kính của alert trong suốt khi ở ngoài màn hình). Kiểm (g): đủ 4 ảnh, alert ≥ 200×120.
 3. So với mockup:
    `swift run --package-path scripts/snapshot-settings SnapshotSettings <ra> <thư-mục-artboard> [<thư-mục-chụp-thật>]`
    - Ghi ảnh ghép mockup | app (`*-compare-*.png`, sidebar 4×, segmented 3×, header Ứng dụng 3×) và bảng khung phần tử.

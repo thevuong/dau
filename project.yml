@@ -76,6 +76,9 @@ targets:
         PRODUCT_NAME: Dau
         PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX)
         INFOPLIST_FILE: Apps/Dau/Info.plist
+        # D37: no App Sandbox for the host app (it installs, upgrades and removes the
+        # input method); App Group + hardened runtime only. The input method keeps its
+        # sandbox. Never set ENABLE_APP_SANDBOX here.
         CODE_SIGN_ENTITLEMENTS: Apps/Dau/Dau.entitlements
         # Temporary icon from scripts/make-app-icon.sh (Resources/Brand). The input method
         # has no app icon. TODO(M7): Icon Composer icon (docs/BRAND.md).

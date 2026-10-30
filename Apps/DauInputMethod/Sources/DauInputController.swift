@@ -31,6 +31,8 @@ final class DauInputController: IMKInputController {
     private var settingsObserver: SettingsChangeObserver?
     /// Selected-input-source change observer (see `startObservingInputSource`).
     private var sourceObserver: InputSourceObserver?
+    /// Quit request from the host app (main.swift), see `startObservingQuit`.
+    private var quitObserver: NSObjectProtocol?
     /// When IMK last activated this controller (`ProcessInfo.systemUptime`).
     private var activatedAt: TimeInterval = 0
     /// Identity of the last client proxy seen, to reset when the client changes.
@@ -193,6 +195,7 @@ final class DauInputController: IMKInputController {
         inPlace.activate()
         startObservingSettings()
         startObservingInputSource()
+        startObservingQuit()
         // D18: a nil sender must not keep the previous app's ID (and its underline rule).
         clientID = sender.map { ObjectIdentifier($0 as AnyObject) }
         clientApp = clientBundleID(sender)
@@ -235,7 +238,29 @@ final class DauInputController: IMKInputController {
         resetComposition()
         settingsObserver = nil
         sourceObserver = nil
+        if let quitObserver { NotificationCenter.default.removeObserver(quitObserver) }
+        quitObserver = nil
         super.inputControllerWillClose()
+    }
+
+    // MARK: - Quit requested by the host app (upgrade, uninstall)
+
+    /// The process is about to exit (main.swift): end the word like any reset (D4), so
+    /// underline mode commits the marked text where it is shown instead of leaving it
+    /// to a process that is gone.
+    private func startObservingQuit() {
+        guard quitObserver == nil else { return }
+        let target = WeakController(self)
+        quitObserver = NotificationCenter.default.addObserver(
+            forName: .dauQuitRequested, object: nil, queue: nil) { _ in
+            guard Thread.isMainThread else { return }
+            target.controller?.quitRequested()
+        }
+    }
+
+    private func quitRequested() {
+        let committed = resetComposition(client: client() as Any?)
+        if committed { perf.note("quit-commit", app: clientApp) }
     }
 
     // MARK: - Input source changes IMK does not report (M3)
@@ -496,4 +521,10 @@ private final class InputSourceObserver {
 private final class WeakController: @unchecked Sendable {
     weak var controller: DauInputController?
     init(_ controller: DauInputController) { self.controller = controller }
+}
+
+extension Notification.Name {
+    /// Posted on the main thread just before the process exits at the host app's
+    /// request (main.swift).
+    static let dauQuitRequested = Notification.Name("DauQuitRequested")
 }

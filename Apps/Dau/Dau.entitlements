@@ -2,24 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>com.apple.security.app-sandbox</key>
-	<true/>
+	<!-- D37: the host app is NOT sandboxed. It copies the input method to
+	     ~/Library/Input Methods, clears quarantine on the copy, stops the old input method
+	     process on upgrade and moves the input method to the Trash on uninstall; a
+	     sandboxed app can do none of these. Hardened runtime stays on (project.yml). The
+	     input method keeps its own sandbox and has no network entitlement (N2).
+	     Without the sandbox, the sandbox-only entitlements the app had (read-only
+	     shared-preference exceptions for com.apple.symbolichotkeys and
+	     com.apple.HIToolbox, files.user-selected.read-only for the open panel) do
+	     nothing and were removed. -->
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>$(APP_GROUP_ID)</string>
-	</array>
-	<!-- "Chọn ứng dụng khác…" (Ứng dụng › add rule): NSOpenPanel refuses to open in the
-	     sandbox without it. Read-only, and only the app the user picks. -->
-	<key>com.apple.security.files.user-selected.read-only</key>
-	<true/>
-	<!-- Read-only access to the user's input-source shortcut (Settings > Gõ phím, D2):
-	     AppleSymbolicHotKeys 60/61 and AppleFnUsageType; and to the option "Automatically
-	     switch to a document's input source" (Settings > Ứng dụng, D5):
-	     AppleGlobalTextInputProperties. Never written (N4). -->
-	<key>com.apple.security.temporary-exception.shared-preference.read-only</key>
-	<array>
-		<string>com.apple.symbolichotkeys</string>
-		<string>com.apple.HIToolbox</string>
 	</array>
 </dict>
 </plist>

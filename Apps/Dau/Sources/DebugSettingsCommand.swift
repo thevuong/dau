@@ -8,7 +8,7 @@ import DauShared
 /// to check, without typing, that the input method hears the change.
 ///
 /// Run the built binary directly (not through `open`) so the line reaches the terminal;
-/// the process still runs in the app's sandbox.
+/// the process has the app's real signature and App Group entitlement.
 enum DebugSettingsCommand {
     static let flag = "--set-typing-method"
 
@@ -50,7 +50,7 @@ enum DebugSettingsCommand {
         exit(readBack == method.rawValue ? 0 : 1)
     }
 
-    /// Where the suite's plist lives, as seen from inside the sandbox, with whether the
+    /// Where the suite's plist lives, as the app sees it, with whether the
     /// file exists. "unknown" when the App Group container cannot be resolved.
     private static func plistPath(kind: String, suite: String) -> String {
         let fileManager = FileManager.default
@@ -59,7 +59,7 @@ enum DebugSettingsCommand {
             url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: suite)?
                 .appendingPathComponent("Library/Preferences/\(suite).plist")
         } else {
-            // The standard suite of a sandboxed app lives in its container's home.
+            // The app's standard suite (not sandboxed since D37: ~/Library/Preferences).
             url = URL(fileURLWithPath: NSHomeDirectory())
                 .appendingPathComponent("Library/Preferences/\(suite).plist")
         }

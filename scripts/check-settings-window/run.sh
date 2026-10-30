@@ -3,12 +3,14 @@
 #
 # Usage: scripts/check-settings-window/run.sh <output-dir> [Dau.app]
 #
-# Copies the Debug build of Dau.app, signs the copy without the sandbox (so it can
-# write its captures), and runs it with --capture-window for every combination of
+# Copies the Debug build of Dau.app, re-signs the copy ad hoc without entitlements
+# (the build is not sandboxed since D37; the copy also drops the App Group, as before),
+# and runs it with --capture-window for every combination of
 # scroll bar style (overlay, legacy "Always", system "Automatic") and scroll offset
 # (0, 60 pt). Each run captures the 4 sections in light and dark mode off screen.
-# Then it captures the onboarding window (onboarding/, onboarding-no-shortcut/).
-# check.swift checks the captures and frames (a)–(f) and writes a summary grid.
+# Then it captures the onboarding window (onboarding/, onboarding-no-shortcut/) and the
+# uninstall alerts (uninstall/).
+# check.swift checks the captures and frames (a)–(g) and writes a summary grid.
 # Exit status 0 only if every check passes.
 #
 # The window is moved off screen but exists for a few seconds per run.
@@ -36,11 +38,16 @@ for style in WhenScrolling Always Automatic; do
   done
 done
 
-# The onboarding window (steps 1, 2, 2 after "Bật Dấu", 3; light and dark), on fixed
+# The onboarding window (steps 1, 2, 2 with Dấu still off, 2 not listed (logout),
+# 2 after "Bật Dấu", 3; light and dark), on fixed
 # services; once with the real input-source shortcut, once as if none were set.
 "$work/Dau.app/Contents/MacOS/Dau" --capture-onboarding "$out/onboarding" >/dev/null 2>&1
 "$work/Dau.app/Contents/MacOS/Dau" --capture-onboarding "$out/onboarding-no-shortcut" \
   --shortcut none >/dev/null 2>&1
+
+# The uninstall alerts (D16, mockup "ConfirmDialogs"): shown as sheets on the Settings
+# window, captured, dismissed; nothing is uninstalled.
+"$work/Dau.app/Contents/MacOS/Dau" --capture-uninstall "$out/uninstall" >/dev/null 2>&1
 
 swiftc -O -o "$work/check" "$here/check.swift"
 "$work/check" "$out"

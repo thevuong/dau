@@ -201,12 +201,32 @@ for dirName in ["onboarding", "onboarding-no-shortcut"] {
     }
 }
 
+// (g) Uninstall alerts (Dau --capture-uninstall): both alerts captured as sheets in
+// both modes, at an alert's size.
+var uninstallResults: [(String, Bool)] = []
+do {
+    let dir = root.appendingPathComponent("uninstall")
+    let frames = loadFrames(dir)
+    for key in ["confirm", "done"].flatMap({ k in ["light", "dark"].map { "uninstall-\(k)-\($0)" } }) {
+        var ok = true
+        if let sheet = frames[key]?["sheet"], sheet.width >= 200, sheet.height >= 120,
+           image(dir.appendingPathComponent("\(key).png")) != nil {
+        } else {
+            ok = false
+            fail("uninstall/\(key) (g) missing or sheet too small: \(String(describing: frames[key]?["sheet"]))")
+        }
+        uninstallResults.append((key, ok))
+    }
+}
+
 print("run | mode | a frames | b to edge | c no strip | d scrolled | e positions")
 for (run, mode, c) in results {
     print(([run, mode] + ["a", "b", "c", "d", "e"].map { c[$0]! ? "ok" : "FAIL" }).joined(separator: " | "))
 }
 print("onboarding | f positions")
 for (key, ok) in onboardingResults { print("\(key) | \(ok ? "ok" : "FAIL")") }
+print("uninstall | g captured")
+for (key, ok) in uninstallResults { print("\(key) | \(ok ? "ok" : "FAIL")") }
 failures.forEach { print("FAIL", $0) }
 print(failures.isEmpty ? "All UI checks passed." : "\(failures.count) check(s) failed.")
 exit(failures.isEmpty ? 0 : 1)

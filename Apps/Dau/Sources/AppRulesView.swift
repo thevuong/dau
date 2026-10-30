@@ -212,7 +212,7 @@ struct AppIcon: View {
     }
 }
 
-/// Names and icons of installed apps, through Launch Services (works in the sandbox).
+/// Names and icons of installed apps, through Launch Services.
 @MainActor
 enum AppDirectory {
     static func url(for bundleID: String) -> URL? {

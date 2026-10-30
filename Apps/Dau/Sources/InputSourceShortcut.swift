@@ -8,8 +8,8 @@ import Foundation
 ///   modifier flags)`.
 /// - `com.apple.HIToolbox` → `AppleFnUsageType`; 1 means the 🌐/fn key changes the
 ///   input source.
-/// The sandbox reads them through the read-only shared-preference exception in
-/// Dau.entitlements. When nothing can be read the UI keeps a placeholder (N5).
+/// Read only, never written (N4); the app is not sandboxed (D37), so no exception is
+/// needed. When nothing can be read the UI keeps a placeholder (N5).
 struct InputSourceShortcut: Equatable, Sendable {
     /// Keycaps of the first enabled shortcut, e.g. ["⌃", "Space"]; empty if none.
     var keys: [String]

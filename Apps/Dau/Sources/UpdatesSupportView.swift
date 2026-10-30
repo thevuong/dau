@@ -1,10 +1,13 @@
 import AppKit
 import SwiftUI
 
-/// "Cập nhật & hỗ trợ" (mockup "SettingsAbout"). Updates (Sparkle, D7) arrive in M7 and
-/// support actions (report, roll back, uninstall — D8, D16, D19) in M5/M7, so their
-/// controls are disabled and promise nothing yet (N5). No network access until then.
+/// "Cập nhật & hỗ trợ" (mockup "SettingsAbout"). Updates (Sparkle, D7) and the report
+/// and roll-back actions (D8, D19) arrive in M7, so their controls are disabled and
+/// promise nothing yet (N5). No network access until then. "Gỡ cài đặt…" (D16) works:
+/// `InputMethodActions.confirmUninstall`.
 struct UpdatesSupportView: View {
+    @Environment(\.inputMethodActions) private var actions
+
     var body: some View {
         SettingsPage(SettingsSection.updates.title) {
             SettingsCard(padding: 18) {
@@ -58,20 +61,26 @@ struct UpdatesSupportView: View {
                         Button("Báo lỗi…") {}
                             .settingsButton()
                     }
+                    .disabled(true)
                     RowDivider()
                     SettingsRow(Text("Quay về bản trước"), hint: Text("Dùng khi bản mới gây lỗi")) {
-                        // TODO(M5): roll back with confirmation (D16, D19).
+                        // TODO(M7): roll back with confirmation (D16, D19), with Sparkle.
                         Button("Quay về…") {}
                             .settingsButton()
                     }
+                    .disabled(true)
                     RowDivider()
                     SettingsRow(Text("Gỡ Dấu khỏi máy")) {
-                        // TODO(M5): uninstall with confirmation (D16).
-                        Button("Gỡ cài đặt…", role: .destructive) {}
-                            .settingsButton()
+                        // docs/UI.md: red, in the system red (D9).
+                        Button(role: .destructive) {
+                            actions?.confirmUninstall(in: NSApp.keyWindow)
+                        } label: {
+                            Text("Gỡ cài đặt…").foregroundStyle(actions == nil ? AnyShapeStyle(.tertiary) : AnyShapeStyle(Color.red))
+                        }
+                        .settingsButton()
+                        .disabled(actions == nil || actions?.isUninstalling == true)
                     }
                 }
-                .disabled(true)
             } footer: {
                 // Wording fixed by docs/UI.md (D8, N2).
                 Hint(Text("Dấu không gửi chữ bạn gõ ra khỏi máy. Bộ gõ không có quyền truy cập mạng; chỉ phần cập nhật kết nối để tải bản mới và danh sách ứng dụng tương thích. Mã nguồn mở theo giấy phép GPLv3."))

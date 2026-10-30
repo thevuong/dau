@@ -7,8 +7,8 @@ Không có status item riêng. Dấu có một input mode (D2): menu của hệ 
 
 ## Onboarding (một cửa sổ, thanh bước bên trái)
 Sidebar: icon app, tên, 3 bước có trạng thái (xong / đang làm / chưa), dòng về quyền cần cấp (để ô trống, điền sau khi kiểm chứng ở M2)
-1. **Tắt bộ gõ cũ trước đã** — chỉ hiện khi phát hiện bộ gõ khác đang chạy. Thẻ app (vd. OpenKey, nhãn "Đang chạy") kèm hướng dẫn tắt ngay tại chỗ (thoát app, tắt trong Mục đăng nhập). Tự kiểm tra lại khi cửa sổ được kích hoạt. Nút: Bỏ qua / Kiểm tra lại.
-2. **Bật Dấu** — đăng ký và bật nguồn nhập liệu; có Hoàn tác.
+1. **Tắt bộ gõ cũ trước đã** — chỉ hiện khi phát hiện bộ gõ chặn phím khác đang chạy (OpenKey, EVKey, GoTiengViet, XKey, PHTV, Gõ Nhanh, GoKey; bundle ID trong `docs/research/M5-INSTALL.md` mục 5). Các bước tắt chỉ ghi tên menu đã kiểm chứng; app chưa kiểm thì ghi chung "Thoát <tên>" và đường dẫn Mục đăng nhập (N5). Thẻ app (vd. OpenKey, nhãn "Đang chạy") kèm hướng dẫn tắt ngay tại chỗ (thoát app, tắt trong Mục đăng nhập). Tự kiểm tra lại khi cửa sổ được kích hoạt. Nút: Bỏ qua / Kiểm tra lại.
+2. **Bật Dấu** — chép bộ gõ vào `~/Library/Input Methods`, đăng ký, và chỉ khi người dùng bấm "Bật Dấu" mới bật nguồn nhập liệu; có Hoàn tác (N4, D37). Kết quả đọc lại từ hệ thống, không báo thành công khi chưa thấy bật (N5): macOS vẫn để tắt → mở Cài đặt Bàn phím và hiện các bước tự thêm "Dấu – Tiếng Việt"; macOS chưa liệt kê Dấu (lần cài đầu) → hướng dẫn đăng xuất rồi đăng nhập lại một lần. Có nguồn tiếng Việt kiểu IMK khác đang bật (ví dụ Telex của Apple) thì chỉ nhắc nhẹ dưới thẻ, không chặn (D14).
 3. **Chọn kiểu gõ và gõ thử** — segmented Telex | VNI | Telex đơn giản, ô gõ thử, gợi ý "tooi yeeu tieengs Vieetj". Nút: Quay lại / Bắt đầu gõ.
 
 ## Cửa sổ Cài đặt (sidebar + ô tìm kiếm)
@@ -37,13 +37,13 @@ Sidebar có icon màu: Gõ phím (xanh dương), Thông minh (tím), Ứng dụn
 - Chú thích quyền riêng tư (giữ đúng nội dung): "Dấu không gửi chữ bạn gõ ra khỏi máy. Bộ gõ không có quyền truy cập mạng; chỉ phần cập nhật kết nối để tải bản mới và danh sách ứng dụng tương thích. Mã nguồn mở theo giấy phép GPLv3."
 
 ## Các trạng thái bổ sung
-- **Dấu chưa được bật** (người dùng gỡ khỏi Nguồn nhập liệu): banner màu cam đầu mọi mục Cài đặt, "Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt.", nút "Bật lại".
+- **Dấu chưa được bật** (người dùng gỡ khỏi Nguồn nhập liệu): banner màu cam đầu mọi mục Cài đặt, "Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt.", nút "Bật lại". Bấm "Bật lại" thì bật Dấu và đọc lại trạng thái (N4): bật được → banner xanh "Đã bật Dấu trong Nguồn nhập liệu" kèm nút "Hoàn tác"; macOS vẫn để tắt → mở Cài đặt Bàn phím, banner hiện các bước tự thêm; chưa cài hoặc macOS chưa liệt kê Dấu → mở cửa sổ thiết lập.
 - **Chế độ tối:** toàn bộ Cài đặt và onboarding phải có giao diện tối (dùng màu hệ thống của SwiftUI là tự có).
 - **Thêm quy tắc ứng dụng** (nút +): sheet với ô tìm, danh sách ứng dụng chưa có quy tắc đã lưu (app trong danh sách tương thích có nhãn "Đề xuất" và khi thêm thì giữ nhãn đó), một segmented "Khi đang gõ" (Không gạch chân | Có gạch chân), nút Huỷ / Thêm.
 - **Thẻ cập nhật** có 6 trạng thái: đã mới nhất; đang kiểm tra; đang tải (thanh tiến trình, "Bạn vẫn gõ bình thường", nút Huỷ); chờ cài ("Sẽ cài khi bạn ngừng gõ", nút Cài ngay); không có mạng (nút Thử lại, "Dấu vẫn gõ bình thường"); chữ ký không hợp lệ ("Đã huỷ bản cập nhật", nút Báo lỗi…).
-- **Xác nhận quay về bản trước** (D19) và **xác nhận gỡ cài đặt** (nút đỏ, checkbox "Xoá cả cài đặt và quy tắc ứng dụng", câu "Bàn phím đang dùng trước đó được giữ nguyên").
+- **Xác nhận quay về bản trước** (D19) và **xác nhận gỡ cài đặt** (alert hệ thống: "Gỡ Dấu khỏi máy?", nút đỏ "Gỡ cài đặt", "Huỷ", checkbox "Xoá cả cài đặt và quy tắc ứng dụng"). Câu "Bàn phím đang dùng trước đó được giữ nguyên" để ô trống `[…]` cho tới khi M5 T4 kiểm chứng (N5). macOS 27 vẽ alert căn trái, hai nút nằm ngang, nút "Gỡ cài đặt" chữ đỏ trên nền đỏ nhạt; mockup vẽ căn giữa, nút xếp dọc, nền đỏ chữ trắng — theo hệ thống (D9). Gỡ xong: alert "Đã gỡ bộ gõ Dấu" nêu những gì đã làm (đọc lại từ hệ thống) và nút "Thoát Dấu"; app không tự xoá chính nó, chỉ hướng dẫn kéo Dấu vào Thùng rác.
 - **Khi gõ trong ứng dụng:** không gạch chân (mặc định), có gạch chân (từ đang gõ được gạch, chốt khi Space), gõ tiếng Anh bằng ABC (chỉ báo của hệ thống), thêm dấu cho từ đã gõ.
-- **Onboarding bước 2:** giải thích sẽ thấy biểu tượng V, và chuyển sang ABC để gõ tiếng Anh bằng phím tắt nguồn nhập liệu của macOS (⌃Space); chỗ dành cho hướng dẫn nếu macOS yêu cầu xác nhận (câu hỏi mở).
+- **Onboarding bước 2:** giải thích sẽ thấy biểu tượng V, và chuyển sang ABC để gõ tiếng Anh bằng phím tắt nguồn nhập liệu của macOS: hiện **phím tắt thật** đọc từ cài đặt hệ thống dạng keycap (không viết cứng phím nào, N5); chưa đặt phím tắt thì nói vậy và có nút mở Cài đặt Bàn phím; không đọc được thì keycap trống kèm nút đó. Chỗ dành cho hướng dẫn nếu macOS yêu cầu xác nhận (hộp thoại "Cho phép … bật …?", kiểm chứng ở M5 T4).
 
 ## Thông báo cập nhật (alert nhỏ, căn giữa)
 Icon app, "Đã có Dấu x.y.z", mô tả (cài lúc không gõ, quay về được), "Có gì mới", dòng "Đã xác minh chữ ký số của bản cập nhật", checkbox "Tự động cài các bản sau", nút xếp dọc: Cài đặt / Nhắc sau / Bỏ qua bản này.

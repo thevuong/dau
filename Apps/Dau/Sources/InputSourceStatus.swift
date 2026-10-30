@@ -35,17 +35,24 @@ final class InputSourceStatus {
         isEnabled = Self.query()
     }
 
-    /// Reads the enabled input sources now. `nil` when the input method bundle is not
-    /// found inside the app.
+    /// Reads the enabled input sources now: is "Dấu – Tiếng Việt" (the `.vi` mode, D2)
+    /// among them? The same test as `SystemInputMethodInstaller.status()`: the parent
+    /// input method alone being on does not let the user type. `nil` when the input
+    /// method bundle is not found inside the app.
     nonisolated static func query() -> Bool? {
-        guard let bundleID = inputMethodBundleID else { return nil }
-        let filter = [kTISPropertyBundleID as String: bundleID] as CFDictionary
+        guard let modeID = inputModeID else { return nil }
+        let filter = [kTISPropertyInputSourceID as String: modeID] as CFDictionary
         // includeAllInstalled = false: only enabled sources are returned.
         guard let list = TISCreateInputSourceList(filter, false)?.takeRetainedValue() else {
             return false
         }
         return CFArrayGetCount(list) > 0
     }
+
+    /// The Vietnamese input mode ID of the input method inside this app.
+    nonisolated static let inputModeID: String? = InputMethodBundleFiles.info(
+        at: Bundle.main.bundleURL.appendingPathComponent("Contents/Library/Input Methods/DauInputMethod.app"))?
+        .vietnameseModeID
 
     /// Bundle ID of the input method shipped inside this app (project.yml embeds it in
     /// Contents/Library/Input Methods).

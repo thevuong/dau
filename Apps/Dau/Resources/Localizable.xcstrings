@@ -101,6 +101,16 @@
         }
       }
     },
+    "Bạn có thể bỏ “Dấu – Tiếng Việt” trong Cài đặt Bàn phím › Nguồn đầu vào, rồi thử lại." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bạn có thể bỏ “Dấu – Tiếng Việt” trong Cài đặt Bàn phím › Nguồn đầu vào, rồi thử lại."
+          }
+        }
+      }
+    },
     "Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt." : {
       "localizations" : {
         "vi" : {
@@ -111,12 +121,22 @@
         }
       }
     },
-    "Bấm biểu tượng %@ trên thanh menu, chọn Thoát" : {
+    "Bấm Hoàn tác nếu bạn đổi ý." : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bấm biểu tượng %@ trên thanh menu, chọn Thoát"
+            "value" : "Bấm Hoàn tác nếu bạn đổi ý."
+          }
+        }
+      }
+    },
+    "Bấm biểu tượng OpenKey trên thanh menu, chọn “Thoát”" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bấm biểu tượng OpenKey trên thanh menu, chọn “Thoát”"
           }
         }
       }
@@ -191,6 +211,16 @@
         }
       }
     },
+    "Bộ gõ đã được chuyển vào Thùng rác." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bộ gõ đã được chuyển vào Thùng rác."
+          }
+        }
+      }
+    },
     "Cho phép phụ âm z, f, w, j" : {
       "localizations" : {
         "vi" : {
@@ -237,6 +267,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chưa có quy tắc riêng. Bấm + để thêm."
+          }
+        }
+      }
+    },
+    "Chưa gỡ được Dấu" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa gỡ được Dấu"
           }
         }
       }
@@ -297,6 +337,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chọn ứng dụng khác…"
+          }
+        }
+      }
+    },
+    "Chọn “Thoát XKey” trong menu của XKey" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chọn “Thoát XKey” trong menu của XKey"
           }
         }
       }
@@ -451,6 +501,16 @@
         }
       }
     },
+    "Dấu sẽ bị xoá khỏi Nguồn nhập liệu. [Bàn phím đang dùng trước đó được giữ nguyên — kiểm chứng ở M5 T4]" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu sẽ bị xoá khỏi Nguồn nhập liệu. [Bàn phím đang dùng trước đó được giữ nguyên — kiểm chứng ở M5 T4]"
+          }
+        }
+      }
+    },
     "Dấu sẽ được thêm vào Nguồn nhập liệu của macOS, cạnh bàn phím bạn đang dùng." : {
       "localizations" : {
         "vi" : {
@@ -581,12 +641,32 @@
         }
       }
     },
+    "Gỡ Dấu khỏi máy?" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gỡ Dấu khỏi máy?"
+          }
+        }
+      }
+    },
     "Gỡ Dấu khỏi nguồn nhập liệu" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gỡ Dấu khỏi nguồn nhập liệu"
+          }
+        }
+      }
+    },
+    "Gỡ cài đặt" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gỡ cài đặt"
           }
         }
       }
@@ -771,6 +851,16 @@
         }
       }
     },
+    "Muốn xoá cả ứng dụng, kéo Dấu trong thư mục Ứng dụng vào Thùng rác." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muốn xoá cả ứng dụng, kéo Dấu trong thư mục Ứng dụng vào Thùng rác."
+          }
+        }
+      }
+    },
     "Mới" : {
       "localizations" : {
         "vi" : {
@@ -811,6 +901,16 @@
         }
       }
     },
+    "Nguồn nhập liệu hiện tại: “%@”." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nguồn nhập liệu hiện tại: “%@”."
+          }
+        }
+      }
+    },
     "Nhớ nguồn nhập liệu theo từng cửa sổ" : {
       "localizations" : {
         "vi" : {
@@ -827,6 +927,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nâng cao"
+          }
+        }
+      }
+    },
+    "Nếu %@ tự mở lại: Cài đặt hệ thống › Cài đặt chung › Mục đăng nhập & Phần mở rộng, tắt %@" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nếu %1$@ tự mở lại: Cài đặt hệ thống › Cài đặt chung › Mục đăng nhập & Phần mở rộng, tắt %2$@"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }
@@ -981,6 +1101,46 @@
         }
       }
     },
+    "Thoát %@" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thoát %@"
+          }
+        }
+      }
+    },
+    "Thoát Dấu" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thoát Dấu"
+          }
+        }
+      }
+    },
+    "Thoát Gõ Nhanh" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thoát Gõ Nhanh"
+          }
+        }
+      }
+    },
+    "Thoát PHTV" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thoát PHTV"
+          }
+        }
+      }
+    },
     "Thu gọn" : {
       "localizations" : {
         "vi" : {
@@ -1071,12 +1231,42 @@
         }
       }
     },
-    "Trong Cài đặt hệ thống › Chung › Mục đăng nhập, tắt %@" : {
+    "Trong cài đặt của Gõ Nhanh, tắt “Launch at login”" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Trong Cài đặt hệ thống › Chung › Mục đăng nhập, tắt %@"
+            "value" : "Trong cài đặt của Gõ Nhanh, tắt “Launch at login”"
+          }
+        }
+      }
+    },
+    "Trong cài đặt của PHTV, tắt “Khởi động cùng macOS”" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trong cài đặt của PHTV, tắt “Khởi động cùng macOS”"
+          }
+        }
+      }
+    },
+    "Trong cài đặt của XKey, tắt “Khởi động cùng hệ thống”" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trong cài đặt của XKey, tắt “Khởi động cùng hệ thống”"
+          }
+        }
+      }
+    },
+    "Trong “Bảng điều khiển…” của OpenKey, tắt “Khởi động cùng macOS”" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trong “Bảng điều khiển…” của OpenKey, tắt “Khởi động cùng macOS”"
           }
         }
       }
@@ -1241,6 +1431,16 @@
         }
       }
     },
+    "Xoá cả cài đặt và quy tắc ứng dụng" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xoá cả cài đặt và quy tắc ứng dụng"
+          }
+        }
+      }
+    },
     "Xoá quy tắc" : {
       "localizations" : {
         "vi" : {
@@ -1311,12 +1511,52 @@
         }
       }
     },
+    "macOS chưa bật Dấu. Trong Cài đặt Bàn phím › Nguồn đầu vào, bấm Sửa…, bấm +, chọn “Dấu – Tiếng Việt” trong nhóm Tiếng Việt rồi bấm Thêm." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS chưa bật Dấu. Trong Cài đặt Bàn phím › Nguồn đầu vào, bấm Sửa…, bấm +, chọn “Dấu – Tiếng Việt” trong nhóm Tiếng Việt rồi bấm Thêm."
+          }
+        }
+      }
+    },
+    "macOS chưa thấy Dấu trong danh sách nguồn nhập liệu. Lần cài đầu cần đăng xuất rồi đăng nhập lại một lần (menu Apple › Đăng xuất), sau đó mở lại Dấu để bật." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS chưa thấy Dấu trong danh sách nguồn nhập liệu. Lần cài đầu cần đăng xuất rồi đăng nhập lại một lần (menu Apple › Đăng xuất), sau đó mở lại Dấu để bật."
+          }
+        }
+      }
+    },
+    "macOS vẫn báo Dấu trong Nguồn nhập liệu; bạn có thể bỏ nó trong Cài đặt Bàn phím." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS vẫn báo Dấu trong Nguồn nhập liệu; bạn có thể bỏ nó trong Cài đặt Bàn phím."
+          }
+        }
+      }
+    },
     "Đang bật" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đang bật"
+          }
+        }
+      }
+    },
+    "Đang bật nguồn nhập liệu tiếng Việt khác: %@. Bạn có thể bỏ bớt trong Cài đặt Bàn phím cho gọn danh sách." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang bật nguồn nhập liệu tiếng Việt khác: %@. Bạn có thể bỏ bớt trong Cài đặt Bàn phím cho gọn danh sách."
           }
         }
       }
@@ -1351,6 +1591,16 @@
         }
       }
     },
+    "Đã bật Dấu trong Nguồn nhập liệu" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã bật Dấu trong Nguồn nhập liệu"
+          }
+        }
+      }
+    },
     "Đã bật Dấu. Bấm Hoàn tác nếu bạn đổi ý." : {
       "localizations" : {
         "vi" : {
@@ -1361,12 +1611,32 @@
         }
       }
     },
+    "Đã gỡ bộ gõ Dấu" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã gỡ bộ gõ Dấu"
+          }
+        }
+      }
+    },
     "Đã xong" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đã xong"
+          }
+        }
+      }
+    },
+    "Đã xoá cài đặt và quy tắc ứng dụng." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã xoá cài đặt và quy tắc ứng dụng."
           }
         }
       }
