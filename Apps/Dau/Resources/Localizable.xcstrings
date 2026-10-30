@@ -1,12 +1,32 @@
 {
   "sourceLanguage" : "vi",
   "strings" : {
+    "%@ hoặc 🌐" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ hoặc 🌐"
+          }
+        }
+      }
+    },
     "%@ thành %@" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ thành %@"
+          }
+        }
+      }
+    },
+    "%@ đang chạy. Hai bộ gõ cùng chạy sẽ thêm dấu hai lần và ra chữ lỗi." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ đang chạy. Hai bộ gõ cùng chạy sẽ thêm dấu hai lần và ra chữ lỗi."
           }
         }
       }
@@ -41,6 +61,16 @@
         }
       }
     },
+    "Biểu tượng V trên thanh menu khi đang gõ tiếng Việt" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Biểu tượng V trên thanh menu khi đang gõ tiếng Việt"
+          }
+        }
+      }
+    },
     "Báo lại để bản sau xử lý đúng cho ứng dụng đó" : {
       "localizations" : {
         "vi" : {
@@ -61,12 +91,42 @@
         }
       }
     },
+    "Bước %lld: %@" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bước %lld: %@"
+          }
+        }
+      }
+    },
     "Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt." : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt."
+          }
+        }
+      }
+    },
+    "Bấm biểu tượng %@ trên thanh menu, chọn Thoát" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bấm biểu tượng %@ trên thanh menu, chọn Thoát"
+          }
+        }
+      }
+    },
+    "Bật Dấu" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bật Dấu"
           }
         }
       }
@@ -101,12 +161,32 @@
         }
       }
     },
+    "Bắt đầu gõ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bắt đầu gõ"
+          }
+        }
+      }
+    },
     "Bỏ dấu tự do" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bỏ dấu tự do"
+          }
+        }
+      }
+    },
+    "Bỏ qua" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bỏ qua"
           }
         }
       }
@@ -131,6 +211,26 @@
         }
       }
     },
+    "Chưa bật được Dấu. Bạn có thể tự thêm “Dấu – Tiếng Việt” trong Cài đặt Bàn phím › Nguồn đầu vào." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa bật được Dấu. Bạn có thể tự thêm “Dấu – Tiếng Việt” trong Cài đặt Bàn phím › Nguồn đầu vào."
+          }
+        }
+      }
+    },
+    "Chưa có phím tắt để chuyển nhanh sang bàn phím tiếng Anh." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa có phím tắt để chuyển nhanh sang bàn phím tiếng Anh."
+          }
+        }
+      }
+    },
     "Chưa có quy tắc riêng. Bấm + để thêm." : {
       "localizations" : {
         "vi" : {
@@ -141,12 +241,42 @@
         }
       }
     },
+    "Chưa làm" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa làm"
+          }
+        }
+      }
+    },
     "Chọn" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chọn"
+          }
+        }
+      }
+    },
+    "Chọn kiểu gõ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chọn kiểu gõ"
+          }
+        }
+      }
+    },
+    "Chọn kiểu gõ và gõ thử" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chọn kiểu gõ và gõ thử"
           }
         }
       }
@@ -187,6 +317,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cài đặt…"
+          }
+        }
+      }
+    },
+    "Các bước thiết lập" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Các bước thiết lập"
           }
         }
       }
@@ -271,6 +411,26 @@
         }
       }
     },
+    "Dấu chưa phải nguồn nhập liệu đang dùng: chọn “Dấu – Tiếng Việt” trên thanh menu hoặc bấm %@ rồi gõ thử." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu chưa phải nguồn nhập liệu đang dùng: chọn “Dấu – Tiếng Việt” trên thanh menu hoặc bấm %@ rồi gõ thử."
+          }
+        }
+      }
+    },
+    "Dấu chưa phải nguồn nhập liệu đang dùng: chọn “Dấu – Tiếng Việt” trên thanh menu rồi gõ thử." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu chưa phải nguồn nhập liệu đang dùng: chọn “Dấu – Tiếng Việt” trên thanh menu rồi gõ thử."
+          }
+        }
+      }
+    },
     "Dấu chưa được bật trong Nguồn nhập liệu" : {
       "localizations" : {
         "vi" : {
@@ -287,6 +447,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dấu không gửi chữ bạn gõ ra khỏi máy. Bộ gõ không có quyền truy cập mạng; chỉ phần cập nhật kết nối để tải bản mới và danh sách ứng dụng tương thích. Mã nguồn mở theo giấy phép GPLv3."
+          }
+        }
+      }
+    },
+    "Dấu sẽ được thêm vào Nguồn nhập liệu của macOS, cạnh bàn phím bạn đang dùng." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu sẽ được thêm vào Nguồn nhập liệu của macOS, cạnh bàn phím bạn đang dùng."
+          }
+        }
+      }
+    },
+    "Dấu tự kiểm tra lại khi bạn quay về cửa sổ này." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu tự kiểm tra lại khi bạn quay về cửa sổ này."
+          }
+        }
+      }
+    },
+    "Dấu đã có trong Nguồn nhập liệu của macOS, cạnh bàn phím bạn đang dùng." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dấu đã có trong Nguồn nhập liệu của macOS, cạnh bàn phím bạn đang dùng."
           }
         }
       }
@@ -321,12 +511,32 @@
         }
       }
     },
+    "Gõ thử" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gõ thử"
+          }
+        }
+      }
+    },
     "Gõ tắt phụ âm" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gõ tắt phụ âm"
+          }
+        }
+      }
+    },
+    "Gõ ở đây" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gõ ở đây"
           }
         }
       }
@@ -371,6 +581,16 @@
         }
       }
     },
+    "Gỡ Dấu khỏi nguồn nhập liệu" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gỡ Dấu khỏi nguồn nhập liệu"
+          }
+        }
+      }
+    },
     "Gỡ cài đặt…" : {
       "localizations" : {
         "vi" : {
@@ -381,12 +601,42 @@
         }
       }
     },
+    "Gợi ý: %@" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gợi ý: %@"
+          }
+        }
+      }
+    },
+    "Hoàn tác" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoàn tác"
+          }
+        }
+      }
+    },
     "Huỷ" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Huỷ"
+          }
+        }
+      }
+    },
+    "Hướng dẫn thiết lập…" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hướng dẫn thiết lập…"
           }
         }
       }
@@ -437,6 +687,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Không gạch chân"
+          }
+        }
+      }
+    },
+    "Kiểm tra bộ gõ cũ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiểm tra bộ gõ cũ"
+          }
+        }
+      }
+    },
+    "Kiểm tra lại" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiểm tra lại"
           }
         }
       }
@@ -521,6 +791,16 @@
         }
       }
     },
+    "Mở Cài đặt Bàn phím…" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mở Cài đặt Bàn phím…"
+          }
+        }
+      }
+    },
     "Mở rộng" : {
       "localizations" : {
         "vi" : {
@@ -581,6 +861,36 @@
         }
       }
     },
+    "Phím tắt nguồn nhập liệu của macOS để chuyển sang bàn phím tiếng Anh" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phím tắt nguồn nhập liệu của macOS để chuyển sang bàn phím tiếng Anh"
+          }
+        }
+      }
+    },
+    "Phím tắt nguồn nhập liệu của macOS để chuyển sang “%@” gõ tiếng Anh" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phím tắt nguồn nhập liệu của macOS để chuyển sang “%@” gõ tiếng Anh"
+          }
+        }
+      }
+    },
+    "Quay lại" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quay lại"
+          }
+        }
+      }
+    },
     "Quay về bản trước" : {
       "localizations" : {
         "vi" : {
@@ -621,6 +931,16 @@
         }
       }
     },
+    "Sau khi bật, bạn sẽ thấy" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sau khi bật, bạn sẽ thấy"
+          }
+        }
+      }
+    },
     "Sửa từ đã gõ" : {
       "localizations" : {
         "vi" : {
@@ -647,6 +967,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Telex đơn giản"
+          }
+        }
+      }
+    },
+    "Thiết lập Dấu" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thiết lập Dấu"
           }
         }
       }
@@ -691,6 +1021,16 @@
         }
       }
     },
+    "Thêm vào nguồn nhập liệu" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thêm vào nguồn nhập liệu"
+          }
+        }
+      }
+    },
     "Thêm ứng dụng" : {
       "localizations" : {
         "vi" : {
@@ -707,6 +1047,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thông minh"
+          }
+        }
+      }
+    },
+    "Tiếp tục" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiếp tục"
+          }
+        }
+      }
+    },
+    "Tiếp tục khi bộ gõ cũ vẫn đang chạy" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiếp tục khi bộ gõ cũ vẫn đang chạy"
+          }
+        }
+      }
+    },
+    "Trong Cài đặt hệ thống › Chung › Mục đăng nhập, tắt %@" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trong Cài đặt hệ thống › Chung › Mục đăng nhập, tắt %@"
+          }
+        }
+      }
+    },
+    "Tránh gõ ra chữ lỗi" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tránh gõ ra chữ lỗi"
           }
         }
       }
@@ -747,6 +1127,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tìm ứng dụng"
+          }
+        }
+      }
+    },
+    "Tắt bộ gõ cũ trước đã" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tắt bộ gõ cũ trước đã"
           }
         }
       }
@@ -821,6 +1211,16 @@
         }
       }
     },
+    "Và gõ thử" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Và gõ thử"
+          }
+        }
+      }
+    },
     "Vị trí dấu thanh" : {
       "localizations" : {
         "vi" : {
@@ -861,12 +1261,32 @@
         }
       }
     },
+    "[Nếu macOS yêu cầu xác nhận, hướng dẫn sẽ hiện ở đây — kiểm chứng ở M5]" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[Nếu macOS yêu cầu xác nhận, hướng dẫn sẽ hiện ở đây — kiểm chứng ở M5]"
+          }
+        }
+      }
+    },
     "[Phím tắt hệ thống]" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "[Phím tắt hệ thống]"
+          }
+        }
+      }
+    },
+    "[Quyền cần cấp — điền sau khi kiểm chứng ở M5]" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[Quyền cần cấp — điền sau khi kiểm chứng ở M5]"
           }
         }
       }
@@ -901,12 +1321,52 @@
         }
       }
     },
+    "Đang chạy" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang chạy"
+          }
+        }
+      }
+    },
+    "Đang làm" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang làm"
+          }
+        }
+      }
+    },
     "Đang tắt" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đang tắt"
+          }
+        }
+      }
+    },
+    "Đã bật Dấu. Bấm Hoàn tác nếu bạn đổi ý." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã bật Dấu. Bấm Hoàn tác nếu bạn đổi ý."
+          }
+        }
+      }
+    },
+    "Đã xong" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã xong"
           }
         }
       }
@@ -937,6 +1397,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đề xuất"
+          }
+        }
+      }
+    },
+    "Đổi lại bất cứ lúc nào trong Cài đặt." : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đổi lại bất cứ lúc nào trong Cài đặt."
           }
         }
       }

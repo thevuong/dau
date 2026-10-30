@@ -12,9 +12,11 @@ Danh sách phải chạy hết trước khi báo xong bất kỳ thay đổi gia
    - Ảnh lấy từ window server nên có material, vibrancy và hiệu ứng mép cuộn.
    - Kiểm (a)–(e) bên dưới. Ghi `matrix-grid.png` (mỗi hàng một tổ hợp). Thoát với mã 0 chỉ khi mọi kiểm tra đạt.
    - Cửa sổ được đưa ra ngoài màn hình nhưng vẫn tồn tại vài giây mỗi lần chạy.
+   - Chụp thêm cửa sổ onboarding (`Dau --capture-onboarding <thư-mục>`, dịch vụ giả: OpenKey đang chạy, Dấu đã cài chưa bật): bước 1, 2, 2 sau "Bật Dấu", 3 × {sáng, tối} vào `onboarding/`, và một lượt `--shortcut none` vào `onboarding-no-shortcut/`; kèm `onboarding-<bước>-accessibility.txt` (cây trợ năng đọc qua AX API, cần quyền Trợ năng của Terminal). Kiểm (f).
 3. So với mockup:
    `swift run --package-path scripts/snapshot-settings SnapshotSettings <ra> <thư-mục-artboard> [<thư-mục-chụp-thật>]`
    - Ghi ảnh ghép mockup | app (`*-compare-*.png`, sidebar 4×, segmented 3×, header Ứng dụng 3×) và bảng khung phần tử.
+   - Thêm đối số thứ tư `<thư-mục-chụp-onboarding>` (vd. `<ra-run.sh>/onboarding`): ghi `onboarding-<bước>-compare-{light,dark}.png` so với artboard OnboardingConflict, OnboardingEnable, Onboarding (không có artboard tối: mockup sáng cạnh app tối).
    - Kiểm khung 4 mục trong cửa sổ dựng tay: in "Layout: identical in all sections", thoát 1 nếu lệch.
 4. Test: `swift test --package-path scripts/snapshot-settings` (ví dụ do engine tính, phím tắt, ô tìm sidebar).
 
@@ -35,6 +37,7 @@ Toạ độ tính bằng pt, gốc ở góc trên-trái cửa sổ 820×600.
 | 9 | Header không che nội dung khi cuộn | run.sh (d), cuộn 60 pt | Vùng header (x 390–540, y 6–46) khác ảnh chưa cuộn trung bình ≤ 4/255 |
 | 10 | Thiếu thanh cuộn (nằm ngoài cửa sổ) | run.sh (b), (d); khung `scroller` | Mục có cuộn: `scroller` x ≥ 700, mép phải ≤ 820, y ≥ 51 |
 | 11 | Dải hở ở mép phải (cột thanh cuộn chừa sẵn) | run.sh (b), (c) | (b) màu nền trang ở mép phải (hoặc sát trái thanh cuộn) trùng màu nền trang bên trái, lệch ≤ 6/255; vạch dưới header có ở x 600 và x 817 cùng hàng. (c) dải 24 pt ở mép phải không có điểm nào khác màu nền trang, trừ thanh cuộn |
+| 12 | Onboarding lệch mockup | run.sh (f) | Cửa sổ 720×500; tên app x 20 y 50; tiêu đề x 266 y 40; thẻ x 266 rộng 418; cụm nút mép phải 684, mép dưới 472 — ở mọi bước, cả hai chế độ |
 
 ## Quy tắc thanh cuộn (chốt 29/10/2026)
 

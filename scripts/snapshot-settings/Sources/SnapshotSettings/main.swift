@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 import DauShared
 
-// Usage: SnapshotSettings <output-dir> [<artboard-dir>]
+// Usage: SnapshotSettings <output-dir> [<artboard-dir> [<real-capture-dir> [<onboarding-capture-dir>]]]
 // - Renders every page in light, dark and high-contrast appearance, the 2×2 grids of
 //   the four sections, and checks that the layout does not move between sections
 //   (exit 1 if it does).
@@ -13,6 +13,10 @@ import DauShared
 //   the app side of the comparisons uses those captures of the real SwiftUI scene and
 //   its frames.json: this hand-made window does not reproduce the scene's chrome,
 //   system colors and control sizes exactly.
+// - With <onboarding-capture-dir> (Dau --capture-onboarding <dir>), also writes
+//   "onboarding-<step>-compare-<mode>.png" (mockup | real window) for the three
+//   onboarding artboards and their element frames. There is no dark artboard: the
+//   dark compare puts the light mockup beside the dark window.
 
 var arguments: [String] = []
 var skipNext = false
@@ -24,10 +28,11 @@ for arg in CommandLine.arguments.dropFirst() {
 let outDir = URL(fileURLWithPath: arguments.first ?? FileManager.default.currentDirectoryPath, isDirectory: true)
 let artboards = arguments.count > 1 ? URL(fileURLWithPath: arguments[1], isDirectory: true) : nil
 let realDir = arguments.count > 2 ? URL(fileURLWithPath: arguments[2], isDirectory: true) : nil
+let onboardingDir = arguments.count > 3 ? URL(fileURLWithPath: arguments[3], isDirectory: true) : nil
 
 /// A real-window capture and its probe frames, if present.
-func realCapture(_ key: String) -> (NSBitmapImageRep, [String: CGRect])? {
-    guard let realDir,
+func realCapture(_ key: String, in dir: URL? = realDir) -> (NSBitmapImageRep, [String: CGRect])? {
+    guard let realDir = dir,
           let rep = NSBitmapImageRep(data: (try? Data(contentsOf: realDir.appendingPathComponent("\(key).png"))) ?? Data()),
           let json = try? JSONSerialization.jsonObject(with: Data(contentsOf: realDir.appendingPathComponent("frames.json"))) as? [String: [String: [Double]]]
     else { return nil }
@@ -201,6 +206,34 @@ let failed: Bool = MainActor.assumeIsolated {
                     size: CGSize(width: 900, height: 680), crop: crop, measure: [:]), let sheet {
                     Snapshot.sideBySide([mock.image, sheet.rep],
                                         to: outDir.appendingPathComponent("apps-add-compare-light.png"))
+                }
+            }
+        }
+        // Onboarding: the window is at 50,40 in the 820×580 artboards.
+        if let onboardingDir {
+            let crop = CGRect(x: 50, y: 40, width: 720, height: 500)
+            let measure = [
+                "close": "document.querySelector('aside [aria-hidden=true] span').getBoundingClientRect()",
+                "onbAppName": "document.querySelector('aside > div:nth-child(2)').getBoundingClientRect()",
+                "onbSteps": "document.querySelector('aside ol').getBoundingClientRect()",
+                "onbTitle": "(() => { const r = document.createRange(); r.selectNodeContents(document.querySelector('main h1')); return r.getBoundingClientRect(); })()",
+                "onbCard": "document.querySelector('main .card').getBoundingClientRect()",
+                "onbSegmented": "document.querySelector('main .seg') && document.querySelector('main .seg').getBoundingClientRect()",
+                "onbButtons": "document.querySelector('main > div:last-child').getBoundingClientRect()",
+            ]
+            for (step, file) in [("1", "OnboardingConflict"), ("2", "OnboardingEnable"), ("3", "Onboarding")] {
+                guard let mock = Mockup.render(artboards.appendingPathComponent("\(file).dc.html"),
+                                               size: CGSize(width: 820, height: 580), crop: crop, measure: measure)
+                else { print("cannot render \(file)"); continue }
+                for mode in ["light", "dark"] {
+                    guard let real = realCapture("onboarding-\(step)-\(mode)", in: onboardingDir) else { continue }
+                    Snapshot.sideBySide([mock.image, real.0],
+                                        to: outDir.appendingPathComponent("onboarding-\(step)-compare-\(mode).png"))
+                    if mode == "light" {
+                        for key in measure.keys.sorted() {
+                            rows.append("onboarding-\(step) | \(key) | \(f(mock.frames[key])) | \(f(real.1[key]))")
+                        }
+                    }
                 }
             }
         }

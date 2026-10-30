@@ -18,16 +18,57 @@ struct InputSourceShortcut: Equatable, Sendable {
 
     var isEmpty: Bool { keys.isEmpty && !globeKey }
 
-    /// Reads the current shortcut; `nil` when the preferences cannot be read.
+    /// What the preferences say about the shortcut.
+    enum Reading: Equatable, Sendable {
+        case shortcut(InputSourceShortcut)
+        /// Known to be off: both entries 60 and 61 are present and disabled, and the 🌐
+        /// key is set to something else.
+        case none
+        /// Not readable, or entries missing (the system default then applies, which
+        /// Dấu does not guess, N5).
+        case unknown
+
+        var shortcut: InputSourceShortcut? {
+            if case .shortcut(let shortcut) = self { return shortcut }
+            return nil
+        }
+    }
+
+    /// Reads the current shortcut; `nil` when the preferences cannot be read or set none.
     static func current() -> InputSourceShortcut? {
+        read().shortcut
+    }
+
+    /// Reads the user's preferences (read only, N4).
+    static func read() -> Reading {
         let hotKeys = CFPreferencesCopyAppValue(
             "AppleSymbolicHotKeys" as CFString, "com.apple.symbolichotkeys" as CFString) as? [String: Any]
         let fnUsage = CFPreferencesCopyAppValue(
             "AppleFnUsageType" as CFString, "com.apple.HIToolbox" as CFString) as? Int
-        guard hotKeys != nil || fnUsage != nil else { return nil }
+        return reading(hotKeys: hotKeys, fnUsage: fnUsage)
+    }
+
+    static func reading(hotKeys: [String: Any]?, fnUsage: Int?) -> Reading {
+        guard hotKeys != nil || fnUsage != nil else { return .unknown }
         let keys = ["60", "61"].lazy.compactMap { hotKeys?[$0].flatMap(keycaps(from:)) }.first ?? []
         let shortcut = InputSourceShortcut(keys: keys, globeKey: fnUsage == 1)
-        return shortcut.isEmpty ? nil : shortcut
+        if !shortcut.isEmpty { return .shortcut(shortcut) }
+        let bothOff = ["60", "61"].allSatisfy { key in
+            guard let entry = hotKeys?[key] as? [String: Any] else { return false }
+            return !((entry["enabled"] as? Bool) ?? ((entry["enabled"] as? Int) == 1))
+        }
+        return bothOff && fnUsage != nil ? .none : .unknown
+    }
+
+    /// The keys as one short string for running text, e.g. "⌃Space" or
+    /// "⌃Space hoặc 🌐".
+    var inlineText: String {
+        let combo = keys.joined()
+        switch (combo.isEmpty, globeKey) {
+        case (false, true): return String(localized: "\(combo) hoặc 🌐")
+        case (true, true): return "🌐"
+        default: return combo
+        }
     }
 
     /// Keycaps for one `AppleSymbolicHotKeys` entry, or nil if disabled or malformed.

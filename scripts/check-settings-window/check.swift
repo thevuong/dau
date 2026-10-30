@@ -180,10 +180,33 @@ if let grid = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: cellW * cols, 
     try? grid.representation(using: .png, properties: [:])?.write(to: root.appendingPathComponent("matrix-grid.png"))
 }
 
+// (f) Onboarding window (Dau --capture-onboarding, run.sh): 720×500, mockup positions
+// ("OnboardingConflict", "OnboardingEnable", "Onboarding"; window at 50,40 in the
+// artboard), the same in every step and both modes.
+var onboardingResults: [(String, Bool)] = []
+for dirName in ["onboarding", "onboarding-no-shortcut"] {
+    let frames = loadFrames(root.appendingPathComponent(dirName))
+    if frames.isEmpty { fail("\(dirName): no frames.json"); continue }
+    for key in frames.keys.sorted() {
+        let f = frames[key]!
+        var ok = true
+        func bad(_ message: String) { ok = false; fail("\(dirName)/\(key) (f) \(message)") }
+        func near(_ a: CGFloat?, _ b: CGFloat, _ tolerance: CGFloat = 1) -> Bool { a.map { abs($0 - b) <= tolerance } ?? false }
+        if f["window"]?.size != CGSize(width: 720, height: 500) { bad("window \(String(describing: f["window"]))") }
+        if !near(f["onbAppName"]?.minX, 20) || !near(f["onbAppName"]?.minY, 50) { bad("app name at \(String(describing: f["onbAppName"]))") }
+        if !near(f["onbTitle"]?.minX, 266) || !near(f["onbTitle"]?.minY, 40, 2) { bad("title at \(String(describing: f["onbTitle"]))") }
+        if !near(f["onbCard"]?.minX, 266) || !near(f["onbCard"]?.width, 418) { bad("card at \(String(describing: f["onbCard"]))") }
+        if !near(f["onbButtons"]?.maxX, 684) || !near(f["onbButtons"]?.maxY, 472) { bad("buttons at \(String(describing: f["onbButtons"]))") }
+        onboardingResults.append(("\(dirName)/\(key)", ok))
+    }
+}
+
 print("run | mode | a frames | b to edge | c no strip | d scrolled | e positions")
 for (run, mode, c) in results {
     print(([run, mode] + ["a", "b", "c", "d", "e"].map { c[$0]! ? "ok" : "FAIL" }).joined(separator: " | "))
 }
+print("onboarding | f positions")
+for (key, ok) in onboardingResults { print("\(key) | \(ok ? "ok" : "FAIL")") }
 failures.forEach { print("FAIL", $0) }
 print(failures.isEmpty ? "All UI checks passed." : "\(failures.count) check(s) failed.")
 exit(failures.isEmpty ? 0 : 1)

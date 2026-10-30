@@ -43,6 +43,12 @@ enum SettingsSamples {
         smart(method == .vni ? "lan22" : "carr", method)
     }
 
+    /// The hint under the onboarding's try-it field (step 3), for the chosen method.
+    static func tryIt(_ method: DauSettings.TypingMethod) -> TypingExample {
+        let keys = method == .vni ? "to6i ye6u tie61ng Vie65t" : "tooi yeeu tieengs Vieetj"
+        return TypingExample(keys: keys, options: DauSettings(typingMethod: method).engineOptions)
+    }
+
     /// "Thêm dấu cho từ đã gõ" (D20): "hoc" is already in the app, then the nặng key.
     static func addMarks(_ method: DauSettings.TypingMethod) -> TypingExample {
         smart(method == .vni ? "5" : "j", after: "hoc", method)

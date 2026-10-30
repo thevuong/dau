@@ -130,6 +130,7 @@ struct ShortcutKeycaps: View {
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("Phím tắt hiện tại"))
+            .accessibilityAddTraits(.isStaticText)
             .accessibilityValue(Text(verbatim: spokenValue(shortcut)))
         } else {
             // Not readable: keep the placeholder rather than guess (N5).
