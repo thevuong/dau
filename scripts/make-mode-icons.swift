@@ -4,6 +4,10 @@
 // (docs/BRAND.md, "Biểu tượng thanh menu"). Letters are stroked paths, not a font, so
 // no font license is involved.
 //
+// The same image is drawn, tinted white, inside the blue ⌃Space indicator under the
+// caret; that only works when the input mode declares TISIconIsTemplate (Info.plist,
+// docs/COMPATIBILITY.md 6.7). The system cannot draw a text label ("A") for us.
+//
 // TODO(M7): replace with the official identity files (BRAND.md "File cần xuất").
 //
 // Usage: scripts/make-mode-icons.sh (wraps this script and tiffutil).

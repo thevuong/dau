@@ -56,6 +56,7 @@
 	     scripts/make-mode-icons.sh. TextServices.h documents .tif/.icns, paths relative to
 	     Resources. TISIconIsTemplate is not in the public headers but every built-in IMK input
 	     method that ships monochrome icons sets it (AinuIM, TamilIM, PluginIM on macOS 27).
+	     It is repeated in the input mode below (the ⌃Space indicator needs it there).
 	     TODO(M7): official identity files (docs/BRAND.md). -->
 	<key>tsInputMethodIconFileKey</key>
 	<string>ModeVietnamese.tiff</string>
@@ -85,8 +86,18 @@
 				<string>ModeVietnamese.tiff</string>
 				<key>tsInputModePaletteIconFileKey</key>
 				<string>ModeVietnamese.tiff</string>
+				<!-- Required here, not only at bundle level: the mode's TIS property
+				     TSMInputSourcePropertyIconShouldBeTemplate stays false without it. The ⌃Space
+				     indicator under the caret (CursorUIViewService, KLInputSourceIconManager in
+				     KeyboardLayouts.framework) draws third-party sources from the mode's icon
+				     image and its template flag; a non-template icon gives an empty blue bubble
+				     (verified 30/10/2026, macOS 27.2, docs/COMPATIBILITY.md 6.7). -->
+				<key>TISIconIsTemplate</key>
+				<true/>
 				<!-- Undocumented: Apple's TamilIM declares a text label per mode this way
-				     (macOS 27). Kept so the system can draw its own label if it prefers it. -->
+				     (macOS 27). The system does not read it for third-party sources: indicator
+				     and menu bar labels ("A", "VI") come from a table built into
+				     KeyboardLayouts.framework, keyed by Apple's input source IDs (6.7). Harmless. -->
 				<key>TISIconLabels</key>
 				<dict>
 					<key>Primary</key>

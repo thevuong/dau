@@ -226,6 +226,14 @@ Phát hiện ở M3 T2 (`docs/PROGRESS.md` nhật ký 30/10/2026): Terminal xử
 
 Biểu tượng Dấu là ảnh template (BRAND.md). macOS tô ảnh template của bộ gõ bên ngoài bằng một màu chung; ô "A"/"VI" của Apple thì hệ thống tự vẽ từ nhãn và đổi màu riêng theo từng màn hình. Hệ quả: khi màn hình phụ có thanh menu tối (biểu tượng hệ thống màu trắng), ô V của Dấu vẫn đen; chữ V khoét rỗng vẫn để lộ màu nền. Đã thử (chụp thanh menu cả hai màn hình): bỏ cờ template, bỏ hẳn ảnh (macOS hiện biểu tượng mặc định), dùng `.icns` như Apple: không cách nào để hệ thống tự vẽ nhãn cho bộ gõ bên ngoài. Không có cách sửa phía Dấu.
 
+### 6.7 Chỉ báo ⌃Space dưới con trỏ trống — ghi ngày 30/10/2026, đã sửa cùng ngày
+
+- Hiện tượng (đến 55c00bb): chuyển nguồn bằng ⌃Space, bong bóng xanh dưới con trỏ hiện "A" cho U.S. nhưng **trống** cho Dấu.
+- Nguyên nhân (đọc bằng lldb và gọi thử lớp riêng `KLInputSourceIconManager` của `KeyboardLayouts.framework`, macOS 27.2): bong bóng do `CursorUIViewService` (TextInputUIMacHelper) vẽ, lấy ảnh từ `indicatorImageForInputSource:`. Nhãn chữ ("A", "VI", "VI TX") lấy từ bảng `KLDynamicInputSourceIconTable` dựng sẵn trong framework, khoá theo ID nguồn của Apple (291 mục); `TISIconLabels` trong Info.plist không được đọc cho bộ gõ bên ngoài. Nguồn không có trong bảng thì dùng ảnh TIS `TSMInputSourcePropertyIconImage` và cờ `TSMInputSourcePropertyIconShouldBeTemplate`. Cờ này của input mode `….Dau.vi` là `false` dù `TISIconIsTemplate` đặt ở cấp bundle (nguồn cấp bundle thì `true`); với ảnh không phải template, bong bóng trống.
+- Cách sửa: thêm `TISIconIsTemplate = true` vào từ điển của input mode. Cờ TIS đổi ngay khi cài lại, không cần đăng xuất. Bong bóng hiện ô V trắng khoét chữ (cùng ảnh thanh menu), không phải chữ trần như "A": hệ thống không cho bộ gõ bên ngoài nhãn chữ.
+- Kiểm chứng (TextEdit, ⌃Space Dấu → U.S. → Dấu, chụp 0,25 s sau phím): có khoá ở mode: hiện V; bỏ khoá (đối chứng, cùng cách khởi động lại dịch vụ): trống. Thanh menu hai màn hình vẫn đúng. `CursorUIViewService` giữ ảnh cũ trong bộ nhớ đệm và bỏ qua SIGTERM: máy đã cài bản cũ thấy V sau khi đăng xuất, hoặc `killall -9 CursorUIViewService` (dịch vụ tự chạy lại).
+- Không thử (không cần sau khi tìm ra nguyên nhân): ảnh PDF, `TISIconLabels` cấp bundle, nhãn bản địa hoá. Chuyển sang IMK extension (`.appex`) có lẽ cũng không cho nhãn chữ, vì bảng nhãn khoá theo ID của Apple (suy luận, chưa thử).
+
 ## 7. Còn mở
 
 - Phần còn lại của ma trận làm tiếp ở M6 (người dùng chốt 30/10/2026): Zalo, Discord, Messages, Pages, Numbers, Ghostty, Zed, Xcode, WebStorm (và phần còn lại của Mail); kiểm chứng lại Terminal không gửi ⌫ cho bộ gõ (mục 6.5); K5, K6 cho phần lớn app (K6 theo mong đợi mới D4 × D20).
