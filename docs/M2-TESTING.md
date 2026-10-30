@@ -76,7 +76,7 @@ Các dòng cần chép vào bảng: `selectedRange_us` (chi phí của cách A),
 
 Làm trong TextEdit (và lặp lại ở ứng dụng nào có kết quả lạ ở mục 2).
 
-Kết quả (30/10/2026): agent tự gõ qua System Events. Chưa chạy: 9, 10 (chạy lại sau khi bỏ chế độ Anh ở 9680c68), 16 (VoiceOver, cần người); 3 bỏ qua; 14 mới xong một phần.
+Kết quả (30/10/2026): agent tự gõ qua System Events. 9, 10 ĐẠT sau khi bỏ chế độ Anh. Hoãn: 16 (VoiceOver, M3 theo D17) và phần còn lại của 14 (xem biểu tượng V, làm cùng VoiceOver ở M3); 3 bỏ qua (người dùng không cho gửi tin).
 
 | # | Thao tác | Mong đợi | Kết quả |
 |---|---|---|---|
