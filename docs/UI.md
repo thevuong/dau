@@ -27,7 +27,7 @@ Sidebar có icon màu: Gõ phím (xanh dương), Thông minh (tím), Ứng dụn
 **Ứng dụng**
 - Thanh tiêu đề: ô tìm ứng dụng, nút +.
 - "Việt/Anh theo cửa sổ": một hàng "Nhớ nguồn nhập liệu theo từng cửa sổ", gợi ý "Tuỳ chọn “Tự động chuyển sang nguồn đầu vào của tài liệu” của macOS", bên phải chữ trạng thái "Đang bật"/"Đang tắt" (đọc, không ghi, từ cài đặt hệ thống; không đọc được thì không hiện chữ, N5) và nút "Đổi…" mở Cài đặt Bàn phím (D5, N4).
-- "Quy tắc riêng": icon app, tên, nhãn "Đề xuất" nếu đến từ danh sách tương thích, một popup "Không gạch chân/Có gạch chân" (D5, D13). Ghi chú: "“Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ."
+- "Quy tắc riêng": icon app, tên, nhãn "Đề xuất" nếu đến từ danh sách tương thích, một popup "Không gạch chân/Có gạch chân" (D5, D13). Ghi chú: "“Đề xuất” đến từ danh sách tương thích." Câu "Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ." (mockup) chỉ thêm lại khi M3 đo được gạch chân sửa được lỗi (N5; người dùng chốt 30/10/2026).
 
 **Cập nhật & hỗ trợ**
 - Thẻ đầu: icon app, phiên bản, trạng thái kiểm tra, nút "Kiểm tra ngay".

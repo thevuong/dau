@@ -961,12 +961,12 @@
         }
       }
     },
-    "“Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ. [Gạch chân — có ở bản sau (M3)]" : {
+    "“Đề xuất” đến từ danh sách tương thích. [Gạch chân — có ở bản sau (M3)]" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ. [Gạch chân — có ở bản sau (M3)]"
+            "value" : "“Đề xuất” đến từ danh sách tương thích. [Gạch chân — có ở bản sau (M3)]"
           }
         }
       }

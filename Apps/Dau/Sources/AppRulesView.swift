@@ -71,8 +71,9 @@ struct AppRulesView: View {
                     }
                 }
             } footer: {
-                // N5: underlining (D13) is not in the input method yet.
-                Hint(Text("“Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ. [Gạch chân — có ở bản sau (M3)]"))
+                // N5: underlining (D13) is not in the input method yet. The advice on when to
+                // choose it comes back once M3 measures that it fixes the app.
+                Hint(Text("“Đề xuất” đến từ danh sách tương thích. [Gạch chân — có ở bản sau (M3)]"))
                     .padding(.horizontal, 4)
             }
         }
