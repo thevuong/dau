@@ -34,23 +34,26 @@ func draw(_ letter: Character, in ctx: CGContext) {
                        cornerWidth: 4, cornerHeight: 4, transform: nil))
     ctx.fillPath()
 
-    // The letter is erased from the badge (transparent), not drawn on top of it.
+    // The letter is erased from the badge (transparent), not drawn on top of it. It is a
+    // filled outline, not a stroke, so its box is exact: 9 × 8.5 pt centred in the badge,
+    // the size of the system's "A" (measured 30/10/2026: 18 × 17 px on a Retina menu bar).
     ctx.setBlendMode(.clear)
-    ctx.setStrokeColor(CGColor(gray: 0, alpha: 1))
-    ctx.setLineWidth(2.0)
-    ctx.setLineJoin(.miter)
+    ctx.setFillColor(CGColor(gray: 0, alpha: 1))
     let path = CGMutablePath()
     switch letter {
     case "V":
-        ctx.setLineCap(.butt)
-        path.move(to: CGPoint(x: 7.3, y: 12.4))
-        path.addLine(to: CGPoint(x: 11.0, y: 3.6))
-        path.addLine(to: CGPoint(x: 14.7, y: 12.4))
+        path.addLines(between: [
+            CGPoint(x: 6.5, y: 12.25), CGPoint(x: 8.3, y: 12.25),   // left arm, top
+            CGPoint(x: 11.0, y: 5.875),                              // inner apex
+            CGPoint(x: 13.7, y: 12.25), CGPoint(x: 15.5, y: 12.25), // right arm, top
+            CGPoint(x: 11.9, y: 3.75), CGPoint(x: 10.1, y: 3.75),   // flat base
+        ])
+        path.closeSubpath()
     default:
         fatalError("unknown letter")
     }
     ctx.addPath(path)
-    ctx.strokePath()
+    ctx.fillPath()
 }
 
 func writePNG(_ letter: Character, scale: Int, name: String) throws {
