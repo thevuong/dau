@@ -37,7 +37,7 @@
         }
       }
     },
-    "com.example.dau.inputmethod.Dau.vi" : {
+    "com.codefastlabs.dau.inputmethod.Dau.vi" : {
       "comment" : "Input mode name shown in the input source menu (D2, D24). Key = mode ID in Info.plist.",
       "extractionState" : "manual",
       "localizations" : {

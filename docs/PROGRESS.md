@@ -3,11 +3,11 @@
 Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị nén) tiếp tục đúng chỗ. Phiên chính cập nhật file này sau mỗi bước.
 
 ## Trạng thái hiện tại
-- Mốc đang làm: M3 (chưa bắt đầu). M2 và M4 đã đóng (kiểm toán lần 3 ĐẠT, 30/10/2026). Việc hoãn: VoiceOver (D17) và biểu tượng V → M3; VoiceOver/Tab trong Cài đặt, máy tiếng Anh hẳn, sheet chế độ tối → M7; reset khi đổi nguồn không qua `activateServer`, tự sửa chính tả (D4) → M3. Test hiện tại: engine 76, DauShared 21, IMK 25, snapshot-settings 10. M0, M1 đã đóng. Việc đang chờ người dùng: Bundle ID (placeholder `com.example.dau`).
-- Việc đang chờ người dùng: Bundle ID (placeholder `com.example.dau`). Team ID: Personal Team miễn phí `M58DANM3ZP` (30/10/2026), ký tự động "Apple Development"; bản phát hành dùng Developer ID ở M7.
+- Mốc đang làm: M3 (chưa bắt đầu). M2 và M4 đã đóng (kiểm toán lần 3 ĐẠT, 30/10/2026). Việc hoãn: VoiceOver (D17) và biểu tượng V → M3; VoiceOver/Tab trong Cài đặt, máy tiếng Anh hẳn, sheet chế độ tối → M7; reset khi đổi nguồn không qua `activateServer`, tự sửa chính tả (D4) → M3. Test hiện tại: engine 76, DauShared 21, IMK 25, snapshot-settings 10. M0, M1 đã đóng. Bundle ID đã chốt `com.codefastlabs.dau` (D24).
+- Việc đang chờ người dùng: bật nguồn nhập liệu mới `com.codefastlabs.dau.inputmethod.Dau.vi` sau khi đổi Bundle ID. Team ID: Personal Team miễn phí `M58DANM3ZP` (30/10/2026), ký tự động "Apple Development"; bản phát hành dùng Developer ID ở M7.
 - M1a xong: `docs/OPENKEY-NOTES.md` (commit b0739c7).
 - M0: khung xong (commit b2a331d, 06f0dcb, 6fe660b), phiên chính đã kiểm chứng lại: xcodegen + build Debug 2 target với `-destination 'generic/platform=macOS'` ra `x86_64 arm64`, swift test 2 package xanh, bộ gõ không có network.client. Tên hiển thị "Dấu" cho locale `en` đã sửa (0b188dd). **Kiểm toán M0: ĐẠT.**
-- Chốt kỹ thuật M0: Debug lệnh trơn chỉ build arm64 (Xcode 27.1 build package local theo kiến trúc máy); Debug universal dùng `-destination 'generic/platform=macOS'`, Release luôn universal. CI (M7) phải dùng destination này. ID input mode viết cứng trong `Apps/DauInputMethod/Info.plist` và `InfoPlist.xcstrings` — đổi Bundle ID phải sửa cả hai.
+- Chốt kỹ thuật M0: Debug lệnh trơn chỉ build arm64 (Xcode 27.1 build package local theo kiến trúc máy); Debug universal dùng `-destination 'generic/platform=macOS'`, Release luôn universal. CI (M7) phải dùng destination này. ID input mode viết cứng trong `Apps/DauInputMethod/Info.plist` và `InfoPlist.xcstrings` (Xcode không thay biến trong khoá plist, đã thử 30/10/2026) — đổi Bundle ID phải sửa cả hai.
 - Môi trường: Xcode 27.1 ở `/Applications/Xcode.app` nhưng `xcode-select` đang trỏ CommandLineTools → mọi lệnh build dùng `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`. Swift 6.4.
 
 ## Kế hoạch M0 + M1

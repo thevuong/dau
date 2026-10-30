@@ -46,8 +46,8 @@ struct SettingsStoreTests {
 
     @Test("notification name is derived from the suite")
     func notificationName() {
-        #expect(SettingsStore.changeNotificationName(suiteName: "TEAM.com.example.dau")
-                == "TEAM.com.example.dau.settingsDidChange")
+        #expect(SettingsStore.changeNotificationName(suiteName: "TEAM.com.codefastlabs.dau")
+                == "TEAM.com.codefastlabs.dau.settingsDidChange")
     }
 
     @Test("App Group ID is read from Info.plist; unexpanded or empty values are ignored")
@@ -65,7 +65,7 @@ struct SettingsStoreTests {
             try data.write(to: contents.appendingPathComponent("Info.plist"))
             return try #require(Bundle(url: url))
         }
-        #expect(SettingsStore.appGroupIdentifier(in: try bundle("TEAM.com.example.dau")) == "TEAM.com.example.dau")
+        #expect(SettingsStore.appGroupIdentifier(in: try bundle("TEAM.com.codefastlabs.dau")) == "TEAM.com.codefastlabs.dau")
         #expect(SettingsStore.appGroupIdentifier(in: try bundle("$(APP_GROUP_ID)")) == nil)
         #expect(SettingsStore.appGroupIdentifier(in: try bundle("")) == nil)
         #expect(SettingsStore.appGroupIdentifier(in: try bundle(nil)) == nil)

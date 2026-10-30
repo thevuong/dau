@@ -4,7 +4,7 @@ Mục tiêu: kiểm chứng app Cài đặt và bộ gõ dùng chung cài đặt
 
 ## Chuẩn bị
 1. Cài lại bản Debug: `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer scripts/install-debug.sh`.
-2. Mở Console.app, lọc subsystem `com.example.dau.inputmethod.Dau`, category `settings` và `perf`.
+2. Mở Console.app, lọc subsystem `com.codefastlabs.dau.inputmethod.Dau`, category `settings` và `perf`.
 3. Chạy app chủ bản Debug (`Dau.app` trong thư mục build mà script in ra).
 
 Lưu ý: kiểu gõ đã chọn ở M2 không được chuyển sang cài đặt mới, nên bộ gõ quay về Telex.

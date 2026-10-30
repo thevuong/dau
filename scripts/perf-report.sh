@@ -35,7 +35,7 @@ SUBSYSTEM="${DAU_IM_BUNDLE_ID:-}"
 if [[ -z "$SUBSYSTEM" && -f "$INSTALLED_PLIST" ]]; then
   SUBSYSTEM="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$INSTALLED_PLIST" 2>/dev/null || true)"
 fi
-SUBSYSTEM="${SUBSYSTEM:-com.example.dau.inputmethod.Dau}"
+SUBSYSTEM="${SUBSYSTEM:-com.codefastlabs.dau.inputmethod.Dau}"
 
 read_log() {
   if [[ -n "$INPUT" ]]; then

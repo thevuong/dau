@@ -65,18 +65,20 @@
 	     English is typed with the system's ABC/U.S. source). The mode is kept, rather than
 	     declaring the bundle alone, so the input source ID users already enabled
 	     ("….Dau.vi") does not change and the source stays in the Vietnamese group.
-	     Input mode IDs are literal: Xcode does not expand build settings in plist keys.
+	     Input mode IDs are literal: Xcode expands build settings in plist values but not in
+	     keys (checked 30/10/2026, Xcode 27.1: a "$(PRODUCT_BUNDLE_IDENTIFIER).vi" key stays
+	     unexpanded in the built Info.plist), and the String Catalog key below is literal too.
 	     They must start with this bundle's identifier. When BUNDLE_ID_PREFIX changes in
-	     project.yml, update every "com.example.dau.inputmethod.Dau.vi" here AND the matching
-	     key in Resources/InfoPlist.xcstrings (display name "Dấu – Tiếng Việt"). -->
+	     project.yml, update every "com.codefastlabs.dau.inputmethod.Dau.vi" here AND the
+	     matching key in Resources/InfoPlist.xcstrings (display name "Dấu – Tiếng Việt"). -->
 	<key>ComponentInputModeDict</key>
 	<dict>
 		<key>tsInputModeListKey</key>
 		<dict>
-			<key>com.example.dau.inputmethod.Dau.vi</key>
+			<key>com.codefastlabs.dau.inputmethod.Dau.vi</key>
 			<dict>
 				<key>TISInputSourceID</key>
-				<string>com.example.dau.inputmethod.Dau.vi</string>
+				<string>com.codefastlabs.dau.inputmethod.Dau.vi</string>
 				<key>tsInputModeMenuIconFileKey</key>
 				<string>ModeVietnamese.tiff</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
@@ -104,7 +106,7 @@
 		</dict>
 		<key>tsVisibleInputModeOrderedArrayKey</key>
 		<array>
-			<string>com.example.dau.inputmethod.Dau.vi</string>
+			<string>com.codefastlabs.dau.inputmethod.Dau.vi</string>
 		</array>
 	</dict>
 </dict>

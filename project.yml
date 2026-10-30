@@ -1,8 +1,9 @@
 # XcodeGen spec for Dấu. Generate the project with `xcodegen generate`.
 # Dau.xcodeproj is generated and git-ignored: edit this file, never the .xcodeproj.
 #
-# Placeholders (D24 — ask the user before changing):
-#   BUNDLE_ID_PREFIX  reverse-DNS prefix; real value not chosen yet.
+# BUNDLE_ID_PREFIX is settled in D24 (com.codefastlabs.dau, from the domain dau.codefastlabs.com);
+# ask the user before changing it. The input mode ID is hard-coded in
+# Apps/DauInputMethod/Info.plist and Resources/InfoPlist.xcstrings: update both with it.
 # DEVELOPMENT_TEAM is the maintainer's free Personal Team (M58DANM3ZP). Builds are signed
 # "Apple Development" with automatic signing: the App Group needs a real Team ID, macOS
 # rejects it for ad-hoc signed builds (see DECISIONS.md). To build under another team, pass
@@ -13,7 +14,7 @@
 name: Dau
 
 options:
-  bundleIdPrefix: com.example.dau
+  bundleIdPrefix: com.codefastlabs.dau
   deploymentTarget:
     macOS: "14.0"
   developmentLanguage: vi
@@ -29,7 +30,7 @@ packages:
 
 settings:
   base:
-    BUNDLE_ID_PREFIX: com.example.dau
+    BUNDLE_ID_PREFIX: com.codefastlabs.dau
     # App Group shared by the host app and the input method (settings, compatibility list).
     # TeamIdentifierPrefix is "M58DANM3ZP." (empty only for ad-hoc builds).
     APP_GROUP_ID: $(TeamIdentifierPrefix)$(BUNDLE_ID_PREFIX).shared
