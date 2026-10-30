@@ -147,3 +147,12 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 30/10/2026 — kiểm toán M3 lần 3 — auditor — ĐẠT. Đóng M3 — phiên chính
 - 30/10/2026 — biểu tượng nguồn nhập liệu theo góp ý người dùng (không giống kiểu hệ thống, cỡ lệch với "A"): vẽ lại thành ô tô đặc 22 × 16 pt, chữ V khoét rỗng 9 × 8,5 pt, đo khớp ô "A" trên thanh menu Retina (36c2771, 8c45ac0). Người dùng cấp quyền Ghi màn hình để phiên chính tự chụp kiểm tra. Ảnh cũ trong bộ đệm của `TextInputMenuAgent` chỉ đổi sau khi khởi động lại tiến trình đó. Ô chỉ báo khi ⌃Space trống và màu sai ở màn hình phụ: xem dòng sau — phiên chính
 - 30/10/2026 — ô chỉ báo ⌃Space trống + ô V đen ở thanh menu tối màn hình phụ: cùng một nguyên nhân, `TISIconIsTemplate` chỉ ở cấp bundle, cờ của input mode là false. Thêm cờ ở cấp mode — imk-dev (bcb1227; tìm bằng lldb: ô chỉ báo do `CursorUIViewService` vẽ, nhãn chữ chỉ có cho ID nguồn của Apple). Phiên chính chụp kiểm: ô chỉ báo hiện ô V trắng; thanh menu xám trên nền sáng, trắng trên nền tối ở cả hai màn hình. Ghi chú: `CursorUIViewService` giữ ảnh cũ, cần đăng xuất hoặc `killall -9 CursorUIViewService` trên máy đã cài bản cũ — phiên chính
+
+## Kế hoạch M5 (30/10/2026)
+| # | Việc | Agent | Song song |
+|---|---|---|---|
+| T1 | Trả lời câu hỏi mở: `TISRegisterInputSource`/`TISEnableInputSource` từ app chủ có cần người dùng xác nhận, có phải đăng xuất lần đầu không; app chủ có sandbox chép được bộ gõ vào `~/Library/Input Methods` không (temporary-exception); cách các bộ gõ mở cài/gỡ; danh sách bundle ID bộ gõ tiếng Việt cũ | researcher | cùng T2 |
+| T2 | Giao diện onboarding 3 bước theo artboard (OnboardingConflict, OnboardingEnable, Onboarding), dịch vụ cài/bật/phát hiện để giao diện gọi qua protocol, hiện đúng phím tắt hệ thống | app-ui-dev | cùng T1 |
+| T3 | Dịch vụ cài đặt thật: chép bộ gõ nhúng sẵn, đăng ký, bật (người dùng bấm, N4) có Hoàn tác, nâng cấp bản mới (dừng tiến trình cũ), gỡ cài đặt (D16, sheet xác nhận) | imk-dev (+ app-ui-dev nối giao diện) | sau T1 |
+| T4 | Thử trên máy: gỡ bản Debug hiện tại rồi chạy onboarding từ đầu (cần người dùng đồng ý vì đổi nguồn nhập liệu đang bật) | phiên chính + người dùng | sau T3 |
+| T5 | Kiểm toán M5 | auditor | cuối |
