@@ -22,7 +22,7 @@ Mỗi mốc kết thúc khi: test xanh, đã tự rà soát với `DECISIONS.md`
 ## M3 — Độ tin cậy
 - Reset khi lệch ngữ cảnh, phòng thủ đầu vào IMK (D18), fallback marked text theo danh sách tương thích (D13), quy tắc theo ứng dụng (D5), kiểm chứng bằng VoiceOver rằng hệ thống tự đọc tên nguồn nhập liệu khi chuyển (D17).
 - Ma trận tương thích: bảng app × kết quả, lưu trong `docs/COMPATIBILITY.md`.
-- Reset khi nguồn nhập liệu đổi mà bộ gõ không nhận `activateServer` (đo 30/10/2026: chọn lại Dấu bằng `TISSelectInputSource` từ tiến trình khác thì từ đang gõ dở không được reset, `to` → U.S. → Dấu → `o` ra "tô"; chuyển bằng ⌃Space thì đúng).
+- Reset khi nguồn nhập liệu đổi mà bộ gõ không nhận `activateServer` — xong (8ab965e). Đo 30/10/2026 lúc M2: chọn lại Dấu bằng `TISSelectInputSource` từ tiến trình khác thì từ đang gõ dở không được reset. Kịch bản đo cũ (`to` → U.S. → Dấu → `o` ra "tô") nay không còn là lỗi: "tô" là hành vi của D20 sau sự kiện reset (D4 × D20). Bản sửa được kiểm bằng `to⇄cj␣` → "tocj" (tắt bộ nghe để đối chứng: "tọc").
 - Ghi tự sửa chính tả của macOS (D4, giới hạn đã biết) vào ma trận tương thích.
 
 ## M4 — App Cài đặt
@@ -35,13 +35,14 @@ Mỗi mốc kết thúc khi: test xanh, đã tự rà soát với `DECISIONS.md`
 - App test tự gửi phím 20 phím/giây vào TextEdit, Safari, Telegram trong khi CPU đầy và `memory_pressure` đang chạy.
 - Chỉ số: văn bản cuối khớp 100%; độ trễ p50/p99 phía bộ gõ; bộ nhớ ổn định theo thời gian. So với gõ bằng ABC và với OpenKey.
 - Chốt ngưỡng vào `DECISIONS.md`; quyết định về D12 dựa trên số đo.
+- Chạy tiếp ma trận tương thích `docs/COMPATIBILITY.md` (người dùng chốt 30/10/2026): Zalo, Discord, Messages, Pages, Numbers, Ghostty, Zed, Xcode, WebStorm; kiểm lại Terminal không gửi ⌫ cho bộ gõ; K5, K6 cho phần lớn app (K6 theo D4 × D20).
 
 ## M7 — Phát hành
 - Ký Developer ID, notarize, DMG; Sparkle 2 (EdDSA, 2 kênh, phát hành theo đợt); JSON tương thích có chữ ký; GitHub Actions build từ tag + artifact attestation; Homebrew cask với `auto_updates true`.
 - Báo lỗi (URL issue điền sẵn), Quay về bản trước, Gỡ cài đặt.
 - Xuất bộ file nhận diện theo `docs/BRAND.md` (biểu tượng app, ảnh template thanh menu, favicon, ảnh Open Graph, ảnh xem trước GitHub, nền DMG) và gắn thẻ meta cho website.
 - Việc cần tài khoản Apple Developer: chuẩn bị sẵn, dừng lại để người dùng thực hiện.
-- Kiểm tra trước phát hành (cần người, hoãn từ M4): VoiceOver và Tab ("Điều hướng bàn phím") qua cửa sổ Cài đặt; VoiceOver đọc đúng tên "Dấu – Tiếng Việt" khi chuyển nguồn (M3 mới xác nhận là hệ thống có đọc, D17); máy để tiếng Anh hẳn (menu app, tên "Dấu" trong Finder); các sheet ở chế độ tối.
+- Kiểm tra trước phát hành (cần người, hoãn từ M4): VoiceOver và Tab ("Điều hướng bàn phím") qua cửa sổ Cài đặt; VoiceOver đọc đúng tên "Dấu – Tiếng Việt" khi chuyển nguồn (M3 mới xác nhận là hệ thống có đọc, D17); biểu tượng "V" trên thanh menu đơn sắc, đổi màu theo nền sáng/tối (hoãn từ M2/M3, người dùng chốt 30/10/2026); máy để tiếng Anh hẳn (menu app, tên "Dấu" trong Finder); các sheet ở chế độ tối.
 
 ## M8 — Website
 - Dựng trang tải về theo `docs/UI.md` (mục "Trang tải về") và `docs/BRAND.md`: trang tĩnh, responsive, thẻ meta và ảnh Open Graph, favicon. Công nghệ chọn ở đầu mốc và hỏi người dùng.

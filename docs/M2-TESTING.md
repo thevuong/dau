@@ -76,7 +76,7 @@ Các dòng cần chép vào bảng: `selectedRange_us` (chi phí của cách A),
 
 Làm trong TextEdit (và lặp lại ở ứng dụng nào có kết quả lạ ở mục 2).
 
-Kết quả (30/10/2026): agent tự gõ qua System Events. 9, 10 ĐẠT sau khi bỏ chế độ Anh. Hoãn: 16 (VoiceOver, M3 theo D17) và phần còn lại của 14 (xem biểu tượng V, làm cùng VoiceOver ở M3); 3 bỏ qua (người dùng không cho gửi tin).
+Kết quả (30/10/2026): agent tự gõ qua System Events. 9, 10 ĐẠT sau khi bỏ chế độ Anh. 16 (VoiceOver): hệ thống có đọc mỗi lần chuyển nguồn (người dùng, 30/10/2026); kiểm tên đọc đúng hoãn sang M7. Phần còn lại của 14 (xem biểu tượng V) hoãn sang M7 (người dùng chốt 30/10/2026). 3 bỏ qua (người dùng không cho gửi tin). Mong đợi của 6 và 10 đã sửa theo D4 × D20 (DECISIONS D20, 30/10/2026); kết quả ĐẠT ở M2 của hai dòng này là theo mong đợi cũ, trước khi có D20.
 
 | # | Thao tác | Mong đợi | Kết quả |
 |---|---|---|---|
@@ -85,17 +85,17 @@ Kết quả (30/10/2026): agent tự gõ qua System Events. 9, 10 ĐẠT sau khi
 | 3 | Trong Telegram (Saved Messages): gõ `carr` rồi nhấn Return | tin nhắn gửi đi là "car" (thay chữ xong trước khi Return được xử lý) | Bỏ qua: người dùng không cho gửi tin nhắn |
 | 4 | Gõ `to`, click chuột vào chỗ khác trong văn bản, gõ `o` | chỉ thêm "o" ở chỗ mới; chữ "to" cũ không đổi | ĐẠT |
 | 5 | Gõ `tooi`, click vào chỗ khác, gõ `s` | chỉ thêm "s" ở chỗ mới; "tôi" cũ không đổi | ĐẠT |
-| 6 | Gõ `tooi`, nhấn ←, gõ `s` | thêm "s" ở vị trí con trỏ, không bỏ dấu vào "tôi" (D4: mũi tên chỉ reset) | ĐẠT. Ghi chú: lần ← đầu sau một từ gõ dở bị macOS/TextEdit nuốt (với U.S. cũng vậy); lần ← thứ hai mới chạy, Dấu ghi log reset |
+| 6 | Gõ `tooi`, nhấn ←, gõ `s` | D20 bật (mặc định): "tối" — ← chỉ xoá bộ đệm, không chặn D20; phím dấu đặt dấu vào chữ ngay trước con trỏ ("tô" → "tố"), "i" sau con trỏ giữ nguyên (D4 × D20). D20 tắt: thêm "s" ở vị trí con trỏ ("tôsi") | ĐẠT ở M2 theo mong đợi cũ (thêm "s", không bỏ dấu; trước khi có D20). Ghi chú: lần ← đầu sau một từ gõ dở bị macOS/TextEdit nuốt (với U.S. cũng vậy); lần ← thứ hai mới chạy, Dấu ghi log reset |
 | 7 | Chọn một đoạn chữ bằng chuột, gõ `tooi` | đoạn chọn bị thay bằng "tôi" | ĐẠT |
 | 8 | Gõ `tooi`, nhấn ⌘Z | ứng dụng hoàn tác bình thường, không lỗi | ĐẠT (⌘Z hoàn tác bình thường) |
 | 9 | Chuyển sang ABC (hoặc U.S.) bằng phím tắt nguồn nhập liệu của macOS, gõ `tooi` | "tooi" (D2: tiếng Anh dùng nguồn của hệ thống) | ĐẠT (30/10, ⌃Space, 2/2 lần): "tôi" → U.S. → "tooi" giữ nguyên |
-| 10 | Chuyển lại "Dấu – Tiếng Việt", gõ `tooi` | "tôi"; chữ đang gõ dở trước khi chuyển không bị sửa (D4: đổi nguồn chỉ reset) | ĐẠT với ⌃Space: `to`, đổi nguồn đi rồi về, `o` ra "too" (đã reset). Chọn lại Dấu bằng `TISSelectInputSource` từ tiến trình khác thì không reset ("tô") — việc của M3 (ROADMAP) |
+| 10 | Chuyển lại "Dấu – Tiếng Việt", gõ `tooi` | "tôi". Đổi nguồn giữa chừng một từ chỉ xoá bộ đệm (D4), không chặn D20: D20 bật (mặc định) thì `to`, đổi nguồn đi rồi về, `o` → "tô" (D20 đọc lại "to", D4 × D20); D20 tắt thì ra "too" | ĐẠT ở M2 với ⌃Space theo mong đợi cũ (trước khi có D20): `to`, đổi nguồn đi rồi về, `o` ra "too" (đã reset). Chọn lại Dấu bằng `TISSelectInputSource` từ tiến trình khác thì không reset ("tô"); M3 đã sửa (8ab965e, nghe `kTISNotifySelectedKeyboardInputSourceChanged`) và kiểm bằng `to⇄cj␣` → "tocj" (ARCHITECTURE.md), vì "tô" nay là hành vi của D20 |
 | 11 | Menu nguồn nhập liệu: có nhóm "Kiểu gõ" với Telex ✓ / VNI / Telex đơn giản và mục "Mở cài đặt Bàn phím…" | đúng như mô tả, chữ có dấu, tên "Dấu" | ĐẠT: Kiểu gõ Telex ✓ / VNI / Telex đơn giản, "Cài đặt Dấu…", "Mở cài đặt Bàn phím…"; chữ có dấu đúng |
 | 12 | Chọn VNI trong menu, gõ `to6i` | "tôi"; mở menu lại thấy VNI ✓. Chọn lại Telex sau khi thử | ĐẠT: `to6i` → "tôi", menu VNI ✓, đã chọn lại Telex |
 | 13 | Bấm "Mở cài đặt Bàn phím…" | Cài đặt hệ thống mở đúng mục Bàn phím (N4) | ĐẠT |
-| 14 | Biểu tượng trên thanh menu khi chọn Dấu; danh sách "+" của Nguồn đầu vào | "V" đơn sắc, đổi màu theo nền sáng/tối. Dấu chỉ có "Dấu – Tiếng Việt" trong nhóm Tiếng Việt, không có "Dấu – Tiếng Anh" ở nhóm Tiếng Anh (D2) | Một phần: không chụp được thanh menu; bundle khai báo biểu tượng V. Danh sách "+" chưa xem lại sau 9680c68 |
+| 14 | Biểu tượng trên thanh menu khi chọn Dấu; danh sách "+" của Nguồn đầu vào | "V" đơn sắc, đổi màu theo nền sáng/tối. Dấu chỉ có "Dấu – Tiếng Việt" trong nhóm Tiếng Việt, không có "Dấu – Tiếng Anh" ở nhóm Tiếng Anh (D2) | Một phần: không chụp được thanh menu; bundle khai báo biểu tượng V. Danh sách "+" chưa xem lại sau 9680c68. Phần xem biểu tượng V hoãn sang M7 (người dùng chốt 30/10/2026) |
 | 15 | Mở bảng Emoji (fn/🌐 E hoặc ⌃⌘Space), chèn một emoji, gõ tiếp `tooi` | không treo, không mất chữ (D18) | ĐẠT: "❤️ tôi", không treo |
-| 16 | Bật VoiceOver (⌘F5), chuyển "Dấu – Tiếng Việt" ↔ ABC bằng phím tắt nguồn nhập liệu | hệ thống tự đọc tên nguồn; Dấu không đọc thêm (D17). Hệ thống không đọc thì ghi lại để xét lại D17 | Chưa chạy (cần người) |
+| 16 | Bật VoiceOver (⌘F5), chuyển "Dấu – Tiếng Việt" ↔ ABC bằng phím tắt nguồn nhập liệu | hệ thống tự đọc tên nguồn; Dấu không đọc thêm (D17). Hệ thống không đọc thì ghi lại để xét lại D17 | ĐẠT phần chính (người dùng, 30/10/2026): mỗi lần chuyển nguồn bằng ⌃Space hệ thống có đọc, Dấu không đọc thêm (đúng D17). Chưa xác nhận đọc đúng tên "Dấu – Tiếng Việt" (người dùng không nghe rõ): kiểm ở M7 |
 | 17 | Gõ ở ô mật khẩu (ví dụ ô mật khẩu trong Safari) | ghi lại hành vi (macOS thường tự chuyển bàn phím ASCII ở ô bảo mật) | Ghi lại: ở ô bảo mật macOS giữ `com.apple.keylayout.US`, Dấu không nhận phím nào |
 
 ## 5. Gửi lại

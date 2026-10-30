@@ -3,7 +3,7 @@
 Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị nén) tiếp tục đúng chỗ. Phiên chính cập nhật file này sau mỗi bước.
 
 ## Trạng thái hiện tại
-- Mốc đang làm: M3 (chưa bắt đầu). M2 và M4 đã đóng (kiểm toán lần 3 ĐẠT, 30/10/2026). Việc hoãn: VoiceOver (D17) và biểu tượng V → M3; VoiceOver/Tab trong Cài đặt, máy tiếng Anh hẳn, sheet chế độ tối → M7; reset khi đổi nguồn không qua `activateServer`, tự sửa chính tả (D4) → M3. Test hiện tại: engine 76, DauShared 21, IMK 25, snapshot-settings 10. M0, M1 đã đóng. Bundle ID đã chốt `com.codefastlabs.dau` (D24).
+- Mốc đang làm: M3 — các việc T1–T7 đã xong; kiểm toán M3 lần 1 (30/10/2026) CHƯA ĐẠT chỉ vì tài liệu (một xung đột D4 × D20 chưa ghi; người dùng chốt D20 thắng, đã ghi ở 9b32e00); sửa tài liệu ở lượt dọn tài liệu (nhật ký cuối file), chờ kiểm toán lại. M0, M1, M2, M4 đã đóng. Việc hoãn: biểu tượng V, VoiceOver đọc đúng tên nguồn (D17), VoiceOver/Tab trong Cài đặt, máy tiếng Anh hẳn, sheet chế độ tối → M7; phần còn lại của ma trận tương thích (Zalo, Discord, Messages, Pages, Numbers, Ghostty, Zed, Xcode, WebStorm, Terminal ⌫, K5/K6) → M6. Test hiện tại: engine 77, DauShared 32, IMK 70, snapshot-settings 10. Bundle ID đã chốt `com.codefastlabs.dau` (D24).
 - Việc đang chờ người dùng: bật nguồn nhập liệu mới `com.codefastlabs.dau.inputmethod.Dau.vi` sau khi đổi Bundle ID. Team ID: Personal Team miễn phí `M58DANM3ZP` (30/10/2026), ký tự động "Apple Development"; bản phát hành dùng Developer ID ở M7.
 - M1a xong: `docs/OPENKEY-NOTES.md` (commit b0739c7).
 - M0: khung xong (commit b2a331d, 06f0dcb, 6fe660b), phiên chính đã kiểm chứng lại: xcodegen + build Debug 2 target với `-destination 'generic/platform=macOS'` ra `x86_64 arm64`, swift test 2 package xanh, bộ gõ không có network.client. Tên hiển thị "Dấu" cho locale `en` đã sửa (0b188dd). **Kiểm toán M0: ĐẠT.**
@@ -25,7 +25,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | M0 Khung dự án | xong | ĐẠT (29/10) | build Debug universal cần `-destination generic/platform=macOS` |
 | M1 Engine | xong | ĐẠT (29/10, lần 2) | Telex, Telex đơn giản, VNI, 75 test; release ~0,15 µs/phím; 0 từ sai / 474 từ, 0 khôi phục nhầm / 15.796 âm tiết, fuzz 800k thao tác không crash |
 | M2 Bộ gõ tối thiểu | xong | ĐẠT (30/10, lần 3; lần 1, 2 CHƯA ĐẠT vì tài liệu) | cách A; tự gõ 30 ms/phím đúng ở TextEdit, Safari, Chrome, VS Code, Terminal, Telegram (thay Slack); Sublime gõ tay; selectedRange p50 0,2–0,6 ms (Debug). M2-TESTING mục 4 ĐẠT trừ việc hoãn (VoiceOver, biểu tượng V → M3; Telegram Return bỏ qua). Test engine 76, IMK 25 |
-| M3 Độ tin cậy | chưa | — | |
+| M3 Độ tin cậy | việc xong, chờ kiểm toán lại | lần 1 CHƯA ĐẠT (30/10, tài liệu) | gạch chân D13 (T1), D20 + reset khi đổi nguồn không báo (T2), danh sách đề xuất có Firefox (T3, 94ada11), ma trận `COMPATIBILITY.md` (T5, T6), ⌫ Chromium (08f3281), VoiceOver có đọc (T7). Hoãn: V, tên VoiceOver → M7; ma trận còn lại → M6. Test engine 77, DauShared 32, IMK 70, snapshot 10 |
 | M4 App Cài đặt | xong | ĐẠT (30/10, lần 3) | DauShared + cửa sổ 4 mục (2d6206e, c731c61); bộ gõ đọc cài đặt chung (0aa4872). App Group chạy với Team ID M58DANM3ZP (958a5a8). Bỏ chế độ Anh, quy tắc theo app chỉ còn gạch chân (9680c68, ea676ae, b23b266). M4-TESTING ĐẠT trừ việc hoãn sang M7 (máy tiếng Anh hẳn, sheet tối, VoiceOver/Tab). Ma trận UI 12/12. Test DauShared 21, IMK 25, snapshot-settings 10 |
 | M5 Onboarding, cài, gỡ | chưa | — | |
 | M6 Hiệu năng dưới tải | chưa | — | |
@@ -35,6 +35,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 ## Ghi nhớ cho M7 (từ kiểm toán M0)
 - Bản Release ký ad-hoc vẫn có `get-task-allow`; phải bỏ trước notarize. Hardened runtime mới chỉ ở Release.
 - `.gitignore` bỏ qua `Package.resolved` → ghim phiên bản Sparkle chính xác trong `project.yml`.
+- Thử bỏ `temporary-exception.mach-register.global-name` của bộ gõ khi rà entitlement trước notarize (hoãn từ M3, ARCHITECTURE.md).
 - Thêm `*.p8`, `*.pem`, `*.key`, `*.xcarchive` vào `.gitignore`.
 - UI.md onboarding viết cứng "⌃Space" — phải hiện phím tắt hệ thống thật (N5), xử lý ở M5.
 - `en.lproj` khiến menu hệ thống có thể hiện tiếng Anh trên máy tiếng Anh — quyết định ở M4.
@@ -139,3 +140,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 30/10/2026 — M3 T3+T4: danh sách tương thích có sẵn (`Apps/Dau/Resources/CompatibilityList.json`, 12 app Electron/Chromium + VS Code, không Terminal), mục "Đề xuất" riêng với nút "Bật gạch chân" (người dùng góp ý: đề xuất phải mang nghĩa nên gạch chân), mở lại lựa chọn gạch chân và công tắc D20 — app-ui-dev (e7da5e6, 83ebc48); test DauShared 32, IMK 64, snapshot 10; ma trận UI 12/12; artboard SettingsApps cập nhật
 - 30/10/2026 — D17: người dùng bật VoiceOver, mỗi lần chuyển nguồn (⌃Space) hệ thống có đọc → Dấu không tự thông báo (đúng D17). Chưa xác nhận VoiceOver đọc đúng tên "Dấu – Tiếng Việt" (người dùng không nghe rõ) → kiểm ở M7 — phiên chính
 - 30/10/2026 — sửa ⌫ xoá hai lần ở Chromium/Electron (Chromium luôn chạy lệnh xoá của ⌫ khi không có marked text) — imk-dev (08f3281); test IMK 70, engine 77. Hồi quy khi máy rảnh (phiên chính): ⌫ ở 30 ms 18/18 PASS (6 app × 3 chuỗi), câu mẫu 30 ms 6/6 PASS, `vieetj⌫s` 120 ms 3/3 PASS. Firefox thêm vào danh sách đề xuất (94ada11); D17 VoiceOver có đọc khi chuyển nguồn (người dùng)
+- 30/10/2026 — kiểm toán M3 lần 1 — auditor — CHƯA ĐẠT (tài liệu, một xung đột D4 × D20 chưa ghi); người dùng chốt D20 thắng (9b32e00), V → M7, ma trận → M6; dọn tài liệu — (commit này)
