@@ -121,16 +121,6 @@
         }
       }
     },
-    "Chế độ khi mở %@" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chế độ khi mở %@"
-          }
-        }
-      }
-    },
     "Chọn" : {
       "localizations" : {
         "vi" : {
@@ -391,16 +381,6 @@
         }
       }
     },
-    "Khi mở app" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Khi mở app"
-          }
-        }
-      }
-    },
     "Khi đang gõ" : {
       "localizations" : {
         "vi" : {
@@ -491,26 +471,6 @@
         }
       }
     },
-    "Mặc định" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mặc định"
-          }
-        }
-      }
-    },
-    "Mặc định tắt. Áp dụng cho các app không có quy tắc riêng bên dưới" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mặc định tắt. Áp dụng cho các app không có quy tắc riêng bên dưới"
-          }
-        }
-      }
-    },
     "Mới" : {
       "localizations" : {
         "vi" : {
@@ -541,12 +501,12 @@
         }
       }
     },
-    "Nhớ chế độ theo từng ứng dụng" : {
+    "Nhớ nguồn nhập liệu theo từng cửa sổ" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nhớ chế độ theo từng ứng dụng"
+            "value" : "Nhớ nguồn nhập liệu theo từng cửa sổ"
           }
         }
       }
@@ -617,16 +577,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quy tắc riêng"
-          }
-        }
-      }
-    },
-    "Quy tắc riêng luôn được áp dụng. “Đề xuất” đến từ danh sách tương thích. [Gạch chân — có ở bản sau (M3)]" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quy tắc riêng luôn được áp dụng. “Đề xuất” đến từ danh sách tương thích. [Gạch chân — có ở bản sau (M3)]"
           }
         }
       }
@@ -731,22 +681,12 @@
         }
       }
     },
-    "Tiếng Anh" : {
+    "Tuỳ chọn “Tự động chuyển sang nguồn đầu vào của tài liệu” của macOS" : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tiếng Anh"
-          }
-        }
-      }
-    },
-    "Tiếng Việt" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tiếng Việt"
+            "value" : "Tuỳ chọn “Tự động chuyển sang nguồn đầu vào của tài liệu” của macOS"
           }
         }
       }
@@ -801,6 +741,16 @@
         }
       }
     },
+    "Tự động chuyển sang nguồn đầu vào của tài liệu" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tự động chuyển sang nguồn đầu vào của tài liệu"
+          }
+        }
+      }
+    },
     "Tự động kiểm tra bản mới" : {
       "localizations" : {
         "vi" : {
@@ -827,6 +777,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "VNI"
+          }
+        }
+      }
+    },
+    "Việt/Anh theo cửa sổ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Việt/Anh theo cửa sổ"
           }
         }
       }
@@ -921,6 +881,26 @@
         }
       }
     },
+    "Đang bật" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang bật"
+          }
+        }
+      }
+    },
+    "Đang tắt" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang tắt"
+          }
+        }
+      }
+    },
     "Đầu từ: f → ph, j → gi (VNI thêm w → qu) · Cuối từ: g → ng, h → nh, k → ch. Áp dụng khi gõ xong từ, chỉ khi ra từ tiếng Việt hợp lệ. Bật mục này sẽ tắt Cho phép phụ âm z, f, w, j." : {
       "localizations" : {
         "vi" : {
@@ -937,6 +917,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đề xuất"
+          }
+        }
+      }
+    },
+    "Đổi tuỳ chọn nhớ nguồn nhập liệu theo từng cửa sổ" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đổi tuỳ chọn nhớ nguồn nhập liệu theo từng cửa sổ"
           }
         }
       }
@@ -967,6 +957,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ứng dụng"
+          }
+        }
+      }
+    },
+    "“Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ. [Gạch chân — có ở bản sau (M3)]" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ. [Gạch chân — có ở bản sau (M3)]"
           }
         }
       }

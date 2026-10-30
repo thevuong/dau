@@ -3,7 +3,7 @@
 Mockup gốc: https://claude.ai/artifact/B2xhNxL3voGwTkXkFV72Ln — xem trực tiếp canvas để đối chiếu bố cục và các trạng thái; nếu phiên làm việc không mở được link thì mô tả dưới đây đủ để dựng. Mockup vẽ theo macOS 27, nhưng app thật dùng control SwiftUI hệ thống nên tự theo phiên bản macOS đang chạy (D9). Chuỗi giao diện tiếng Việt, đặt trong String Catalog. Khi canvas và tài liệu này lệch nhau, `DECISIONS.md` quyết định; sửa bên sai cho khớp.
 
 ## Menu nguồn nhập liệu (hệ thống vẽ)
-Không có status item riêng. Menu của hệ thống liệt kê "Dấu – Tiếng Việt", "Dấu – Tiếng Anh", "ABC"; bộ gõ bổ sung qua `menu()` của IMK: nhóm "Kiểu gõ" (Telex ✓ / VNI / Telex đơn giản), "Cài đặt Dấu…", "Mở cài đặt Bàn phím…". Không icon trên từng mục.
+Không có status item riêng. Dấu có một input mode (D2): menu của hệ thống liệt kê "Dấu – Tiếng Việt" cùng các nguồn khác của người dùng (ví dụ "ABC" để gõ tiếng Anh); bộ gõ bổ sung qua `menu()` của IMK: nhóm "Kiểu gõ" (Telex ✓ / VNI / Telex đơn giản), "Cài đặt Dấu…", "Mở cài đặt Bàn phím…". Không icon trên từng mục.
 
 ## Onboarding (một cửa sổ, thanh bước bên trái)
 Sidebar: icon app, tên, 3 bước có trạng thái (xong / đang làm / chưa), dòng về quyền cần cấp (để ô trống, điền sau khi kiểm chứng ở M2)
@@ -17,7 +17,7 @@ Sidebar có icon màu: Gõ phím (xanh dương), Thông minh (tím), Ứng dụn
 **Gõ phím**
 - Thẻ "Xem trước": chuỗi gõ → kết quả, cập nhật ngay theo kiểu gõ và vị trí dấu; chip hiện cấu hình hiện tại.
 - Kiểu gõ: segmented 3 lựa chọn. Vị trí dấu thanh: segmented Kiểu mới | Kiểu cũ (gợi ý "hoà, thuý · hòa, thúy"). Bỏ dấu tự do: công tắc.
-- Chuyển Tiếng Việt ↔ Tiếng Anh: hiện phím tắt hệ thống hiện tại dạng keycap, nút "Đổi…" mở Cài đặt Bàn phím (N4). Không có phím chuyển riêng (D2).
+- Chuyển Tiếng Việt ↔ Tiếng Anh: là chuyển nguồn nhập liệu (Dấu ↔ ABC/U.S.…); hàng "Phím tắt nguồn nhập liệu" hiện phím tắt hệ thống hiện tại dạng keycap, nút "Đổi…" mở Cài đặt Bàn phím (N4). Không có phím chuyển riêng (D2).
 
 **Thông minh**
 - Gõ lẫn từ nước ngoài: một công tắc "Tự khôi phục từ không phải tiếng Việt" (khi kết thúc từ, từ không phải âm tiết tiếng Việt hợp lệ trở về đúng như đã gõ); ví dụ windows → windows, Hasaki → Hasaki, vieetj → việt; ghi chú: từ trùng thì tiếng Việt thắng (car → cả), gõ đúp phím dấu để giữ chữ gốc (carr → car).
@@ -26,8 +26,8 @@ Sidebar có icon màu: Gõ phím (xanh dương), Thông minh (tím), Ứng dụn
 
 **Ứng dụng**
 - Thanh tiêu đề: ô tìm ứng dụng, nút +.
-- "Nhớ chế độ theo từng ứng dụng" (mặc định tắt, chỉ cho app không có quy tắc riêng).
-- Danh sách quy tắc riêng: icon app, tên, nhãn "Đề xuất" nếu đến từ danh sách tương thích, hai popup "Tiếng Việt/Tiếng Anh" và "Không gạch chân/Có gạch chân". Ghi chú: quy tắc riêng luôn áp dụng.
+- "Việt/Anh theo cửa sổ": một hàng "Nhớ nguồn nhập liệu theo từng cửa sổ", gợi ý "Tuỳ chọn “Tự động chuyển sang nguồn đầu vào của tài liệu” của macOS", bên phải chữ trạng thái "Đang bật"/"Đang tắt" (đọc, không ghi, từ cài đặt hệ thống; không đọc được thì không hiện chữ, N5) và nút "Đổi…" mở Cài đặt Bàn phím (D5, N4).
+- "Quy tắc riêng": icon app, tên, nhãn "Đề xuất" nếu đến từ danh sách tương thích, một popup "Không gạch chân/Có gạch chân" (D5, D13). Ghi chú: "“Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ."
 
 **Cập nhật & hỗ trợ**
 - Thẻ đầu: icon app, phiên bản, trạng thái kiểm tra, nút "Kiểm tra ngay".
@@ -38,17 +38,17 @@ Sidebar có icon màu: Gõ phím (xanh dương), Thông minh (tím), Ứng dụn
 ## Các trạng thái bổ sung
 - **Dấu chưa được bật** (người dùng gỡ khỏi Nguồn nhập liệu): banner màu cam đầu mọi mục Cài đặt, "Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt.", nút "Bật lại".
 - **Chế độ tối:** toàn bộ Cài đặt và onboarding phải có giao diện tối (dùng màu hệ thống của SwiftUI là tự có).
-- **Thêm quy tắc ứng dụng** (nút +): sheet với ô tìm, danh sách ứng dụng, hai segmented "Khi mở app" và "Khi đang gõ", nút Huỷ / Thêm.
+- **Thêm quy tắc ứng dụng** (nút +): sheet với ô tìm, danh sách ứng dụng, một segmented "Khi đang gõ" (Không gạch chân | Có gạch chân), nút Huỷ / Thêm.
 - **Thẻ cập nhật** có 6 trạng thái: đã mới nhất; đang kiểm tra; đang tải (thanh tiến trình, "Bạn vẫn gõ bình thường", nút Huỷ); chờ cài ("Sẽ cài khi bạn ngừng gõ", nút Cài ngay); không có mạng (nút Thử lại, "Dấu vẫn gõ bình thường"); chữ ký không hợp lệ ("Đã huỷ bản cập nhật", nút Báo lỗi…).
 - **Xác nhận quay về bản trước** (D19) và **xác nhận gỡ cài đặt** (nút đỏ, checkbox "Xoá cả cài đặt và quy tắc ứng dụng", câu "Bàn phím đang dùng trước đó được giữ nguyên").
-- **Khi gõ trong ứng dụng:** không gạch chân (mặc định), có gạch chân (từ đang gõ được gạch, chốt khi Space), chế độ Tiếng Anh (chỉ báo E của hệ thống), thêm dấu cho từ đã gõ.
-- **Onboarding bước 2:** giải thích sẽ thấy biểu tượng V/E và phím tắt ⌃Space; chỗ dành cho hướng dẫn nếu macOS yêu cầu xác nhận (câu hỏi mở).
+- **Khi gõ trong ứng dụng:** không gạch chân (mặc định), có gạch chân (từ đang gõ được gạch, chốt khi Space), gõ tiếng Anh bằng ABC (chỉ báo của hệ thống), thêm dấu cho từ đã gõ.
+- **Onboarding bước 2:** giải thích sẽ thấy biểu tượng V, và chuyển sang ABC để gõ tiếng Anh bằng phím tắt nguồn nhập liệu của macOS (⌃Space); chỗ dành cho hướng dẫn nếu macOS yêu cầu xác nhận (câu hỏi mở).
 
 ## Thông báo cập nhật (alert nhỏ, căn giữa)
 Icon app, "Đã có Dấu x.y.z", mô tả (cài lúc không gõ, quay về được), "Có gì mới", dòng "Đã xác minh chữ ký số của bản cập nhật", checkbox "Tự động cài các bản sau", nút xếp dọc: Cài đặt / Nhắc sau / Bỏ qua bản này.
 
 ## Báo ứng dụng gõ lỗi (sheet)
-Ứng dụng (tự điền), Trang web (không bắt buộc), Loại lỗi (segmented: Mất chữ | Lặp chữ | Sai dấu | Khác), Ví dụ đã gõ; mục "Gửi kèm" liệt kê phiên bản macOS, Dấu, kiểu gõ, chế độ, phiên bản app — và câu "Không gửi nội dung bạn đã gõ." Ghi rõ issue GitHub là công khai. Nút: Huỷ / Sao chép nội dung / Mở trên GitHub (URL issue điền sẵn, không có backend).
+Ứng dụng (tự điền), Trang web (không bắt buộc), Loại lỗi (segmented: Mất chữ | Lặp chữ | Sai dấu | Khác), Ví dụ đã gõ; mục "Gửi kèm" liệt kê phiên bản macOS, Dấu, kiểu gõ, phiên bản app — và câu "Không gửi nội dung bạn đã gõ." Ghi rõ issue GitHub là công khai. Nút: Huỷ / Sao chép nội dung / Mở trên GitHub (URL issue điền sẵn, không có backend).
 
 ## Trang tải về (web)
 Phông Be Vietnam Pro, nền Giấy, màu nhấn Mực (D25, `docs/BRAND.md`). Một mã nguồn responsive cho cả máy tính và điện thoại (hai artboard trên canvas). Thứ tự mục:

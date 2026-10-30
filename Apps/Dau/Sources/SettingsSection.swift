@@ -45,9 +45,10 @@ enum SettingsSection: String, CaseIterable, Identifiable, Hashable {
              String(localized: "Nâng cao"), String(localized: "Gõ tắt phụ âm"),
              String(localized: "Cho phép phụ âm z, f, w, j")]
         case .apps:
-            [String(localized: "Mặc định"), String(localized: "Nhớ chế độ theo từng ứng dụng"),
-             String(localized: "Quy tắc riêng"), String(localized: "Gạch chân"),
-             String(localized: "Tiếng Việt"), String(localized: "Tiếng Anh")]
+            [String(localized: "Việt/Anh theo cửa sổ"),
+             String(localized: "Nhớ nguồn nhập liệu theo từng cửa sổ"),
+             String(localized: "Tự động chuyển sang nguồn đầu vào của tài liệu"),
+             String(localized: "Quy tắc riêng"), String(localized: "Gạch chân")]
         case .updates:
             [String(localized: "Phiên bản"), String(localized: "Kiểm tra ngay"),
              String(localized: "Tự động kiểm tra bản mới"), String(localized: "Tự động tải và cài"),

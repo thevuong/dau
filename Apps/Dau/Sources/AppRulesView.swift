@@ -2,14 +2,15 @@ import AppKit
 import SwiftUI
 import DauShared
 
-/// "Ứng dụng" (mockup "SettingsApps"): "Nhớ chế độ theo từng ứng dụng" and the per-app
-/// rules (D5, D13). Search field and + sit in the toolbar, as in the mockup header.
+/// "Ứng dụng" (mockup "SettingsApps"): the macOS option that remembers the input source
+/// per window, shown read-only with "Đổi…" (D5, N4), and the per-app rules (D5, D13).
+/// Search field and + sit in the toolbar, as in the mockup header.
 struct AppRulesView: View {
     @Environment(SettingsModel.self) private var model
     @State private var query = ""
     @State private var isAdding = false
+    @State private var perWindow = DocumentInputSource.isOn()
     @FocusState private var focusedRule: String?
-
 
     private var visibleRules: [AppRule] {
         let rules = model.settings.appRules
@@ -22,20 +23,30 @@ struct AppRulesView: View {
     }
 
     var body: some View {
-        @Bindable var model = model
         SettingsPage(SettingsSection.apps.title,
                      actions: HeaderActions(query: $query, prompt: String(localized: "Tìm ứng dụng"),
                                             addLabel: String(localized: "Thêm ứng dụng"),
                                             onAdd: { isAdding = true })) {
-            SettingsGroup(Text("Mặc định")) {
+            SettingsGroup(Text("Việt/Anh theo cửa sổ")) {
                 SettingsCard {
-                    SettingsRow(Text("Nhớ chế độ theo từng ứng dụng"),
-                                hint: Text("Mặc định tắt. Áp dụng cho các app không có quy tắc riêng bên dưới")) {
-                        RowSwitch(label: Text("Nhớ chế độ theo từng ứng dụng"),
-                                  isOn: $model.settings.rememberModePerApp)
+                    SettingsRow(Text("Nhớ nguồn nhập liệu theo từng cửa sổ"),
+                                hint: Text("Tuỳ chọn “Tự động chuyển sang nguồn đầu vào của tài liệu” của macOS")) {
+                        // Not readable: no value rather than a guess (N5).
+                        if let perWindow {
+                            (perWindow ? Text("Đang bật") : Text("Đang tắt"))
+                                .foregroundStyle(.secondary)
+                                .fixedSize()
+                        }
+                        Button("Đổi…") { SystemSettings.openKeyboard() }
+                            .settingsButton()
+                            .accessibilityLabel(Text("Đổi tuỳ chọn nhớ nguồn nhập liệu theo từng cửa sổ"))
+                            .accessibilityHint(Text("Mở Cài đặt Bàn phím của macOS"))
                     }
                 }
                 .layoutProbe("firstCard")
+            }
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                perWindow = DocumentInputSource.isOn()
             }
 
             SettingsGroup(Text("Quy tắc riêng")) {
@@ -61,7 +72,7 @@ struct AppRulesView: View {
                 }
             } footer: {
                 // N5: underlining (D13) is not in the input method yet.
-                Hint(Text("Quy tắc riêng luôn được áp dụng. “Đề xuất” đến từ danh sách tương thích. [Gạch chân — có ở bản sau (M3)]"))
+                Hint(Text("“Đề xuất” đến từ danh sách tương thích. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ. [Gạch chân — có ở bản sau (M3)]"))
                     .padding(.horizontal, 4)
             }
         }
@@ -76,7 +87,7 @@ struct AppRulesView: View {
     }
 }
 
-/// One rule (height 52): icon 28, name, "Đề xuất" chip, mode and underline popups.
+/// One rule (height 52): icon 28, name, "Đề xuất" chip, underline popup (D5).
 /// Removed with the context menu or the Delete key while focused (the system draws
 /// the focus ring).
 struct AppRuleRow: View {
@@ -98,14 +109,6 @@ struct AppRuleRow: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            Picker(selection: binding(\.mode)) {
-                ForEach(AppRule.Mode.allCases, id: \.self) { Text($0.title).tag($0) }
-            } label: {
-                Text("Chế độ khi mở \(name)")
-            }
-            .labelsHidden()
-            .pickerStyle(.menu)
-            .fixedSize()
             Picker(selection: binding(\.underline)) {
                 Text("Không gạch chân").tag(false)
                 // N5: underlining (D13) is not in the input method yet; a saved value
@@ -134,15 +137,6 @@ struct AppRuleRow: View {
             var updated = model.settings.rule(for: rule.bundleID) ?? rule
             updated[keyPath: keyPath] = newValue
             model.settings.upsert(updated)
-        }
-    }
-}
-
-extension AppRule.Mode {
-    var title: String {
-        switch self {
-        case .vietnamese: String(localized: "Tiếng Việt")
-        case .english: String(localized: "Tiếng Anh")
         }
     }
 }

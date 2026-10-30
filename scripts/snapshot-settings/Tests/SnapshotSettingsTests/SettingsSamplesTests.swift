@@ -75,6 +75,20 @@ struct InputSourceShortcutTests {
     }
 }
 
+@Suite("Document input source option (D5, N5)")
+struct DocumentInputSourceTests {
+    @Test("on, off, and no value when missing or malformed")
+    func values() {
+        let key = "TextInputGlobalPropertyPerContextInput"
+        #expect(DocumentInputSource.isOn(properties: [key: 1]) == true)
+        #expect(DocumentInputSource.isOn(properties: [key: true]) == true)
+        #expect(DocumentInputSource.isOn(properties: [key: 0]) == false)
+        #expect(DocumentInputSource.isOn(properties: [String: Any]()) == nil)
+        #expect(DocumentInputSource.isOn(properties: [key: "1"]) == nil)
+        #expect(DocumentInputSource.isOn(properties: nil) == nil)
+    }
+}
+
 @Suite("Sidebar search")
 struct SidebarSearchTests {
     @Test("case- and diacritic-insensitive")
@@ -82,6 +96,8 @@ struct SidebarSearchTests {
         #expect(SettingsSection.typing.matches("go phim"))
         #expect(SettingsSection.smart.matches("khôi phục"))
         #expect(SettingsSection.apps.matches("GẠCH CHÂN"))
+        #expect(SettingsSection.apps.matches("nguon nhap lieu"))
+        #expect(!SettingsSection.apps.matches("tiếng anh"))
         #expect(!SettingsSection.updates.matches("telex"))
         #expect(SettingsSection.allCases.allSatisfy { $0.matches("") })
     }

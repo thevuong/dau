@@ -159,11 +159,11 @@ enum Snapshot {
     static func sampleSettings() -> DauSettings {
         var s = DauSettings.defaults
         s.upsert(AppRule(bundleID: "com.apple.Terminal", displayName: "Terminal",
-                         mode: .english, underline: true, source: .suggested))
+                         underline: true, source: .suggested))
         s.upsert(AppRule(bundleID: "com.microsoft.VSCode", displayName: "Visual Studio Code",
-                         mode: .english, source: .suggested))
+                         source: .suggested))
         s.upsert(AppRule(bundleID: "com.google.Chrome", displayName: "Google Chrome", source: .suggested))
-        s.upsert(AppRule(bundleID: "com.tinyspeck.slackmacgap", displayName: "Slack"))
+        s.upsert(AppRule(bundleID: "ru.keepcoder.Telegram", displayName: "Telegram"))
         s.upsert(AppRule(bundleID: "com.microsoft.Word", displayName: "Microsoft Word"))
         return s
     }

@@ -2,7 +2,7 @@ import SwiftUI
 import DauShared
 
 /// "Gõ phím" (mockup "SettingsTyping"): preview, typing method, tone placement, free
-/// marking, and the system shortcut that switches Tiếng Việt ↔ Tiếng Anh (D2).
+/// marking, and the system shortcut that switches input sources, e.g. Dấu ↔ ABC (D2).
 struct TypingSettingsView: View {
     @Environment(SettingsModel.self) private var model
     var shortcut: InputSourceShortcut? = InputSourceShortcut.current()

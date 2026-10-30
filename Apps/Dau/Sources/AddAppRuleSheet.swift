@@ -5,7 +5,7 @@ import DauShared
 
 /// "Thêm quy tắc cho ứng dụng" sheet (mockup "SettingsAppsAdd"), 460 wide: search,
 /// a card listing the apps in the Applications folders and the running apps, a card
-/// with "Khi mở app" and "Khi đang gõ", then Huỷ / Thêm. "Chọn ứng dụng khác…" opens
+/// with "Khi đang gõ" (the rule's only setting, D5), then Huỷ / Thêm. "Chọn ứng dụng khác…" opens
 /// the system open panel for apps stored elsewhere.
 struct AddAppRuleSheet: View {
     @Environment(SettingsModel.self) private var model
@@ -14,7 +14,6 @@ struct AddAppRuleSheet: View {
     @State private var query = ""
     @State private var candidates: [AppCandidate] = []
     @State private var selection: AppCandidate.ID?
-    @State private var mode: AppRule.Mode = .vietnamese
     @State private var underline = false
 
     private var visibleCandidates: [AppCandidate] {
@@ -57,12 +56,6 @@ struct AddAppRuleSheet: View {
             }
 
             SettingsCard {
-                SettingsRow(Text("Khi mở app")) {
-                    SegmentedPicker(String(localized: "Khi mở app"), selection: $mode,
-                                    options: AppRule.Mode.allCases.map { ($0, $0.title) })
-                        .frame(width: 220)
-                }
-                RowDivider()
                 SettingsRow(Text("Khi đang gõ")) {
                     // N5: underlining (D13) is not in the input method yet.
                     SegmentedPicker(String(localized: "Khi đang gõ"), selection: $underline,
@@ -139,7 +132,7 @@ struct AddAppRuleSheet: View {
         guard let id = selection, let candidate = candidates.first(where: { $0.id == id }) else { return }
         model.settings.upsert(AppRule(
             bundleID: candidate.bundleID, displayName: candidate.name,
-            mode: mode, underline: underline, source: .user))
+            underline: underline, source: .user))
         dismiss()
     }
 }

@@ -10,7 +10,7 @@ Mockup: các artboard "Nhận diện – …", "Ảnh chia sẻ Open Graph" và 
 - Trên nền tối hoặc nền Mực: thêm viền mảnh màu Giấy ~35% để tách biểu tượng khỏi nền.
 
 ## Biểu tượng thanh menu (input mode)
-- Hai ảnh template đơn sắc "V" (Tiếng Việt) và "E" (Tiếng Anh) có khung viền, để macOS tự tô màu theo nền. Không dùng màu thương hiệu (D9).
+- Một ảnh template đơn sắc "V" (Tiếng Việt) có khung viền, để macOS tự tô màu theo nền. Không dùng màu thương hiệu (D9). Dấu chỉ có một input mode (D2); khi gõ tiếng Anh bằng ABC/U.S., biểu tượng là của hệ thống.
 
 ## Logo chữ
 - "Dấu" viết bằng Be Vietnam Pro ExtraBold, **một màu**. Không tách dấu sắc ra tô màu riêng: lệch một chút là thành "Dâu".
@@ -33,7 +33,7 @@ App dùng màu và phông của hệ thống (D9); bảng màu này dành cho bi
 | File | Kích thước | Dùng ở |
 |---|---|---|
 | Biểu tượng app (Icon Composer + `.icns`) | 16–1024 pt | Finder, Dock, Launchpad, Spotlight, onboarding, hộp thoại |
-| Ảnh template thanh menu V/E | 16×16 @1x/@2x, PDF vector | menu Nguồn nhập liệu |
+| Ảnh template thanh menu V | 16×16 @1x/@2x, PDF vector | menu Nguồn nhập liệu |
 | `favicon.ico` + `favicon.svg` | 16, 32 | tab trình duyệt, kết quả tìm kiếm |
 | `apple-touch-icon.png` | 180×180 | ghim trang trên iPhone/iPad |
 | `og-image.png` | 1200×630 | `og:image`, `twitter:image` — link chia sẻ Zalo, Messenger, Slack, iMessage, X |
