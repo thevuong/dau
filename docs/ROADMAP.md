@@ -16,7 +16,7 @@ Mỗi mốc kết thúc khi: test xanh, đã tự rà soát với `DECISIONS.md`
 ## M2 — Bộ gõ tối thiểu
 - `DauInputMethod` với Telex, chế độ Tiếng Việt/Tiếng Anh, thay chữ tại chỗ.
 - Script cài bản Debug vào `~/Library/Input Methods` và hướng dẫn người dùng bật thử.
-- **Giải quyết câu hỏi mở A/B** (vị trí thay chữ): đo chi phí `selectedRange` trên TextEdit, Safari, Chrome, Slack, VS Code, Terminal; cập nhật `DECISIONS.md`.
+- **Giải quyết câu hỏi mở A/B** (vị trí thay chữ): đo chi phí `selectedRange` trên TextEdit, Safari, Chrome, Telegram (thay Slack, 30/10/2026), VS Code, Terminal; cập nhật `DECISIONS.md`.
 - Xong khi: người dùng gõ được tiếng Việt trong TextEdit và Safari không gạch chân.
 
 ## M3 — Độ tin cậy
@@ -30,7 +30,7 @@ Mỗi mốc kết thúc khi: test xanh, đã tự rà soát với `DECISIONS.md`
 - 3 bước theo `docs/UI.md`; phát hiện bộ gõ cũ; cài/gỡ bộ gõ; xác minh câu hỏi mở về `TISEnableInputSource` và sandbox của app chủ.
 
 ## M6 — Hiệu năng dưới tải
-- App test tự gửi phím 20 phím/giây vào TextEdit, Safari, Slack trong khi CPU đầy và `memory_pressure` đang chạy.
+- App test tự gửi phím 20 phím/giây vào TextEdit, Safari, Telegram trong khi CPU đầy và `memory_pressure` đang chạy.
 - Chỉ số: văn bản cuối khớp 100%; độ trễ p50/p99 phía bộ gõ; bộ nhớ ổn định theo thời gian. So với gõ bằng ABC và với OpenKey.
 - Chốt ngưỡng vào `DECISIONS.md`; quyết định về D12 dựa trên số đo.
 

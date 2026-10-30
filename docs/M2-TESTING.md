@@ -42,7 +42,7 @@ Mỗi ứng dụng: mở một ô soạn thảo trống, gõ câu mẫu, ghi l�
 | TextEdit | `com.apple.TextEdit` | | | | | | |
 | Safari (ô tìm kiếm + một ô soạn thảo trên web) | `com.apple.Safari` | | | | | | |
 | Chrome (thanh địa chỉ + một ô soạn thảo trên web) | `com.google.Chrome` | | | | | | |
-| Slack | `com.tinyspeck.slackmacgap` | | | | | | |
+| Telegram (thay Slack) | `ru.keepcoder.Telegram` | | | | | | |
 | VS Code | `com.microsoft.VSCode` | | | | | | |
 | Terminal | `com.apple.Terminal` | | | | | | |
 
@@ -78,7 +78,7 @@ Làm trong TextEdit (và lặp lại ở ứng dụng nào có kết quả lạ 
 |---|---|---|---|
 | 1 | Gõ `hoaf`, rồi ⌫ | "hoà" rồi "hò" (D32) | |
 | 2 | Gõ `windows` rồi nhấn Return | "windows" rồi xuống dòng | |
-| 3 | Trong Slack: gõ `carr` rồi nhấn Return | tin nhắn gửi đi là "car" (thay chữ xong trước khi Return được xử lý) | |
+| 3 | Trong Telegram (Saved Messages): gõ `carr` rồi nhấn Return | tin nhắn gửi đi là "car" (thay chữ xong trước khi Return được xử lý) | |
 | 4 | Gõ `to`, click chuột vào chỗ khác trong văn bản, gõ `o` | chỉ thêm "o" ở chỗ mới; chữ "to" cũ không đổi | |
 | 5 | Gõ `tooi`, click vào chỗ khác, gõ `s` | chỉ thêm "s" ở chỗ mới; "tôi" cũ không đổi | |
 | 6 | Gõ `tooi`, nhấn ←, gõ `s` | thêm "s" ở vị trí con trỏ, không bỏ dấu vào "tôi" (D4: mũi tên chỉ reset) | |
