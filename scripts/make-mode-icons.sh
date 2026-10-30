@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Regenerates the temporary input mode icon "V" (template TIFF, 16 pt @1x + @2x) into
+# Regenerates the temporary input mode icon "V" (template TIFF, 22 × 16 pt @1x + @2x) into
 # Apps/DauInputMethod/Resources. Apple's headers document .tif/.icns for input method
 # icons (TextServices.h, tsInputMethodIconFileKey); built-in input methods use multi-
 # resolution TIFF the same way. TODO(M7): official identity files (docs/BRAND.md).
