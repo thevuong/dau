@@ -300,7 +300,7 @@ struct InPlaceComposerTests {
         s.type("a")      // after Space typed here: known, no read
         #expect(s.reads == 0)
         s.type("←")
-        s.type("f")      // after an arrow: unknown, read "hoca" → seeded
+        s.type("f")      // after an arrow: unknown, read the word before the cursor ("a") → seeded
         #expect(s.reads == 1)
         #expect(s.doc.text == "hoc à")
     }

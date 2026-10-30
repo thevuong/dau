@@ -33,6 +33,7 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | M8 Website | chưa | — | |
 
 ## Ghi nhớ cho M7 (từ kiểm toán M0)
+- Xem lại gợi ý "Báo lại để bản sau xử lý đúng cho ứng dụng đó" (`Apps/Dau/Sources/UpdatesSupportView.swift:56`) theo N5 khi làm báo lỗi (hoãn từ kiểm toán M3).
 - Bản Release ký ad-hoc vẫn có `get-task-allow`; phải bỏ trước notarize. Hardened runtime mới chỉ ở Release.
 - `.gitignore` bỏ qua `Package.resolved` → ghim phiên bản Sparkle chính xác trong `project.yml`.
 - Thử bỏ `temporary-exception.mach-register.global-name` của bộ gõ khi rà entitlement trước notarize (hoãn từ M3, ARCHITECTURE.md).
@@ -141,3 +142,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 30/10/2026 — D17: người dùng bật VoiceOver, mỗi lần chuyển nguồn (⌃Space) hệ thống có đọc → Dấu không tự thông báo (đúng D17). Chưa xác nhận VoiceOver đọc đúng tên "Dấu – Tiếng Việt" (người dùng không nghe rõ) → kiểm ở M7 — phiên chính
 - 30/10/2026 — sửa ⌫ xoá hai lần ở Chromium/Electron (Chromium luôn chạy lệnh xoá của ⌫ khi không có marked text) — imk-dev (08f3281); test IMK 70, engine 77. Hồi quy khi máy rảnh (phiên chính): ⌫ ở 30 ms 18/18 PASS (6 app × 3 chuỗi), câu mẫu 30 ms 6/6 PASS, `vieetj⌫s` 120 ms 3/3 PASS. Firefox thêm vào danh sách đề xuất (94ada11); D17 VoiceOver có đọc khi chuyển nguồn (người dùng)
 - 30/10/2026 — kiểm toán M3 lần 1 — auditor — CHƯA ĐẠT (tài liệu, một xung đột D4 × D20 chưa ghi); người dùng chốt D20 thắng (9b32e00), V → M7, ma trận → M6; dọn tài liệu — (5d1cb50)
+- 30/10/2026 — kiểm toán M3 lần 2 — auditor — CHƯA ĐẠT (2 việc nhỏ: ghi M7 cho UpdatesSupportView:56, đồng bộ canvas). Đã sửa: ghi nhớ M7, D11 nhắc ngoại lệ D20, M2-TESTING dòng 4, 5, 14, comment test; ghi chú canvas đồng bộ N3, D13 (Firefox), D20 (D4 × D20) — phiên chính
