@@ -30,7 +30,7 @@ enum SettingsSamples {
     /// Foreign words come back as typed, Vietnamese words keep their marks (D4).
     static func restore(_ method: DauSettings.TypingMethod) -> [TypingExample] {
         let vietnamese = method == .vni ? "vie65t" : "vieetj"
-        return ["windows", "Hasaki", vietnamese].map { smart($0, method) }
+        return ["windows", "Sunrise", vietnamese].map { smart($0, method) }
     }
 
     /// Both English-looking and a valid syllable: Vietnamese wins (D4, D36).

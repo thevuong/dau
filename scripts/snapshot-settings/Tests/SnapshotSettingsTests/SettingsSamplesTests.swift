@@ -32,7 +32,7 @@ struct SettingsSamplesTests {
 
     @Test("restore: foreign words come back, Vietnamese stays (D4)", arguments: DauSettings.TypingMethod.allCases)
     func restore(_ method: DauSettings.TypingMethod) {
-        #expect(SettingsSamples.restore(method).map(\.result) == ["windows", "Hasaki", "việt"])
+        #expect(SettingsSamples.restore(method).map(\.result) == ["windows", "Sunrise", "việt"])
     }
 
     @Test("Vietnamese wins, doubling keeps the original (D4, D26, D36)", arguments: DauSettings.TypingMethod.allCases)
