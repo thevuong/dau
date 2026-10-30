@@ -113,8 +113,8 @@ struct AddAppRuleSheet: View {
                                 icon: NSWorkspace.shared.icon(forFile: $0.path)) }
     }
 
-    /// Picks any app with the system open panel (works in the sandbox through the
-    /// powerbox; no file access is kept).
+    /// Picks any app with the system open panel. The sandbox only shows the panel with the
+    /// `files.user-selected.read-only` entitlement; only the bundle ID is kept.
     private func chooseApp() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.application]

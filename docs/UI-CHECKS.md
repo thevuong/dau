@@ -30,7 +30,7 @@ Toạ độ tính bằng pt, gốc ở góc trên-trái cửa sổ 820×600.
 | 4 | Mất đèn giao thông | run.sh (e) | `close` = 19,19 14×14 ở mọi ảnh |
 | 5 | Icon sidebar sai (glyph, màu, cỡ, sát chữ) | `sidebar-compare-*.png`; khung `sidebarRow-*` | Ô 22, bo 6, màu `systemBlue` / `systemPurple` / `systemOrange` / `systemGreen`, glyph nét trắng theo SVG mockup; hàng cao 24 + 8 của list (vệt chọn 32), cách nhau 32 |
 | 6 | Segmented "Kiểu gõ" hẹp, căn giữa | khung `segmented` (frames.json) | x 264, rộng 512 (trải hết card trừ 16 mỗi bên) |
-| 7 | Ô tìm và "+" dính nhau thành một khối glass | run.sh (e); `apps-header-compare-*.png` | `headerSearch` x 556 ± 2, rộng 200; `headerAdd` bắt đầu sau mép phải ô tìm ít nhất 8 pt |
+| 7 | Ô tìm và "+" dính nhau thành một khối glass | run.sh (e); `apps-header-compare-*.png` | `headerSearch` rộng 200, bắt đầu sau tiêu đề ít nhất 40 pt (toạ độ tuyệt đối đổi theo bản macOS: 27.0 x 556, 27.2 x 548); `headerAdd` bắt đầu sau mép phải ô tìm ít nhất 8 pt |
 | 8 | Nút "+" méo (bầu dục) | `apps-header-compare-*.png` | Viền nút tròn: rộng bằng cao, đo trên ảnh |
 | 9 | Header không che nội dung khi cuộn | run.sh (d), cuộn 60 pt | Vùng header (x 390–540, y 6–46) khác ảnh chưa cuộn trung bình ≤ 4/255 |
 | 10 | Thiếu thanh cuộn (nằm ngoài cửa sổ) | run.sh (b), (d); khung `scroller` | Mục có cuộn: `scroller` x ≥ 700, mép phải ≤ 820, y ≥ 51 |

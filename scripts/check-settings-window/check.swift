@@ -146,10 +146,14 @@ for style in styles {
 
                 // (e) Traffic lights, title, Apps search field and + button.
                 if f["close"] != CGRect(x: 19, y: 19, width: 14, height: 14) { bad("e", "\(key) close at \(String(describing: f["close"]))") }
-                if let t = f["title"], abs(t.minX - 245) > 1 || abs(t.minY - 16.5) > 1 { bad("e", "\(key) title at \(t)") }
+                // The toolbar places the title and the header controls, and the exact spot moves
+                // between macOS updates (27.0: title x 245, search x 556; 27.2: 241 and 548).
+                // Check a band and the relations instead; the same-across-sections check above
+                // still catches a shift when switching sections.
+                if let t = f["title"], t.minX < 236 || t.minX > 250 || abs(t.minY - 16.5) > 1 { bad("e", "\(key) title at \(t)") }
                 if section == "apps" {
                     guard let s = f["headerSearch"], let a = f["headerAdd"] else { bad("e", "\(key) header controls missing"); continue }
-                    if abs(s.minX - 556) > 2 || abs(s.width - 200) > 1 { bad("e", "\(key) search at \(s)") }
+                    if abs(s.width - 200) > 1 || s.minX < (f["title"]?.maxX ?? 0) + 40 { bad("e", "\(key) search at \(s)") }
                     if a.minX < s.maxX + 8 || a.maxX > W - 20 { bad("e", "\(key) + at \(a), search ends \(s.maxX)") }
                 }
             }
