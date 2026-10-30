@@ -9,6 +9,8 @@ import DauShared
 /// the system open panel for apps stored elsewhere.
 struct AddAppRuleSheet: View {
     @Environment(SettingsModel.self) private var model
+    /// Apps already in "Quy tắc riêng", stored or suggested; they are not offered again.
+    var listed: Set<String> = []
     @Environment(\.dismiss) private var dismiss
 
     @State private var query = ""
@@ -57,11 +59,9 @@ struct AddAppRuleSheet: View {
 
             SettingsCard {
                 SettingsRow(Text("Khi đang gõ")) {
-                    // N5: underlining (D13) is not in the input method yet.
                     SegmentedPicker(String(localized: "Khi đang gõ"), selection: $underline,
                                     options: [(false, String(localized: "Không gạch chân")),
-                                              (true, String(localized: "Có gạch chân"))],
-                                    disabled: [true])
+                                              (true, String(localized: "Có gạch chân"))])
                         .frame(width: 240)
                 }
             }
@@ -87,9 +87,9 @@ struct AddAppRuleSheet: View {
     }
 
     /// Apps in the Applications folders plus running apps, without the ones that
-    /// already have a rule and without Dấu itself.
+    /// already have a row in "Quy tắc riêng" and without Dấu itself.
     private func loadApps() async {
-        let ruled = Set(model.settings.appRules.map(\.bundleID))
+        let ruled = Set(model.settings.appRules.map(\.bundleID)).union(listed)
         let own = Bundle.main.bundleIdentifier
         var running: [AppListing] = []
         for app in NSWorkspace.shared.runningApplications where app.activationPolicy == .regular {

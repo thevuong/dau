@@ -16,12 +16,16 @@ final class SettingsModel {
         }
     }
 
+    /// Apps labelled "Đề xuất" on the Apps page (D13). Bundled with the app; the signed
+    /// downloaded copy of M7 (D7) will replace it here. Not shared with the input method.
+    @ObservationIgnored let compatibility: CompatibilityList
     @ObservationIgnored private let store: SettingsStore
     @ObservationIgnored private var observer: SettingsChangeObserver?
     @ObservationIgnored private var isReloading = false
 
-    init(store: SettingsStore) {
+    init(store: SettingsStore, compatibility: CompatibilityList = .bundled()) {
         self.store = store
+        self.compatibility = compatibility
         self.settings = store.load()
         observer = store.observeChanges { [weak self] in
             // Delivered on the main queue (observeChanges default).

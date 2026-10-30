@@ -45,7 +45,7 @@ let failed: Bool = MainActor.assumeIsolated {
     UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite)
     let store = SettingsStore(defaults: UserDefaults(suiteName: suite) ?? .standard, suiteName: suite)
     store.save(Snapshot.sampleSettings())
-    let model = SettingsModel(store: store)
+    let model = SettingsModel(store: store, compatibility: Snapshot.sampleList)
     let enabled = InputSourceStatus(fixed: true)
     let notEnabled = InputSourceStatus(fixed: false)
     let window820 = CGSize(width: 820, height: 600)

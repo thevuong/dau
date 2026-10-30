@@ -5,7 +5,7 @@ Bảng ghi kết quả thử Dấu trong từng ứng dụng (M3, việc T5 lậ
 ## 1. Mục đích
 
 - Biết Dấu gõ đúng hay sai trong từng ứng dụng, ở tốc độ nào, và vì sao.
-- Là nguồn duy nhất cho **danh sách tương thích**: ứng dụng nào cần gạch chân (marked text, D13) thì vào danh sách theo bundle ID. Danh sách có sẵn trong bản build (M3, việc T3) và về sau được cập nhật riêng bằng file JSON có chữ ký do app chủ tải (D7); tiến trình bộ gõ không tải gì (N2). Trong trang Ứng dụng, các quy tắc đến từ danh sách hiện nhãn "Đề xuất" (D5, `AppRule` nguồn `suggested`).
+- Là nguồn duy nhất cho **danh sách tương thích**: ứng dụng nào cần gạch chân (marked text, D13) thì vào danh sách theo bundle ID. Danh sách có sẵn trong bản build (M3, việc T3: `Apps/Dau/Resources/CompatibilityList.json`, model `CompatibilityList` trong DauShared) và về sau được cập nhật riêng bằng file JSON có chữ ký do app chủ tải (D7); tiến trình bộ gõ không tải gì (N2). Trong trang Ứng dụng, các quy tắc đến từ danh sách hiện nhãn "Đề xuất" (D5, `AppRule` nguồn `suggested`).
 - Đề xuất (chưa ghi vào `DECISIONS.md`): một ứng dụng chỉ vào danh sách khi bảng ở mục 5 có kết quả đo của nó (ngày, cách thử, kết quả với và không gạch chân). Không đo thì không vào.
 - Bảng này không phải lời hứa (N5). Không chép kết quả lên giao diện hay website ("chạy tốt trong mọi app", danh sách logo ứng dụng…) trước khi phiên chính tổng hợp; website giữ ô trống như `[Kết quả bài test tải nặng]`.
 

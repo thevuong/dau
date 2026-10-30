@@ -11,7 +11,7 @@ dau/
 │  ├─ DauEngine/               # Swift package thuần, không Foundation/AppKit
 │  │  ├─ Sources/DauEngine/    # VietEngine, bảng nguyên âm/dấu, quy tắc chính tả
 │  │  └─ Tests/                # Swift Testing: ca Telex/VNI theo quy tắc chính tả, ca biên, test hiệu năng
-│  └─ DauShared/               # model cài đặt chung (phụ thuộc DauEngine), lưu trữ App Group + Darwin notification, xem trước bằng engine thật; sau này: danh sách tương thích + kiểm chữ ký
+│  └─ DauShared/               # model cài đặt chung (phụ thuộc DauEngine), lưu trữ App Group + Darwin notification, xem trước bằng engine thật, model danh sách tương thích; sau này (M7): kiểm chữ ký danh sách tải về
 ├─ Apps/
 │  ├─ DauInputMethod/          # bundle input method (IMK), sandbox, KHÔNG có quyền mạng (N2)
 │  └─ Dau/                     # app chủ SwiftUI: Cài đặt, onboarding, cập nhật (Sparkle), báo lỗi
@@ -34,6 +34,7 @@ dau/
 - Phụ thuộc DauEngine (để đổi cài đặt sang `EngineOptions` và chạy engine thật cho phần xem trước); không dùng trong đường nóng của engine.
 - `DauSettings` (Sendable, Codable, mặc định D15; `advanced` là một enum nên D22 không thể bật cả hai), `AppRule` (D5, D13: bundle ID, tên hiển thị, gạch chân, nguồn "Đề xuất"/người dùng; không có chế độ Việt/Anh). Giải mã dễ dãi: khoá lạ hoặc khoá cũ (`rememberModePerApp`, `mode` của quy tắc, từ bản trước 30/10/2026) bị bỏ qua, quy tắc cũ giữ lựa chọn gạch chân; lần lưu sau không ghi lại các khoá đó (D18). Hệ quả: quy tắc cũ chỉ có "Tiếng Anh" trở thành quy tắc không làm gì (không gạch chân), và Dấu gõ tiếng Việt ở app đó; người dùng không được báo. Chấp nhận vì chưa có bản phát hành nào.
 - `SettingsStore`: lưu cả cài đặt thành một JSON dưới khoá `settings` trong UserDefaults suite = App Group (`DauAppGroupIdentifier` trong Info.plist, giá trị `$(TeamIdentifierPrefix)$(BUNDLE_ID_PREFIX).shared`); sau mỗi lần lưu phát Darwin notification `<suite>.settingsDidChange`; `observeChanges` cho bộ gõ áp dụng ngay.
+- `CompatibilityList` (D7, D13): danh sách app được gắn nhãn "Đề xuất" — mỗi mục có các bundle ID của một app (một app có thể có nhiều ID), tên, cờ `suggestUnderline`, ghi chú cho người bảo trì (không hiện lên giao diện, N5); có `version`. Giải mã dễ dãi (D18): khoá lạ bị bỏ qua, mục hỏng hoặc không có bundle ID bị bỏ mà không mất các mục khác, file hỏng thành danh sách rỗng. Bản có sẵn là `Apps/Dau/Resources/CompatibilityList.json` trong app chủ (M3: VS Code và các app Electron/Chromium của `docs/COMPATIBILITY.md`, không có Terminal); test trong DauShared đọc chính file này. `DauSettings.ruleRows(suggesting:isInstalled:)` dựng các hàng "Quy tắc riêng": app đề xuất đã cài mà chưa có quy tắc hiện như quy tắc "Không gạch chân" nguồn `suggested` nhưng **không lưu**; người dùng đổi popup thì `setUnderline` lưu quy tắc nguồn `suggested` (đặt lại "Không gạch chân" thì xoá quy tắc đó); hàng giữ nguyên chỗ khi được lưu. Quy tắc người dùng tự thêm cho một app đề xuất vẫn là quy tắc người dùng. Bộ gõ **không** đọc danh sách: gạch chân chỉ theo quy tắc đã lưu (D13). M7: app chủ tải bản JSON có chữ ký cùng định dạng vào container App Group (bộ gõ không tải, N2), kiểm chữ ký rồi dùng bản hợp lệ có `version` cao hơn giữa bản tải về và bản có sẵn; chỉ cần thay chỗ `SettingsModel` lấy danh sách (`CompatibilityList.bundled()`).
 - `TypingPreview`/`TypingExample`: chạy engine thật như bộ gõ. App chủ dùng chúng để dựng mọi ví dụ "phím → kết quả" trên giao diện (`SettingsSamples` trong `Apps/Dau`, có test ở `scripts/snapshot-settings`), nên mọi ví dụ đều do engine tính (N5).
 
 ### DauInputMethod (input method)
@@ -63,7 +64,7 @@ dau/
   - Thông báo cài đặt và nguồn nhập liệu: chỉ chạy trên main thread, tham chiếu yếu tới controller.
 - Một input mode duy nhất "Dấu – Tiếng Việt" (`….Dau.vi`) khai báo trong Info.plist (`ComponentInputModeDict`), để ID nguồn đã bật không đổi và nguồn nằm trong nhóm Tiếng Việt (D2). Gõ tiếng Anh bằng nguồn ABC/U.S. của macOS. Bộ gõ không giữ trạng thái chế độ: IMK báo mode nào (kể cả `….Dau.en` còn sót từ bản cũ) cũng xử lý như tiếng Việt; `setValue(_:forTag:client:)` chỉ reset từ đang gõ (D4, D18). Không tự đổi nguồn nhập liệu theo app, không nhớ chế độ theo app (D5), không tự thông báo VoiceOver (D17).
 - Quy tắc theo app: lựa chọn gạch chân đọc lúc `activateServer` và khi cài đặt đổi, không đọc theo phím. Đổi chế độ giữa chừng một từ thì chốt từ trước. Bundle ID của app lấy từ client lúc `activateServer`; Chrome đôi khi đưa client có `bundleIdentifier()` nil, khi đó dùng app đang ở trước (`NSWorkspace.frontmostApplication`). Bản Debug có thêm khoá `DauDebugForceUnderline` (mảng bundle ID, miền global `defaults write -g`) để ép gạch chân khi thử mà không đụng cài đặt người dùng; bản Release không đọc khoá này. Lúc khởi động, bộ gõ xoá khoá `rememberedInputModes` (nhớ chế độ theo app của bản cũ) khỏi defaults riêng của nó.
-- Đọc cài đặt và danh sách tương thích từ App Group; nghe thay đổi để áp dụng ngay.
+- Đọc cài đặt từ App Group; nghe thay đổi để áp dụng ngay. Không đọc danh sách tương thích: gạch chân chỉ theo quy tắc đã lưu (D13).
 - Entitlements: App Sandbox, App Group, tạm thêm `temporary-exception.mach-register.global-name` cho tên kết nối IMK (theo mẫu IMK có sandbox). Chưa thử bỏ đi để biết có cần không: để M3. **Không** `com.apple.security.network.client`.
 - Khoá Info.plist đang dùng (chạy được trên macOS 27 ở M2): `InputMethodConnectionName`, `InputMethodServerControllerClass`, `LSBackgroundOnly`, `TISInputSourceID`, `TISIntendedLanguage`, `ComponentInputModeDict` (một mode `.vi`, icon template V), `tsInputMethodIconFileKey`, `TISIconIsTemplate`; thêm `DauHostAppBundleIdentifier`, `DauAppGroupIdentifier` của riêng Dấu.
 
@@ -82,7 +83,7 @@ dau/
 - Bản Debug có cờ chạy không mở cửa sổ (`--print-…`) và `--capture-window` để chụp cửa sổ thật; `scripts/check-settings-window` dùng cờ này để kiểm giao diện.
 - Onboarding 3 bước và sheet báo lỗi: chưa làm (M5, M7; xem `docs/UI.md`).
 - Cài bộ gõ: chép bundle `DauInputMethod.app` từ trong app chủ vào `~/Library/Input Methods`, đăng ký qua Text Input Sources. Gỡ cài đặt và quay về bản trước cũng nằm ở đây (D16).
-- Sparkle 2 + tải danh sách tương thích có chữ ký (D7). Sau khi cập nhật, chờ người dùng ngừng gõ rồi dừng tiến trình bộ gõ cũ.
+- Danh sách tương thích có sẵn trong app (`Resources/CompatibilityList.json`, xem DauShared); M7: Sparkle 2 + tải danh sách có chữ ký (D7). Sau khi cập nhật, chờ người dùng ngừng gõ rồi dừng tiến trình bộ gõ cũ.
 - Phát hiện bộ gõ cũ đang chạy bằng `NSWorkspace.shared.runningApplications` (D14).
 
 ## Luồng một phím (chế độ Tiếng Việt)

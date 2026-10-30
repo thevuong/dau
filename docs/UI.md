@@ -21,13 +21,13 @@ Sidebar có icon màu: Gõ phím (xanh dương), Thông minh (tím), Ứng dụn
 
 **Thông minh**
 - Gõ lẫn từ nước ngoài: một công tắc "Tự khôi phục từ không phải tiếng Việt" (khi kết thúc từ, từ không phải âm tiết tiếng Việt hợp lệ trở về đúng như đã gõ); ví dụ windows → windows, Hasaki → Hasaki, vieetj → việt; ghi chú: từ trùng thì tiếng Việt thắng (car → cả), gõ đúp phím dấu để giữ chữ gốc (carr → car).
-- Sửa từ đã gõ: "Thêm dấu cho từ đã gõ", nhãn "Mới", dòng ghi chú về độ ổn định trên web editor để ô trống `[Kết quả kiểm chứng trên Google Docs, Notion…]` cho tới khi đo (N5, câu hỏi mở trong DECISIONS.md); ví dụ hoc + j → học. Lưu ý: "dep" + j ra "dẹp", không phải "đẹp" — ví dụ phải đúng quy tắc Telex.
+- Sửa từ đã gõ: "Thêm dấu cho từ đã gõ", nhãn "Mới", ghi chú "Đặt con trỏ ngay sau từ rồi gõ phím dấu. Không áp dụng ở ứng dụng có quy tắc “Có gạch chân”." (phạm vi D20) rồi ô trống về độ ổn định trên web editor `[Kết quả kiểm chứng trên Google Docs, Notion…]` cho tới khi đo (N5, câu hỏi mở trong DECISIONS.md); ví dụ hoc + j → học. Lưu ý: "dep" + j ra "dẹp", không phải "đẹp" — ví dụ phải đúng quy tắc Telex.
 - "Nâng cao" thu gọn (có artboard trạng thái mở): "Gõ tắt phụ âm" — đầu từ f → ph, j → gi (VNI thêm w → qu), cuối từ g → ng, h → nh, k → ch, áp dụng khi kết thúc từ và chỉ khi ra từ hợp lệ (D21, D23); "Cho phép phụ âm z, f, w, j" — ghi chú "Bật mục này sẽ tắt Gõ tắt phụ âm" (D22); khi kiểu gõ là Telex, thêm ghi chú w luôn thành ư nên mục này chỉ tác dụng với z, f, j (D22, D23). Cả hai mặc định tắt. Tóm tắt bên phải tiêu đề: "2 tuỳ chọn, đang tắt".
 
 **Ứng dụng**
 - Thanh tiêu đề: ô tìm ứng dụng, nút +.
 - "Việt/Anh theo cửa sổ": một hàng "Nhớ nguồn nhập liệu theo từng cửa sổ", gợi ý "Tuỳ chọn “Tự động chuyển sang nguồn đầu vào của tài liệu” của macOS", bên phải chữ trạng thái "Đang bật"/"Đang tắt" (đọc, không ghi, từ cài đặt hệ thống; không đọc được thì không hiện chữ, N5) và nút "Đổi…" mở Cài đặt Bàn phím (D5, N4).
-- "Quy tắc riêng": icon app, tên, nhãn "Đề xuất" nếu đến từ danh sách tương thích, một popup "Không gạch chân/Có gạch chân" (D5, D13). Ghi chú: "“Đề xuất” đến từ danh sách tương thích." Câu "Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ." (mockup) chỉ thêm lại khi M3 đo được gạch chân sửa được lỗi (N5; người dùng chốt 30/10/2026).
+- "Quy tắc riêng": icon app, tên, nhãn "Đề xuất" nếu đến từ danh sách tương thích, một popup "Không gạch chân/Có gạch chân" (D5, D13). App trong danh sách đã cài trên máy mà chưa có quy tắc hiện sẵn với nhãn "Đề xuất" và "Không gạch chân" (mặc định D13), chưa lưu gì; đổi popup thì mới lưu thành quy tắc. App chưa cài không hiện. Hàng đề xuất chưa lưu không có "Xoá quy tắc". Không có hàng nào thì hiện "Chưa có quy tắc riêng. Bấm + để thêm." Ghi chú (M3 đã đo, D13: thay tại chỗ chỉ sai khi phím cách nhau dưới 10 ms; gạch chân sửa được Chrome, VS Code nhưng không sửa được Terminal, nên chỉ nói khi nào chọn, không hứa sửa được): "“Đề xuất” đến từ danh sách tương thích: app có thể sai chữ khi gõ rất nhanh. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ." (câu thứ hai lấy từ mockup).
 
 **Cập nhật & hỗ trợ**
 - Thẻ đầu: icon app, phiên bản, trạng thái kiểm tra, nút "Kiểm tra ngay".
@@ -38,7 +38,7 @@ Sidebar có icon màu: Gõ phím (xanh dương), Thông minh (tím), Ứng dụn
 ## Các trạng thái bổ sung
 - **Dấu chưa được bật** (người dùng gỡ khỏi Nguồn nhập liệu): banner màu cam đầu mọi mục Cài đặt, "Bạn vẫn chỉnh được cài đặt, nhưng chưa gõ được tiếng Việt.", nút "Bật lại".
 - **Chế độ tối:** toàn bộ Cài đặt và onboarding phải có giao diện tối (dùng màu hệ thống của SwiftUI là tự có).
-- **Thêm quy tắc ứng dụng** (nút +): sheet với ô tìm, danh sách ứng dụng, một segmented "Khi đang gõ" (Không gạch chân | Có gạch chân), nút Huỷ / Thêm.
+- **Thêm quy tắc ứng dụng** (nút +): sheet với ô tìm, danh sách ứng dụng (trừ app đã có hàng trong "Quy tắc riêng", kể cả hàng đề xuất), một segmented "Khi đang gõ" (Không gạch chân | Có gạch chân), nút Huỷ / Thêm.
 - **Thẻ cập nhật** có 6 trạng thái: đã mới nhất; đang kiểm tra; đang tải (thanh tiến trình, "Bạn vẫn gõ bình thường", nút Huỷ); chờ cài ("Sẽ cài khi bạn ngừng gõ", nút Cài ngay); không có mạng (nút Thử lại, "Dấu vẫn gõ bình thường"); chữ ký không hợp lệ ("Đã huỷ bản cập nhật", nút Báo lỗi…).
 - **Xác nhận quay về bản trước** (D19) và **xác nhận gỡ cài đặt** (nút đỏ, checkbox "Xoá cả cài đặt và quy tắc ứng dụng", câu "Bàn phím đang dùng trước đó được giữ nguyên").
 - **Khi gõ trong ứng dụng:** không gạch chân (mặc định), có gạch chân (từ đang gõ được gạch, chốt khi Space), gõ tiếng Anh bằng ABC (chỉ báo của hệ thống), thêm dấu cho từ đã gõ.

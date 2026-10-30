@@ -791,16 +791,6 @@
         }
       }
     },
-    "Ví dụ của tính năng sắp có:" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ví dụ của tính năng sắp có:"
-          }
-        }
-      }
-    },
     "Vị trí dấu thanh" : {
       "localizations" : {
         "vi" : {
@@ -847,16 +837,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "[Phím tắt hệ thống]"
-          }
-        }
-      }
-    },
-    "[Thêm dấu cho từ đã gõ — có ở bản sau (M3)]" : {
-      "localizations" : {
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "[Thêm dấu cho từ đã gõ — có ở bản sau (M3)]"
           }
         }
       }
@@ -911,6 +891,16 @@
         }
       }
     },
+    "Đặt con trỏ ngay sau từ rồi gõ phím dấu. Không áp dụng ở ứng dụng có quy tắc “Có gạch chân”. [Kết quả kiểm chứng trên Google Docs, Notion…]" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đặt con trỏ ngay sau từ rồi gõ phím dấu. Không áp dụng ở ứng dụng có quy tắc “Có gạch chân”. [Kết quả kiểm chứng trên Google Docs, Notion…]"
+          }
+        }
+      }
+    },
     "Đề xuất" : {
       "localizations" : {
         "vi" : {
@@ -961,12 +951,12 @@
         }
       }
     },
-    "“Đề xuất” đến từ danh sách tương thích. [Gạch chân — có ở bản sau (M3)]" : {
+    "“Đề xuất” đến từ danh sách tương thích: app có thể sai chữ khi gõ rất nhanh. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ." : {
       "localizations" : {
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“Đề xuất” đến từ danh sách tương thích. [Gạch chân — có ở bản sau (M3)]"
+            "value" : "“Đề xuất” đến từ danh sách tương thích: app có thể sai chữ khi gõ rất nhanh. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ."
           }
         }
       }

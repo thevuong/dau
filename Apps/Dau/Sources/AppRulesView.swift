@@ -3,17 +3,25 @@ import SwiftUI
 import DauShared
 
 /// "Ứng dụng" (mockup "SettingsApps"): the macOS option that remembers the input source
-/// per window, shown read-only with "Đổi…" (D5, N4), and the per-app rules (D5, D13).
+/// per window, shown read-only with "Đổi…" (D5, N4), and the per-app rules (D5, D13),
+/// with the installed apps of the compatibility list labelled "Đề xuất".
 /// Search field and + sit in the toolbar, as in the mockup header.
 struct AppRulesView: View {
     @Environment(SettingsModel.self) private var model
     @State private var query = ""
     @State private var isAdding = false
     @State private var perWindow = DocumentInputSource.isOn()
+    @State private var installedSuggestions = AppDirectory.installedSuggestions(in: .empty)
     @FocusState private var focusedRule: String?
 
+    /// Stored rules plus the installed suggestions without a rule (not stored, D13).
+    private var rules: [AppRule] {
+        model.settings.ruleRows(suggesting: model.compatibility,
+                                isInstalled: installedSuggestions.contains)
+    }
+
     private var visibleRules: [AppRule] {
-        let rules = model.settings.appRules
+        let rules = rules
         let query = query.trimmingCharacters(in: .whitespaces)
         guard !query.isEmpty else { return rules }
         return rules.filter {
@@ -47,38 +55,51 @@ struct AppRulesView: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
                 perWindow = DocumentInputSource.isOn()
+                installedSuggestions = AppDirectory.installedSuggestions(in: model.compatibility)
             }
 
             SettingsGroup(Text("Quy tắc riêng")) {
                 SettingsCard {
-                    if model.settings.appRules.isEmpty {
+                    if rules.isEmpty {
                         SettingsRow(Text("Chưa có quy tắc riêng. Bấm + để thêm."), minHeight: 52) {}
                     } else if visibleRules.isEmpty {
                         SettingsRow(Text("Không có ứng dụng nào khớp."), minHeight: 52) {}
                     } else {
                         ForEach(Array(visibleRules.enumerated()), id: \.element.id) { index, rule in
                             if index > 0 { RowDivider() }
+                            // An unsaved suggestion has nothing to remove.
+                            let stored = model.settings.rule(for: rule.bundleID) != nil
                             AppRuleRow(rule: rule)
                                 .focusable()
                                 .focused($focusedRule, equals: rule.bundleID)
                                 .onTapGesture { focusedRule = rule.bundleID }
-                                .onDeleteCommand { remove(rule) }
+                                .onDeleteCommand { if stored { remove(rule) } }
                                 .contextMenu {
-                                    Button("Xoá quy tắc", role: .destructive) { remove(rule) }
+                                    if stored {
+                                        Button("Xoá quy tắc", role: .destructive) { remove(rule) }
+                                    }
                                 }
-                                .accessibilityAction(named: Text("Xoá quy tắc")) { remove(rule) }
+                                .accessibilityActions {
+                                    if stored {
+                                        Button("Xoá quy tắc") { remove(rule) }
+                                    }
+                                }
                         }
                     }
                 }
             } footer: {
-                // N5: underlining (D13) is not in the input method yet. The advice on when to
-                // choose it comes back once M3 measures that it fixes the app.
-                Hint(Text("“Đề xuất” đến từ danh sách tương thích. [Gạch chân — có ở bản sau (M3)]"))
+                // N5: only what M3 measured (D13): in-place typing went wrong only when keys
+                // came less than 10 ms apart; underlining fixed Chrome and VS Code but not
+                // Terminal, so the hint says when to choose it, not that it always helps.
+                Hint(Text("“Đề xuất” đến từ danh sách tương thích: app có thể sai chữ khi gõ rất nhanh. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ."))
                     .padding(.horizontal, 4)
             }
         }
+        .onAppear {
+            installedSuggestions = AppDirectory.installedSuggestions(in: model.compatibility)
+        }
         .sheet(isPresented: $isAdding) {
-            AddAppRuleSheet()
+            AddAppRuleSheet(listed: Set(rules.map(\.bundleID)))
         }
     }
 
@@ -112,10 +133,7 @@ struct AppRuleRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             Picker(selection: underlineBinding) {
                 Text("Không gạch chân").tag(false)
-                // N5: underlining (D13) is not in the input method yet; a saved value
-                // is kept and shown, but cannot be chosen. `.disabled` on a menu-style
-                // Picker item is not honored on macOS, so the binding refuses it too.
-                Text("Có gạch chân").tag(true).disabled(true)
+                Text("Có gạch chân").tag(true)
             } label: {
                 Text("Gạch chân khi gõ trong \(name)")
             }
@@ -132,15 +150,13 @@ struct AppRuleRow: View {
         .accessibilityLabel(Text(verbatim: name))
     }
 
-    /// Only "Không gạch chân" can be chosen until M3 (N5).
+    /// Changing an unsaved suggestion stores it as a suggested rule; setting a suggested
+    /// rule back to "Không gạch chân" removes it again (D13 default).
     private var underlineBinding: Binding<Bool> {
         Binding {
             (model.settings.rule(for: rule.bundleID) ?? rule).underline
         } set: { newValue in
-            guard !newValue else { return }
-            var updated = model.settings.rule(for: rule.bundleID) ?? rule
-            updated.underline = false
-            model.settings.upsert(updated)
+            model.settings.setUnderline(newValue, for: rule)
         }
     }
 }
@@ -162,6 +178,11 @@ enum AppDirectory {
     static func name(for rule: AppRule) -> String {
         if let url = url(for: rule.bundleID) { return name(at: url) }
         return rule.displayName ?? rule.bundleID
+    }
+
+    /// The suggested bundle IDs of `list` that are installed on this Mac.
+    static func installedSuggestions(in list: CompatibilityList) -> Set<String> {
+        Set(list.suggestedBundleIDs.filter { url(for: $0) != nil })
     }
 
     static func icon(for bundleID: String) -> NSImage {

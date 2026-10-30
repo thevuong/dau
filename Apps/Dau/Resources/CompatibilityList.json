@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "updated": "2026-10-30",
+  "about": "Apps Dấu labels “Đề xuất” for underlining (D13). Every app types without underline until the user turns it on. Initial list (D13, 30/10/2026): VS Code and the Electron/Chromium apps of docs/COMPATIBILITY.md; Terminal is not suggested. Bundle IDs from docs/COMPATIBILITY.md section 3.",
+  "apps": [
+    {
+      "name": "Visual Studio Code",
+      "bundleIDs": ["com.microsoft.VSCode"],
+      "suggestUnderline": true,
+      "note": "Electron. Measured 30/10/2026: in-place wrong at 0 and 5 ms between keys, right from 10 ms; underline right at 0 ms."
+    },
+    {
+      "name": "Google Chrome",
+      "bundleIDs": ["com.google.Chrome"],
+      "suggestUnderline": true,
+      "note": "Chromium. Measured 30/10/2026: in-place wrong at 0 ms, right from 5 ms; underline right at 0 ms."
+    },
+    {
+      "name": "Microsoft Edge",
+      "bundleIDs": ["com.microsoft.edgemac"],
+      "suggestUnderline": true,
+      "note": "Chromium (Microsoft Edge Framework). Not measured."
+    },
+    {
+      "name": "Brave",
+      "bundleIDs": ["com.brave.Browser"],
+      "suggestUnderline": true,
+      "note": "Chromium (inferred). Not measured."
+    },
+    {
+      "name": "Arc",
+      "bundleIDs": ["company.thebrowser.Browser"],
+      "suggestUnderline": true,
+      "note": "Chromium (inferred). Not measured."
+    },
+    {
+      "name": "Cursor",
+      "bundleIDs": ["com.todesktop.230313mzl4w4u92"],
+      "suggestUnderline": true,
+      "note": "Electron (built from VS Code). Not measured."
+    },
+    {
+      "name": "Zalo",
+      "bundleIDs": ["com.vng.zalo"],
+      "suggestUnderline": true,
+      "note": "Electron. Not measured."
+    },
+    {
+      "name": "Discord",
+      "bundleIDs": ["com.hnc.Discord"],
+      "suggestUnderline": true,
+      "note": "Electron. Not measured."
+    },
+    {
+      "name": "Slack",
+      "bundleIDs": ["com.tinyspeck.slackmacgap"],
+      "suggestUnderline": true,
+      "note": "Electron (inferred). Not measured."
+    },
+    {
+      "name": "Notion",
+      "bundleIDs": ["notion.id"],
+      "suggestUnderline": true,
+      "note": "Electron. Not measured."
+    },
+    {
+      "name": "Obsidian",
+      "bundleIDs": ["md.obsidian"],
+      "suggestUnderline": true,
+      "note": "Electron (inferred). Not measured."
+    },
+    {
+      "name": "Figma",
+      "bundleIDs": ["com.figma.Desktop"],
+      "suggestUnderline": true,
+      "note": "Electron, content drawn on a canvas. Not measured."
+    }
+  ]
+}
