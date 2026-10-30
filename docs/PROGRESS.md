@@ -156,3 +156,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | T3 | Dịch vụ cài đặt thật: chép bộ gõ nhúng sẵn, đăng ký, bật (người dùng bấm, N4) có Hoàn tác, nâng cấp bản mới (dừng tiến trình cũ), gỡ cài đặt (D16, sheet xác nhận) | imk-dev (+ app-ui-dev nối giao diện) | sau T1 |
 | T4 | Thử trên máy: gỡ bản Debug hiện tại rồi chạy onboarding từ đầu (cần người dùng đồng ý vì đổi nguồn nhập liệu đang bật) | phiên chính + người dùng | sau T3 |
 | T5 | Kiểm toán M5 | auditor | cuối |
+- 30/10/2026 — M5 T2 onboarding 3 bước (deddc49), T3 cài/bật/nâng cấp/gỡ thật, app chủ bỏ sandbox (D37), bộ gõ thoát khi nhận thông báo quitRequested (d1b74f8) — app-ui-dev, imk-dev; test engine 77, DauShared 34, snapshot 45, IMK 70; selftest-app-group PASS với app không sandbox. Thay từ mẫu cũ bằng "Sunrise" ở repo và canvas (7b3f815, 3378b6e). Chờ T4 trên máy cùng người dùng — phiên chính
