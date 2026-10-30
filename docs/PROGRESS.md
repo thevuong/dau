@@ -118,3 +118,15 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 30/10/2026 — kiểm toán lần 3 M2 + M4 — auditor — ĐẠT cả hai (sửa dòng tóm tắt trong commit đóng mốc); ma trận UI 12/12, test 76/21/25/10 xanh. Đóng M2, M4 — phiên chính
 - 30/10/2026 — đổi Bundle ID sang com.codefastlabs.dau (3b8864b): cài đè cùng đường dẫn `~/Library/Input Methods/DauInputMethod.app` với ID khác làm bộ đệm TIS lệch (ID nguồn mới nhưng `kTISPropertyBundleID` vẫn là ID cũ, báo enabled trong khi `AppleEnabledInputSources` không có) → thêm nguồn không kích hoạt được. Cách sửa: đăng xuất/đăng nhập. Ghi cho M5 (cài/gỡ, cập nhật): không đổi ID bộ gõ giữa các bản; nếu phải đổi thì hướng dẫn đăng xuất — phiên chính
 - 30/10/2026 — sau khi người dùng đăng xuất/đăng nhập và bật lại "Dấu – Tiếng Việt": TIS đúng ID mới (com.codefastlabs.dau.inputmethod.Dau.vi); `selftest-app-group.sh` PASS với App Group M58DANM3ZP.com.codefastlabs.dau.shared; `selftest-typing textedit` PASS — phiên chính
+
+## Kế hoạch M3 (30/10/2026)
+| # | Việc | Agent | Song song |
+|---|---|---|---|
+| T1 | Chế độ gạch chân D13 (`setMarkedText`, chốt chữ khi kết thúc từ/reset), bật theo quy tắc người dùng; đo thử ở Chrome, VS Code, Terminal với phím dồn (0/5/10 ms) | imk-dev | cùng T5 |
+| T5 | Khung `docs/COMPATIBILITY.md`: danh sách app cần thử (app phổ biến ở VN, app đã cài trên máy), cột kết quả, cách thử | researcher | cùng T1 |
+| T2 | D20 "Thêm dấu cho từ đã gõ" ở bộ gõ (đọc chữ trước con trỏ bằng `attributedSubstring` khi bộ đệm rỗng, `seed`); reset khi đổi nguồn không qua `activateServer`; rà D18 | imk-dev | sau T1 (cùng file controller) |
+| T3 | Danh sách tương thích có sẵn trong bản build (D7, D13): model ở DauShared, bộ gõ đọc, app hiện "Đề xuất"; nội dung theo kết quả T1 | imk-dev + app-ui-dev | sau T1 |
+| T4 | Mở lại giao diện đã làm xong (lựa chọn gạch chân, công tắc D20), bỏ ô trống M3 tương ứng | app-ui-dev | sau T2, T3 |
+| T6 | Chạy ma trận tương thích trên máy, ghi tự sửa chính tả (D4) | phiên chính + agent GUI | sau T4 |
+| T7 | VoiceOver đọc tên nguồn (D17), biểu tượng V | người dùng | bất kỳ lúc nào |
+| T8 | Kiểm toán M3 | auditor | cuối |
