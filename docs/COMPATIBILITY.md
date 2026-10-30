@@ -109,7 +109,7 @@ Mong đợi: `windows car tôi yêu tiếng Việt, Hasaki␣` (D4, D26, D30). "
 | K4 | Backspace (D32) | gõ `hoaf` rồi ⌫ | "hoà" rồi "hò" |
 | K5 | Click reset (D4, D11) | gõ `tooi`, click vào chỗ khác trong văn bản, gõ `s` | chỉ thêm "s" ở chỗ mới, "tôi" cũ không đổi |
 | K6 | Mũi tên reset (D4) | gõ `tooi`, nhấn ←, gõ `s` | thêm "s" tại con trỏ, không bỏ dấu vào "tôi". Ghi chú M2: lần ← đầu sau từ gõ dở có thể bị ứng dụng nuốt (TextEdit, cả với U.S.) |
-| K7 | Thêm dấu cho từ đã gõ (D20) | chờ T2. Dự kiến: gõ `hoc`, dấu cách, ⌫, rồi `j` | "học". Cách thử chốt lại theo cách T2 làm |
+| K7 | Thêm dấu cho từ đã gõ (D20) | gõ `hoc`, dấu cách, ⌫, nghỉ một nhịp (≥ 50 ms, gõ tay là đủ), rồi `j`. Tự gõ: `run.sh --delay 120 --keys "hoc ⌫j tooi ⌫s carr ⌫s hoc ⌫f viet ⌫j xin chao ⌫f " --expect "học tối cars hocf vietj xin chào "` | "học". Phím dồn dưới 50 ms thì D20 cố ý không chạy ("hocj"). App gạch chân (D13): không có D20, ra "hocj". Terminal: ⌫ không tới bộ gõ nên ra "hocj" (ARCHITECTURE.md) |
 | K8 | Tự sửa chính tả (D4) | gõ `tooi yeeu tieengs Vieetj, Hasaki carr␣` | Dấu trả "car". Nếu sau dấu cách chữ thành "cả": gõ lại câu bằng U.S. (`… Hasaki car␣`). U.S. cũng bị sửa thì đó là macOS, ghi "có" ở cột Tự sửa; không tắt tự sửa hộ người dùng (N4) |
 
 ### 4.4 Số đo cần ghi
