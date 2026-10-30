@@ -25,9 +25,14 @@ final class DauInputController: IMKInputController {
     /// every change notification and at activation.
     private var settings = SettingsStore.inputMethod.load()
     private lazy var engine = VietEngine(options: settings.engineOptions)
-    private var tracker = CursorTracker()
+    /// In-place mode (method A): cursor tracking and D20 "Thêm dấu cho từ đã gõ".
+    private var inPlace = InPlaceComposer()
     /// Keeps the Darwin notification registration alive; dropped when the client closes.
     private var settingsObserver: SettingsChangeObserver?
+    /// Selected-input-source change observer (see `startObservingInputSource`).
+    private var sourceObserver: InputSourceObserver?
+    /// When IMK last activated this controller (`ProcessInfo.systemUptime`).
+    private var activatedAt: TimeInterval = 0
     /// Identity of the last client proxy seen, to reset when the client changes.
     private var clientID: ObjectIdentifier?
     /// Bundle ID of the client app, for perf logs and per-app rules (D13); read once
@@ -65,6 +70,7 @@ final class DauInputController: IMKInputController {
             // Underline mode: commit the word where it is shown before the click moves
             // the cursor (D4: reset, no restore).
             let committed = resetComposition(client: sender)
+            inPlace.noteEvent(at: event.timestamp)
             record(KeyResult(kind: committed ? .commit : .reset), start: start)
             return false
         default:
@@ -81,7 +87,20 @@ final class DauInputController: IMKInputController {
         let route = KeyRouter.route(keyCode: event.keyCode,
                                     modifiers: event.modifierFlags,
                                     characters: event.characters)
-        let result = underline ? processMarked(route, client: client) : process(route, client: client)
+        let timed = TimedClient(client)
+        var result: KeyResult
+        if underline {
+            result = processMarked(route, client: timed)
+        } else {
+            let outcome = inPlace.handle(route, time: event.timestamp, engine: &engine, client: timed)
+            result = KeyResult(consumed: outcome.consumed, kind: outcome.kind)
+            #if DEBUG
+            result.diag = outcome.attempt.map(ReplaceDiag.init)
+            #endif
+        }
+        result.selectedRangeNs = timed.selectedRangeNs
+        result.insertTextNs = timed.callNs
+        result.readNs = timed.readNs
         record(result, start: start)
         #if DEBUG
         // After the timing is recorded, so the extra selectedRange is not measured.
@@ -96,93 +115,19 @@ final class DauInputController: IMKInputController {
         var kind: PerfLog.Kind = .pass
         var selectedRangeNs: Int64 = -1
         var insertTextNs: Int64 = -1
-        /// The replacement could not be applied (mismatch, unsupported client).
-        var failed = false
+        var readNs: Int64 = -1
         #if DEBUG
         /// Positions of the last replacement attempt of this key (Debug diagnostics).
         var diag: ReplaceDiag?
         #endif
     }
 
-    private func process(_ route: KeyRoute, client: IMKTextInput) -> KeyResult {
-        switch route {
-        case .ignore:
-            // D4: shortcuts, arrows, Esc only reset; nothing is restored.
-            resetComposition()
-            return KeyResult(kind: .reset)
-
-        case .backspace:
-            let wasComposing = engine.isComposing
-            switch engine.backspace() {
-            case .passThrough:
-                // The app deletes one character itself.
-                if wasComposing && engine.isComposing {
-                    tracker.backspacePassedThrough()
-                } else {
-                    tracker.invalidate()
-                }
-                return KeyResult()
-            case .replace(let deleteCount, let insert):
-                var result = replace(deleteCount: deleteCount, insert: insert, client: client)
-                if result.failed {
-                    // Let the app's own Delete run; the engine no longer knows the word.
-                    resetComposition()
-                    result.consumed = false
-                } else if !engine.isComposing {
-                    tracker.invalidate()
-                }
-                return result
-            }
-
-        case .endWord:
-            // Return, Tab, keypad Enter: restore the word if needed (D4), then let the app
-            // handle the key itself (send a message, move focus…).
-            var result = KeyResult()
-            if case .replace(let deleteCount, let insert) = engine.endWord() {
-                result = replace(deleteCount: deleteCount, insert: insert, client: client)
-            }
-            resetComposition()
-            result.consumed = false
-            return result
-
-        case .character(let scalar):
-            switch engine.handle(scalar) {
-            case .passThrough:
-                tracker.passedThrough(length: scalar.utf16.count)
-                if !engine.isComposing { tracker.invalidate() }
-                return KeyResult()
-            case .replace(let deleteCount, let insert):
-                var result = replace(deleteCount: deleteCount, insert: insert, client: client)
-                if result.failed {
-                    // D11: the app's text is not what the engine thinks. Start over from
-                    // this key alone, so it still does the most it can on its own.
-                    resetComposition()
-                    switch engine.handle(scalar) {
-                    case .passThrough:
-                        result.consumed = false
-                    case .replace(0, let insert):
-                        let inserted = insertAtCursor(insert, client: client)
-                        result.insertTextNs = inserted
-                        result.consumed = true
-                    case .replace:
-                        resetComposition()
-                        result.consumed = false
-                    }
-                    if !engine.isComposing { tracker.invalidate() }
-                    return result
-                }
-                if !engine.isComposing { tracker.invalidate() }
-                return result
-            }
-        }
-    }
-
     /// Underline mode (D13): at most one `setMarkedText` or `insertText` per key, both
-    /// with replacementRange NSNotFound; never `selectedRange` (N3). See `MarkedComposer`.
-    private func processMarked(_ route: KeyRoute, client: IMKTextInput) -> KeyResult {
-        let timed = TimedClient(client)
-        let outcome = composer.handle(route, engine: &engine, client: timed)
-        markedClient = composer.isComposing ? (client as AnyObject) : nil
+    /// with replacementRange NSNotFound; never `selectedRange` (N3), and no D20 read
+    /// (see ARCHITECTURE.md). See `MarkedComposer`.
+    private func processMarked(_ route: KeyRoute, client: TimedClient) -> KeyResult {
+        let outcome = composer.handle(route, engine: &engine, client: client)
+        markedClient = composer.isComposing ? (client.client as AnyObject) : nil
         var result = KeyResult(consumed: outcome.consumed)
         switch outcome.call {
         case .none:
@@ -192,66 +137,7 @@ final class DauInputController: IMKInputController {
         case .insertText:
             result.kind = .commit
         }
-        result.insertTextNs = timed.callNs
         return result
-    }
-
-    /// Applies `.replace` with exactly one `insertText` call (N3). Method A: ask the
-    /// client for `selectedRange` when text before the cursor must be replaced.
-    private func replace(deleteCount: Int, insert: TextBuffer, client: IMKTextInput) -> KeyResult {
-        var result = KeyResult(consumed: true)
-        if deleteCount == 0 {
-            result.kind = .insert
-            result.insertTextNs = insertAtCursor(insert, client: client)
-            return result
-        }
-        // Engine letters are BMP scalars, so deleteCount scalars == deleteCount UTF-16 units
-        // (no D20 seed yet, so no decomposed text can be on screen).
-        let selStart = PerfLog.now()
-        let selSignpost = PerfLog.signposter.beginInterval("selectedRange")
-        let selection = client.selectedRange()
-        PerfLog.signposter.endInterval("selectedRange", selSignpost)
-        result.selectedRangeNs = Int64(PerfLog.now() &- selStart)
-        #if DEBUG
-        result.diag = ReplaceDiag(deleteCount: deleteCount, selection: selection,
-                                  expected: tracker.expected, insertedLength: insert.description.utf16.count)
-        #endif
-
-        switch tracker.plan(selection: selection, deleteCount: deleteCount) {
-        case .replace(let range):
-            #if DEBUG
-            result.diag?.replacement = range
-            #endif
-            let text = insert.description
-            let insStart = PerfLog.now()
-            let insSignpost = PerfLog.signposter.beginInterval("insertText")
-            client.insertText(text, replacementRange: range)
-            PerfLog.signposter.endInterval("insertText", insSignpost)
-            result.insertTextNs = Int64(PerfLog.now() &- insStart)
-            tracker.didReplace(range, insertedLength: text.utf16.count)
-            result.kind = .replace
-        case .unsupported:
-            result.kind = .unsupported
-            result.failed = true
-            result.consumed = false
-        case .mismatch:
-            result.kind = .mismatch
-            result.failed = true
-            result.consumed = false
-        }
-        return result
-    }
-
-    /// Inserts at the current selection without asking where it is (deleteCount 0).
-    /// Returns the duration of the `insertText` call in nanoseconds.
-    private func insertAtCursor(_ insert: TextBuffer, client: IMKTextInput) -> Int64 {
-        let text = insert.description
-        let start = PerfLog.now()
-        let signpost = PerfLog.signposter.beginInterval("insertText")
-        client.insertText(text, replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
-        PerfLog.signposter.endInterval("insertText", signpost)
-        tracker.didInsertAtCursor(length: text.utf16.count)
-        return Int64(PerfLog.now() &- start)
     }
 
     private func record(_ result: KeyResult, start: UInt64) {
@@ -259,6 +145,7 @@ final class DauInputController: IMKInputController {
                     handleNs: PerfLog.now() &- start,
                     selectedRangeNs: result.selectedRangeNs,
                     insertTextNs: result.insertTextNs,
+                    readNs: result.readNs,
                     app: clientApp)
     }
 
@@ -269,7 +156,7 @@ final class DauInputController: IMKInputController {
     /// else to `client`. Returns true if text was committed.
     @discardableResult
     private func resetComposition(client: Any? = nil) -> Bool {
-        tracker.invalidate()
+        inPlace.reset(engine: &engine)
         guard composer.isComposing else {
             composer.abandon(engine: &engine) // resets the engine; no text to keep
             return false
@@ -295,17 +182,20 @@ final class DauInputController: IMKInputController {
                 perf.note("client-changed", app: clientApp)
             }
             clientID = id
+            inPlace.activate() // a new client may give text (D20) even if the last did not
         }
     }
 
     override func activateServer(_ sender: Any!) {
         super.activateServer(sender)
         resetComposition(client: sender)
+        activatedAt = ProcessInfo.processInfo.systemUptime
+        inPlace.activate()
         startObservingSettings()
-        if let sender {
-            clientID = ObjectIdentifier(sender as AnyObject)
-            clientApp = clientBundleID(sender)
-        }
+        startObservingInputSource()
+        // D18: a nil sender must not keep the previous app's ID (and its underline rule).
+        clientID = sender.map { ObjectIdentifier($0 as AnyObject) }
+        clientApp = clientBundleID(sender)
         // Catch up on anything missed while no observer was registered (or if the
         // registration failed). One small JSON decode per activation, not per key.
         // After `clientApp` is known, so the app's underline rule applies (D13).
@@ -320,7 +210,7 @@ final class DauInputController: IMKInputController {
     /// the input method through a client whose `bundleIdentifier()` is nil (seen
     /// 30/10/2026 in the D13 trial: the Chrome rule then did not apply); the frontmost
     /// app is the one receiving keys, so it stands in. "?" if neither is known (D18).
-    private func clientBundleID(_ sender: Any) -> String {
+    private func clientBundleID(_ sender: Any?) -> String {
         if let id = (sender as? IMKTextInput)?.bundleIdentifier(), !id.isEmpty { return id }
         let frontmost = onMain { NSWorkspace.shared.frontmostApplication?.bundleIdentifier } ?? nil
         guard let frontmost, !frontmost.isEmpty else { return "?" }
@@ -344,7 +234,39 @@ final class DauInputController: IMKInputController {
     override func inputControllerWillClose() {
         resetComposition()
         settingsObserver = nil
+        sourceObserver = nil
         super.inputControllerWillClose()
+    }
+
+    // MARK: - Input source changes IMK does not report (M3)
+
+    /// A switch to another input source and back that IMK does not report with
+    /// `deactivateServer`/`activateServer` (measured 30/10/2026: `TISSelectInputSource`
+    /// from another process, "to" → U.S. → Dấu → "o" gave "tô") must still end the word
+    /// (D4: reset, no restore). The system posts the distributed notification
+    /// `kTISNotifySelectedKeyboardInputSourceChanged` for every switch, and a sandboxed
+    /// process may observe it. A switch made with the keyboard shortcut or the menu also
+    /// activates this controller; its notification arrives just after and is ignored, so
+    /// keys typed right after the switch keep their word.
+    private func startObservingInputSource() {
+        guard sourceObserver == nil else { return }
+        let target = WeakController(self)
+        sourceObserver = InputSourceObserver {
+            guard Thread.isMainThread else { return }
+            target.controller?.inputSourceDidChange()
+        }
+    }
+
+    /// Notifications this soon after `activateServer` are taken as the echo of that
+    /// activation.
+    static let activationEcho: TimeInterval = 0.5
+
+    private func inputSourceDidChange() {
+        let now = ProcessInfo.processInfo.systemUptime
+        guard now - activatedAt >= Self.activationEcho else { return }
+        let hadWord = engine.isComposing || composer.isComposing
+        resetComposition(client: client() as Any?)
+        if hadWord { perf.note("source-changed-reset", app: clientApp) }
     }
 
     // MARK: - Shared settings (M4)
@@ -378,19 +300,16 @@ final class DauInputController: IMKInputController {
         if newUnderline != underline || new.engineOptions != engine.options {
             // D4: a settings change ends the word without restoring it; a marked word is
             // committed as shown before the engine is reset or the mode switches.
-            resetComposition(client: client())
+            resetComposition(client: client() as Any?)
         }
         settings = new
         underline = newUnderline
         if EngineSettings.apply(new, to: &engine) {
-            tracker.invalidate()
+            inPlace.reset(engine: &engine)
             perf.note("options-changed", app: clientApp)
         }
-        // TODO(D20): "Thêm dấu cho từ đã gõ" (`settings.addMarksToTypedWords`). Off: never
-        // seed (current behavior). On: not implemented yet — seeding needs
-        // `attributedSubstring` for the word before the cursor and a UTF-16 count of the
-        // seeded (possibly NFD) text for `deleteCount` (PROGRESS.md, notes for M2). Until
-        // then the engine is never seeded, whatever the setting says.
+        // D20 "Thêm dấu cho từ đã gõ" (D15: on by default). Read here, never per key.
+        inPlace.addMarksEnabled = new.addMarksToTypedWords
     }
 
     /// Debug builds only: bundle IDs forced into underline mode for trials
@@ -415,7 +334,8 @@ final class DauInputController: IMKInputController {
     /// not used beyond a reset (D4: a source/mode change ends the word without restoring
     /// it). Any value, including an old "….Dau.en" ID or garbage, is accepted (D18).
     override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
-        super.setValue(value, forTag: tag, client: sender)
+        // D18: a nil value carries nothing to store; super is not given it.
+        if let value { super.setValue(value, forTag: tag, client: sender) }
         guard tag == kTextServiceInputModePropertyTag else { return }
         resetComposition(client: sender)
     }
@@ -465,7 +385,7 @@ final class DauInputController: IMKInputController {
         var new = store.load()
         new.typingMethod = method
         store.save(new)
-        resetComposition(client: client())
+        resetComposition(client: client() as Any?)
         apply(new)
     }
 
@@ -504,13 +424,36 @@ final class DauInputController: IMKInputController {
     }
 }
 
-/// `IMKTextInput` as a `MarkedTextClient`, timing the one call of the key for the perf
-/// log (D8: durations only).
-private final class TimedClient: MarkedTextClient {
+/// `IMKTextInput` as the client of either mode, timing each call of the key for the
+/// perf log (D8: durations only, never the text).
+private final class TimedClient: MarkedTextClient, InPlaceClient {
     let client: IMKTextInput
+    /// Duration of the `insertText` or `setMarkedText` call of the key, -1 if none.
     private(set) var callNs: Int64 = -1
+    private(set) var selectedRangeNs: Int64 = -1
+    /// Duration of the `attributedSubstring` call (D20), -1 if none.
+    private(set) var readNs: Int64 = -1
 
     init(_ client: IMKTextInput) { self.client = client }
+
+    func selectedRange() -> NSRange {
+        let start = PerfLog.now()
+        let signpost = PerfLog.signposter.beginInterval("selectedRange")
+        let range = client.selectedRange()
+        PerfLog.signposter.endInterval("selectedRange", signpost)
+        selectedRangeNs = Int64(PerfLog.now() &- start)
+        return range
+    }
+
+    func text(in range: NSRange) -> String? {
+        let start = PerfLog.now()
+        let signpost = PerfLog.signposter.beginInterval("attributedSubstring")
+        // D18: the header allows nil (no document access); never force-unwrap.
+        let attributed: NSAttributedString? = client.attributedSubstring(from: range)
+        PerfLog.signposter.endInterval("attributedSubstring", signpost)
+        readNs = Int64(PerfLog.now() &- start)
+        return attributed?.string
+    }
 
     func setMarkedText(_ text: String, selectionRange: NSRange, replacementRange: NSRange) {
         let start = PerfLog.now()
@@ -526,6 +469,25 @@ private final class TimedClient: MarkedTextClient {
         client.insertText(text, replacementRange: replacementRange)
         PerfLog.signposter.endInterval("insertText", signpost)
         callNs = Int64(PerfLog.now() &- start)
+    }
+}
+
+/// Observes the distributed notification for a change of the selected keyboard input
+/// source (`kTISNotifySelectedKeyboardInputSourceChanged`) on the main queue; removes
+/// itself when released. The notification carries no text (D8) and nothing is read from
+/// it: it only says that a switch happened.
+private final class InputSourceObserver {
+    private let token: NSObjectProtocol
+
+    init(_ handler: @escaping @Sendable () -> Void) {
+        let name = Notification.Name(kTISNotifySelectedKeyboardInputSourceChanged as String)
+        token = DistributedNotificationCenter.default().addObserver(forName: name, object: nil, queue: .main) { _ in
+            handler()
+        }
+    }
+
+    deinit {
+        DistributedNotificationCenter.default().removeObserver(token)
     }
 }
 

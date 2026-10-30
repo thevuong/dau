@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Prints per-app timing of the input method from the unified log (open question A/B):
-# p50/p99 of `selectedRange()`, `insertText`, and the whole `handle`, plus event counts.
+# p50/p99 of `selectedRange()`, `insertText`, `attributedSubstring` (D20), and the whole
+# `handle`, plus event counts.
 #
 # The input method logs one line per key (Debug builds, or Release with the defaults key
 # DauPerfLog = YES), category "perf": event kind, durations in ns and the client app's
@@ -62,13 +63,16 @@ read_log | awk -v want="$(printf '%s' "$APP_FILTER" | tr '[:upper:]' '[:lower:]'
     if (app == "" || kind == "") next
     if (want != "" && index(tolower(app), want) == 0) next
     print app, "count_" kind, 1
-    h = field("handle_ns"); s = field("sel_ns"); i = field("ins_ns")
+    h = field("handle_ns"); s = field("sel_ns"); i = field("ins_ns"); r = field("read_ns")
     if (h != "") print app, "handle_us", h / 1000
     if (kind == "replace" || kind == "mismatch" || kind == "unsupported") {
       if (h != "") print app, "handle_replace_us", h / 1000
     }
     if (s != "" && s + 0 >= 0) print app, "selectedRange_us", s / 1000
     if (i != "" && i + 0 >= 0) print app, "insertText_us", i / 1000
+    # D20 "Thêm dấu cho từ đã gõ": attributedSubstring, and the whole key when it read.
+    if (r != "" && r + 0 >= 0) print app, "attributedSubstring_us", r / 1000
+    if (kind ~ /^seed/ && h != "") print app, "handle_seed_us", h / 1000
   }
   / event name=/ {
     app = field("app"); name = field("name")

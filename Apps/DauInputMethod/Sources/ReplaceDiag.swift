@@ -21,6 +21,14 @@ struct ReplaceDiag {
     /// The `replacementRange` sent, or nil when nothing was sent (mismatch, unsupported).
     var replacement: NSRange?
 
+    init(_ attempt: InPlaceComposer.Attempt) {
+        deleteCount = attempt.deleteCount
+        selection = attempt.selection
+        expected = attempt.expected
+        insertedLength = attempt.insertedLength
+        replacement = attempt.replacement
+    }
+
     /// Logs one line. Reads `selectedRange()` once more after the insertion to see where
     /// the client put the cursor; an extra client call, Debug only.
     static func log(_ diag: ReplaceDiag, kind: PerfLog.Kind, client: IMKTextInput, app: String) {

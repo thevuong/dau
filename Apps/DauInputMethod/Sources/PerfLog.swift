@@ -33,6 +33,15 @@ struct PerfLog {
         /// Underline mode (D13): insertText of the marked word (word end or reset event),
         /// replacementRange NSNotFound, no selectedRange.
         case commit
+        /// D20: selectedRange + attributedSubstring read a word before the cursor, the
+        /// engine was seeded with it and the key replaced it (one insertText).
+        case seed
+        /// D20: a word was read and seeded, but the key does not apply to it
+        /// ("viet" + j): the key went to the app unchanged.
+        case seedPass = "seed_pass"
+        /// D20: selectedRange (and attributedSubstring if there was text before the
+        /// cursor) found no word to seed; the key was handled as the first of a word.
+        case seedNone = "seed_none"
     }
 
     let enabled: Bool
@@ -53,10 +62,12 @@ struct PerfLog {
     ///   - selectedRangeNs: duration of the `selectedRange()` call, or -1 if not called.
     ///   - insertTextNs: duration of the `insertText` call (or, for `mark`, of the
     ///     `setMarkedText` call), or -1 if not called.
-    func record(_ kind: Kind, handleNs: UInt64, selectedRangeNs: Int64, insertTextNs: Int64, app: String) {
+    ///   - readNs: duration of the `attributedSubstring` call (D20), or -1 if not called.
+    func record(_ kind: Kind, handleNs: UInt64, selectedRangeNs: Int64, insertTextNs: Int64,
+                readNs: Int64 = -1, app: String) {
         guard enabled else { return }
         PerfLog.logger.notice(
-            "key kind=\(kind.rawValue, privacy: .public) handle_ns=\(handleNs, privacy: .public) sel_ns=\(selectedRangeNs, privacy: .public) ins_ns=\(insertTextNs, privacy: .public) app=\(app, privacy: .public)"
+            "key kind=\(kind.rawValue, privacy: .public) handle_ns=\(handleNs, privacy: .public) sel_ns=\(selectedRangeNs, privacy: .public) ins_ns=\(insertTextNs, privacy: .public) read_ns=\(readNs, privacy: .public) app=\(app, privacy: .public)"
         )
     }
 
