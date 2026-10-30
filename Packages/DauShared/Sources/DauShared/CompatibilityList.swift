@@ -4,8 +4,8 @@
 // (Apps/Dau/Resources/CompatibilityList.json). In M7 the host app also downloads a
 // signed copy of the same format into the App Group container (D7, N2); the host app
 // then uses whichever valid copy has the higher `version`. The input method never reads
-// the list: underlining only follows the user's rules (D13), and a suggestion only
-// becomes a rule when the user changes it in Settings.
+// the list: underlining only follows the stored rules (D13), and a suggestion only
+// becomes a rule when the user clicks "Bật gạch chân" in Settings.
 
 import Foundation
 
@@ -118,47 +118,38 @@ public struct CompatibilityList: Sendable, Codable, Equatable {
 }
 
 extension DauSettings {
-    /// The rows of "Quy tắc riêng" (D5, D13).
+    /// The rows of "Đề xuất" (D13): the installed suggested apps that have no stored
+    /// rule, in list order. Each row is the rule "Bật gạch chân" would store (underline
+    /// on, source `.suggested`); nothing is stored until the user accepts it.
     ///
-    /// - First the suggested apps, in list order: the stored rule if the user changed
-    ///   it (source `.suggested`), otherwise, if the app is installed and has no rule,
-    ///   an unsaved "Không gạch chân" rule with source `.suggested`. Nothing is stored
-    ///   until the user changes it, and a row keeps its place when it gets stored.
-    /// - Stored suggested rules whose app left the list follow, then the user's rules
-    ///   in stored order. A user rule for a suggested app stays a user rule.
-    public func ruleRows(suggesting list: CompatibilityList,
-                         isInstalled: (String) -> Bool) -> [AppRule] {
-        var rows: [AppRule] = []
-        var shown = Set<String>()
-        for id in list.suggestedBundleIDs {
-            if let stored = rule(for: id) {
-                guard stored.source == .suggested else { continue }
-                rows.append(stored)
-                shown.insert(id)
-            } else if isInstalled(id) {
-                rows.append(AppRule(bundleID: id, displayName: list.suggestion(for: id)?.name,
-                                    underline: false, source: .suggested))
-                shown.insert(id)
-            }
+    /// Any stored rule for the app, user-made or accepted, takes it out of "Đề xuất",
+    /// even when it is set back to "Không gạch chân". Removing the rule brings the
+    /// suggestion back. "Quy tắc riêng" lists `appRules` as stored.
+    public func suggestions(from list: CompatibilityList,
+                            isInstalled: (String) -> Bool) -> [AppRule] {
+        list.suggestedBundleIDs.compactMap { id in
+            guard rule(for: id) == nil, isInstalled(id) else { return nil }
+            return AppRule(bundleID: id, displayName: list.suggestion(for: id)?.name,
+                           underline: true, source: .suggested)
         }
-        for stored in appRules where stored.source == .suggested && !shown.contains(stored.bundleID) {
-            rows.append(stored)
-            shown.insert(stored.bundleID)
-        }
-        rows += appRules.filter { !shown.contains($0.bundleID) }
-        return rows
     }
 
-    /// Sets the underline choice of a row from `ruleRows`. A suggested app goes back to
-    /// having no stored rule when set to "Không gạch chân" (its default, D13); a user
-    /// rule keeps its explicit choice.
-    public mutating func setUnderline(_ underline: Bool, for row: AppRule) {
-        var updated = rule(for: row.bundleID) ?? row
+    /// "Bật gạch chân" on a row of `suggestions`: stores the rule with underline on and
+    /// source `.suggested`, at the end of "Quy tắc riêng". D13: this is the only way a
+    /// suggestion turns underline on.
+    public mutating func acceptSuggestion(_ suggestion: AppRule) {
+        var rule = suggestion
+        rule.underline = true
+        rule.source = .suggested
+        upsert(rule)
+    }
+
+    /// Sets the underline choice of the stored rule for `bundleID`, keeping the rule and
+    /// its source (a suggested rule set to "Không gạch chân" stays a rule). Does nothing
+    /// if there is no stored rule.
+    public mutating func setUnderline(_ underline: Bool, for bundleID: String) {
+        guard var updated = rule(for: bundleID) else { return }
         updated.underline = underline
-        if updated.source == .suggested && !underline {
-            removeRule(for: row.bundleID)
-        } else {
-            upsert(updated)
-        }
+        upsert(updated)
     }
 }

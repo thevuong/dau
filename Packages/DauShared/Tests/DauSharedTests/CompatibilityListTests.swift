@@ -89,72 +89,72 @@ struct CompatibilityListTests {
     }
 }
 
-@Suite("Rule rows with suggestions")
-struct RuleRowsTests {
+@Suite("Suggestions and stored rules")
+struct SuggestionsTests {
     let list = CompatibilityList(version: 1, apps: [
         .init(bundleIDs: ["vscode"], name: "VS Code"),
         .init(bundleIDs: ["teams2", "teams1"], name: "Teams"),
         .init(bundleIDs: ["chrome"], name: "Chrome"),
         .init(bundleIDs: ["firefox"], name: "Firefox", suggestUnderline: false),
     ])
+    let installed: (String) -> Bool = { _ in true }
 
-    @Test("installed suggestions without a rule appear unsaved, without underline")
-    func pendingSuggestions() {
+    @Test("installed suggested apps without a stored rule, in list order, nothing stored")
+    func suggestions() {
         let s = DauSettings(appRules: [AppRule(bundleID: "word", displayName: "Word")])
-        let rows = s.ruleRows(suggesting: list) { $0 != "teams1" }
-        #expect(rows.map(\.bundleID) == ["vscode", "teams2", "chrome", "word"])
-        #expect(rows[0] == AppRule(bundleID: "vscode", displayName: "VS Code", underline: false, source: .suggested))
+        let rows = s.suggestions(from: list) { $0 != "teams1" }
+        #expect(rows.map(\.bundleID) == ["vscode", "teams2", "chrome"])
+        // Each row is the rule "Bật gạch chân" stores.
+        #expect(rows[0] == AppRule(bundleID: "vscode", displayName: "VS Code", underline: true, source: .suggested))
         #expect(rows[1].displayName == "Teams")
-        // Nothing stored.
         #expect(s.appRules.map(\.bundleID) == ["word"])
     }
 
-    @Test("uninstalled and not-suggested apps are not shown; empty stays empty")
+    @Test("uninstalled and not-suggested apps are not suggested; empty list, no rows")
     func nothingApplies() {
-        #expect(DauSettings().ruleRows(suggesting: list) { _ in false }.isEmpty)
-        #expect(DauSettings().ruleRows(suggesting: .empty) { _ in true }.isEmpty)
-        #expect(!DauSettings().ruleRows(suggesting: list) { _ in true }.map(\.bundleID).contains("firefox"))
+        #expect(DauSettings().suggestions(from: list) { _ in false }.isEmpty)
+        #expect(DauSettings().suggestions(from: .empty, isInstalled: installed).isEmpty)
+        #expect(!DauSettings().suggestions(from: list, isInstalled: installed).map(\.bundleID).contains("firefox"))
     }
 
-    @Test("changing a suggestion stores a suggested rule in place; back to default removes it")
-    func changingASuggestion() {
+    @Test("D13: accepting stores an underline rule from the list and leaves Đề xuất")
+    func accept() {
         var s = DauSettings(appRules: [AppRule(bundleID: "word")])
-        let installed: (String) -> Bool = { _ in true }
-        let chrome = s.ruleRows(suggesting: list, isInstalled: installed)[3]
+        let chrome = s.suggestions(from: list, isInstalled: installed)[3]
         #expect(chrome.bundleID == "chrome")
-        s.setUnderline(true, for: chrome)
-        #expect(s.rule(for: "chrome") == AppRule(bundleID: "chrome", displayName: "Chrome",
-                                                  underline: true, source: .suggested))
-        // Same place in the list after it is stored.
-        #expect(s.ruleRows(suggesting: list, isInstalled: installed).map(\.bundleID)
-                == ["vscode", "teams2", "teams1", "chrome", "word"])
-        s.setUnderline(false, for: chrome)
-        #expect(s.rule(for: "chrome") == nil)
-        #expect(s.ruleRows(suggesting: list, isInstalled: installed)[3].underline == false)
+        s.acceptSuggestion(chrome)
+        #expect(s.appRules == [AppRule(bundleID: "word"),
+                               AppRule(bundleID: "chrome", displayName: "Chrome", underline: true, source: .suggested)])
+        #expect(!s.suggestions(from: list, isInstalled: installed).map(\.bundleID).contains("chrome"))
+        // Accepting always turns underline on, whatever the row carried.
+        s.acceptSuggestion(AppRule(bundleID: "vscode", underline: false, source: .user))
+        #expect(s.rule(for: "vscode") == AppRule(bundleID: "vscode", underline: true, source: .suggested))
     }
 
-    @Test("user rules keep an explicit Không gạch chân")
-    func userRuleKeepsChoice() {
+    @Test("an accepted rule set back to Không gạch chân stays a rule; removing it suggests again")
+    func backToDefault() {
+        var s = DauSettings()
+        s.acceptSuggestion(s.suggestions(from: list, isInstalled: installed)[0])
+        s.setUnderline(false, for: "vscode")
+        #expect(s.rule(for: "vscode") == AppRule(bundleID: "vscode", displayName: "VS Code",
+                                                  underline: false, source: .suggested))
+        #expect(s.suggestions(from: list, isInstalled: installed).first?.bundleID == "teams2")
+        s.removeRule(for: "vscode")
+        #expect(s.suggestions(from: list, isInstalled: installed).first?.bundleID == "vscode")
+    }
+
+    @Test("setUnderline keeps the rule's source and does nothing without a rule")
+    func setUnderline() {
         var s = DauSettings(appRules: [AppRule(bundleID: "word", underline: true)])
-        s.setUnderline(false, for: s.appRules[0])
+        s.setUnderline(false, for: "word")
         #expect(s.rule(for: "word") == AppRule(bundleID: "word", underline: false))
+        s.setUnderline(true, for: "missing")
+        #expect(s.appRules.count == 1)
     }
 
-    @Test("a user rule for a suggested app stays a user rule, shown once")
+    @Test("a user rule for a suggested app removes the suggestion")
     func userRuleWins() {
-        let s = DauSettings(appRules: [AppRule(bundleID: "chrome", underline: true)])
-        let rows = s.ruleRows(suggesting: list) { _ in true }
-        #expect(rows.filter { $0.bundleID == "chrome" } == [AppRule(bundleID: "chrome", underline: true)])
-        #expect(rows.last?.bundleID == "chrome")
-    }
-
-    @Test("stored suggested rules stay when the app is gone or left the list")
-    func storedSuggestionsStay() {
-        let s = DauSettings(appRules: [
-            AppRule(bundleID: "old", displayName: "Old", underline: true, source: .suggested),
-            AppRule(bundleID: "vscode", underline: true, source: .suggested),
-        ])
-        let rows = s.ruleRows(suggesting: list) { _ in false }
-        #expect(rows.map(\.bundleID) == ["vscode", "old"])
+        let s = DauSettings(appRules: [AppRule(bundleID: "chrome", underline: false)])
+        #expect(!s.suggestions(from: list, isInstalled: installed).map(\.bundleID).contains("chrome"))
     }
 }

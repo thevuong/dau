@@ -3,8 +3,9 @@ import SwiftUI
 import DauShared
 
 /// "Ứng dụng" (mockup "SettingsApps"): the macOS option that remembers the input source
-/// per window, shown read-only with "Đổi…" (D5, N4), and the per-app rules (D5, D13),
-/// with the installed apps of the compatibility list labelled "Đề xuất".
+/// per window, shown read-only with "Đổi…" (D5, N4); "Quy tắc riêng", the stored rules
+/// (D5, D13); and "Đề xuất", the installed apps of the compatibility list without a
+/// rule, each with "Bật gạch chân" (D13: nothing is turned on until the user clicks it).
 /// Search field and + sit in the toolbar, as in the mockup header.
 struct AppRulesView: View {
     @Environment(SettingsModel.self) private var model
@@ -14,14 +15,13 @@ struct AppRulesView: View {
     @State private var installedSuggestions = AppDirectory.installedSuggestions(in: .empty)
     @FocusState private var focusedRule: String?
 
-    /// Stored rules plus the installed suggestions without a rule (not stored, D13).
-    private var rules: [AppRule] {
-        model.settings.ruleRows(suggesting: model.compatibility,
-                                isInstalled: installedSuggestions.contains)
+    /// Installed suggested apps without a stored rule (not stored, D13).
+    private var suggestions: [AppRule] {
+        model.settings.suggestions(from: model.compatibility,
+                                   isInstalled: installedSuggestions.contains)
     }
 
-    private var visibleRules: [AppRule] {
-        let rules = rules
+    private func matching(_ rules: [AppRule]) -> [AppRule] {
         let query = query.trimmingCharacters(in: .whitespaces)
         guard !query.isEmpty else { return rules }
         return rules.filter {
@@ -31,6 +31,9 @@ struct AppRulesView: View {
     }
 
     var body: some View {
+        let rules = model.settings.appRules
+        let visibleRules = matching(rules)
+        let visibleSuggestions = matching(suggestions)
         SettingsPage(SettingsSection.apps.title,
                      actions: HeaderActions(query: $query, prompt: String(localized: "Tìm ứng dụng"),
                                             addLabel: String(localized: "Thêm ứng dụng"),
@@ -67,39 +70,49 @@ struct AppRulesView: View {
                     } else {
                         ForEach(Array(visibleRules.enumerated()), id: \.element.id) { index, rule in
                             if index > 0 { RowDivider() }
-                            // An unsaved suggestion has nothing to remove.
-                            let stored = model.settings.rule(for: rule.bundleID) != nil
                             AppRuleRow(rule: rule)
                                 .focusable()
                                 .focused($focusedRule, equals: rule.bundleID)
                                 .onTapGesture { focusedRule = rule.bundleID }
-                                .onDeleteCommand { if stored { remove(rule) } }
+                                .onDeleteCommand { remove(rule) }
                                 .contextMenu {
-                                    if stored {
-                                        Button("Xoá quy tắc", role: .destructive) { remove(rule) }
-                                    }
+                                    Button("Xoá quy tắc", role: .destructive) { remove(rule) }
                                 }
                                 .accessibilityActions {
-                                    if stored {
-                                        Button("Xoá quy tắc") { remove(rule) }
-                                    }
+                                    Button("Xoá quy tắc") { remove(rule) }
                                 }
                         }
                     }
                 }
-            } footer: {
-                // N5: only what M3 measured (D13): in-place typing went wrong only when keys
-                // came less than 10 ms apart; underlining fixed Chrome and VS Code but not
-                // Terminal, so the hint says when to choose it, not that it always helps.
-                Hint(Text("“Đề xuất” đến từ danh sách tương thích: app có thể sai chữ khi gõ rất nhanh. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ."))
-                    .padding(.horizontal, 4)
+            }
+
+            // Only while an installed suggested app has no rule (D13); hidden too when
+            // the search matches none of them.
+            if !visibleSuggestions.isEmpty {
+                SettingsGroup(Text("Đề xuất")) {
+                    SettingsCard {
+                        ForEach(Array(visibleSuggestions.enumerated()), id: \.element.id) { index, suggestion in
+                            if index > 0 { RowDivider() }
+                            SuggestionRow(suggestion: suggestion) {
+                                model.settings.acceptSuggestion(suggestion)
+                            }
+                        }
+                    }
+                } footer: {
+                    // N5: only what M3 measured (D13): in-place typing went wrong only when
+                    // keys came less than 10 ms apart; underlining fixed Chrome and VS Code
+                    // but not Terminal, so the hint says when to choose it, not that it
+                    // always helps. Wording approved by the user (30/10/2026).
+                    Hint(Text("“Đề xuất” đến từ danh sách tương thích: app có thể sai chữ khi gõ rất nhanh. Chỉ chọn “Có gạch chân” khi một app bị lỗi chữ lúc gõ."))
+                        .padding(.horizontal, 4)
+                }
             }
         }
         .onAppear {
             installedSuggestions = AppDirectory.installedSuggestions(in: model.compatibility)
         }
         .sheet(isPresented: $isAdding) {
-            AddAppRuleSheet(listed: Set(rules.map(\.bundleID)))
+            AddAppRuleSheet()
         }
     }
 
@@ -109,9 +122,9 @@ struct AppRulesView: View {
     }
 }
 
-/// One rule (height 52): icon 28, name, "Đề xuất" chip, underline popup (D5).
-/// Removed with the context menu or the Delete key while focused (the system draws
-/// the focus ring).
+/// One stored rule (height 52): icon 28, name, "Đề xuất" chip when it came from the
+/// compatibility list, underline popup (D5). Removed with the context menu or the Delete
+/// key while focused (the system draws the focus ring).
 struct AppRuleRow: View {
     @Environment(SettingsModel.self) private var model
     let rule: AppRule
@@ -119,10 +132,7 @@ struct AppRuleRow: View {
     var body: some View {
         let name = AppDirectory.name(for: rule)
         HStack(spacing: 12) {
-            Image(nsImage: AppDirectory.icon(for: rule.bundleID))
-                .resizable()
-                .frame(width: 28, height: 28)
-                .accessibilityHidden(true)
+            AppIcon(bundleID: rule.bundleID)
             HStack(spacing: 8) {
                 Text(verbatim: name)
                     .lineLimit(1)
@@ -150,14 +160,55 @@ struct AppRuleRow: View {
         .accessibilityLabel(Text(verbatim: name))
     }
 
-    /// Changing an unsaved suggestion stores it as a suggested rule; setting a suggested
-    /// rule back to "Không gạch chân" removes it again (D13 default).
+    /// The stored rule keeps its place and source whatever the choice (D13).
     private var underlineBinding: Binding<Bool> {
         Binding {
             (model.settings.rule(for: rule.bundleID) ?? rule).underline
         } set: { newValue in
-            model.settings.setUnderline(newValue, for: rule)
+            model.settings.setUnderline(newValue, for: rule.bundleID)
         }
+    }
+}
+
+/// One suggestion (height 52): icon 28, name, a secondary line, and "Bật gạch chân",
+/// which stores the rule. The list's per-app notes are for maintainers and are not
+/// shown (N5); every row says the same, as the footer does.
+struct SuggestionRow: View {
+    let suggestion: AppRule
+    let accept: () -> Void
+
+    var body: some View {
+        let name = AppDirectory.name(for: suggestion)
+        HStack(spacing: 12) {
+            AppIcon(bundleID: suggestion.bundleID)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: name)
+                    .lineLimit(1)
+                Hint(Text("Có thể sai chữ khi gõ rất nhanh"))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            Button("Bật gạch chân", action: accept)
+                .settingsButton()
+                .accessibilityLabel(Text("Bật gạch chân cho \(name)"))
+        }
+        .font(.system(size: 13))
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .frame(minHeight: 52)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(Text(verbatim: name))
+    }
+}
+
+/// An app's icon, 28 pt, hidden from VoiceOver (the row reads the name).
+struct AppIcon: View {
+    let bundleID: String
+
+    var body: some View {
+        Image(nsImage: AppDirectory.icon(for: bundleID))
+            .resizable()
+            .frame(width: 28, height: 28)
+            .accessibilityHidden(true)
     }
 }
 

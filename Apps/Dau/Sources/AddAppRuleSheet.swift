@@ -4,13 +4,12 @@ import UniformTypeIdentifiers
 import DauShared
 
 /// "Thêm quy tắc cho ứng dụng" sheet (mockup "SettingsAppsAdd"), 460 wide: search,
-/// a card listing the apps in the Applications folders and the running apps, a card
-/// with "Khi đang gõ" (the rule's only setting, D5), then Huỷ / Thêm. "Chọn ứng dụng khác…" opens
-/// the system open panel for apps stored elsewhere.
+/// a card listing the apps in the Applications folders and the running apps without a
+/// stored rule (apps of the compatibility list carry the "Đề xuất" chip), a card with
+/// "Khi đang gõ" (the rule's only setting, D5), then Huỷ / Thêm. "Chọn ứng dụng khác…"
+/// opens the system open panel for apps stored elsewhere.
 struct AddAppRuleSheet: View {
     @Environment(SettingsModel.self) private var model
-    /// Apps already in "Quy tắc riêng", stored or suggested; they are not offered again.
-    var listed: Set<String> = []
     @Environment(\.dismiss) private var dismiss
 
     @State private var query = ""
@@ -44,6 +43,9 @@ struct AddAppRuleSheet: View {
                         Text(verbatim: candidate.name)
                             .font(.system(size: 13))
                             .lineLimit(1)
+                        if candidate.suggested {
+                            Chip(Text("Đề xuất"), height: 20, fontSize: 11)
+                        }
                     }
                     .frame(height: 40)
                     .listRowSeparator(.hidden)
@@ -87,9 +89,10 @@ struct AddAppRuleSheet: View {
     }
 
     /// Apps in the Applications folders plus running apps, without the ones that
-    /// already have a row in "Quy tắc riêng" and without Dấu itself.
+    /// already have a stored rule and without Dấu itself.
     private func loadApps() async {
-        let ruled = Set(model.settings.appRules.map(\.bundleID)).union(listed)
+        let ruled = Set(model.settings.appRules.map(\.bundleID))
+        let list = model.compatibility
         let own = Bundle.main.bundleIdentifier
         var running: [AppListing] = []
         for app in NSWorkspace.shared.runningApplications where app.activationPolicy == .regular {
@@ -103,7 +106,8 @@ struct AddAppRuleSheet: View {
             .filter { $0.bundleID != own && !ruled.contains($0.bundleID) && seen.insert($0.bundleID).inserted }
             .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
             .map { AppCandidate(bundleID: $0.bundleID, name: $0.name,
-                                icon: NSWorkspace.shared.icon(forFile: $0.path)) }
+                                icon: NSWorkspace.shared.icon(forFile: $0.path),
+                                suggested: list.suggestion(for: $0.bundleID) != nil) }
     }
 
     /// Picks any app with the system open panel. The sandbox only shows the panel with the
@@ -121,18 +125,21 @@ struct AddAppRuleSheet: View {
         if !candidates.contains(where: { $0.bundleID == id }) {
             candidates.insert(
                 AppCandidate(bundleID: id, name: AppDirectory.name(at: url),
-                             icon: NSWorkspace.shared.icon(forFile: url.path)),
+                             icon: NSWorkspace.shared.icon(forFile: url.path),
+                             suggested: model.compatibility.suggestion(for: id) != nil),
                 at: 0)
         }
         query = ""
         selection = id
     }
 
+    /// Stores the rule. An app of the compatibility list keeps its "Đề xuất" chip in
+    /// "Quy tắc riêng" (source `.suggested`), as when it is accepted from "Đề xuất".
     private func add() {
         guard let id = selection, let candidate = candidates.first(where: { $0.id == id }) else { return }
         model.settings.upsert(AppRule(
             bundleID: candidate.bundleID, displayName: candidate.name,
-            underline: underline, source: .user))
+            underline: underline, source: candidate.suggested ? .suggested : .user))
         dismiss()
     }
 }
@@ -141,6 +148,8 @@ struct AppCandidate: Identifiable {
     let bundleID: String
     let name: String
     let icon: NSImage
+    /// In the compatibility list: shown with the "Đề xuất" chip.
+    var suggested = false
     var id: String { bundleID }
 }
 

@@ -71,6 +71,26 @@
         }
       }
     },
+    "Bật gạch chân" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bật gạch chân"
+          }
+        }
+      }
+    },
+    "Bật gạch chân cho %@" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bật gạch chân cho %@"
+          }
+        }
+      }
+    },
     "Bật lại" : {
       "localizations" : {
         "vi" : {
@@ -177,6 +197,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Có gạch chân"
+          }
+        }
+      }
+    },
+    "Có thể sai chữ khi gõ rất nhanh" : {
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Có thể sai chữ khi gõ rất nhanh"
           }
         }
       }

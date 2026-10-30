@@ -155,25 +155,22 @@ enum Snapshot {
         }
     }
 
-    /// Settings with the rules from the mockup ("SettingsApps"). Terminal is a user rule
-    /// here: D13 does not suggest it. Chrome is a suggestion the user changed (stored);
-    /// VS Code is an unsaved suggestion that comes from `sampleList` (shown only when
-    /// VS Code is installed, like in the app).
+    /// Settings for the Apps page: one stored rule, Google Chrome, a suggestion the user
+    /// accepted ("Đề xuất" chip, "Có gạch chân"). VS Code and Zalo come from `sampleList`
+    /// without a rule, so they show under "Đề xuất" (only when installed, like in the app).
     static func sampleSettings() -> DauSettings {
         var s = DauSettings.defaults
-        s.upsert(AppRule(bundleID: "com.apple.Terminal", displayName: "Terminal", underline: true))
         s.upsert(AppRule(bundleID: "com.google.Chrome", displayName: "Google Chrome",
                          underline: true, source: .suggested))
-        s.upsert(AppRule(bundleID: "ru.keepcoder.Telegram", displayName: "Telegram"))
-        s.upsert(AppRule(bundleID: "com.microsoft.Word", displayName: "Microsoft Word"))
         return s
     }
 
-    /// The suggestions of the mockup, instead of the shipped list, so the page does not
-    /// depend on which other suggested apps are installed.
+    /// A few suggestions instead of the shipped list, so the page does not depend on
+    /// which other suggested apps are installed.
     static let sampleList = CompatibilityList(version: 1, apps: [
         .init(bundleIDs: ["com.microsoft.VSCode"], name: "Visual Studio Code"),
         .init(bundleIDs: ["com.google.Chrome"], name: "Google Chrome"),
+        .init(bundleIDs: ["com.vng.zalo"], name: "Zalo"),
     ])
 }
 
