@@ -41,7 +41,7 @@ Mỗi mốc kết thúc khi: test xanh, đã tự rà soát với `DECISIONS.md`
 - Báo lỗi (URL issue điền sẵn), Quay về bản trước, Gỡ cài đặt.
 - Xuất bộ file nhận diện theo `docs/BRAND.md` (biểu tượng app, ảnh template thanh menu, favicon, ảnh Open Graph, ảnh xem trước GitHub, nền DMG) và gắn thẻ meta cho website.
 - Việc cần tài khoản Apple Developer: chuẩn bị sẵn, dừng lại để người dùng thực hiện.
-- Kiểm tra trước phát hành (cần người, hoãn từ M4): VoiceOver và Tab ("Điều hướng bàn phím") qua cửa sổ Cài đặt; máy để tiếng Anh hẳn (menu app, tên "Dấu" trong Finder); các sheet ở chế độ tối.
+- Kiểm tra trước phát hành (cần người, hoãn từ M4): VoiceOver và Tab ("Điều hướng bàn phím") qua cửa sổ Cài đặt; VoiceOver đọc đúng tên "Dấu – Tiếng Việt" khi chuyển nguồn (M3 mới xác nhận là hệ thống có đọc, D17); máy để tiếng Anh hẳn (menu app, tên "Dấu" trong Finder); các sheet ở chế độ tối.
 
 ## M8 — Website
 - Dựng trang tải về theo `docs/UI.md` (mục "Trang tải về") và `docs/BRAND.md`: trang tĩnh, responsive, thẻ meta và ảnh Open Graph, favicon. Công nghệ chọn ở đầu mốc và hỏi người dùng.
