@@ -94,7 +94,7 @@ windows carr tooi yeeu tieengs Vieetj, Hasaki␣
 
 Mong đợi: `windows car tôi yêu tiếng Việt, Hasaki␣` (D4, D26, D30). "carr" đứng trước câu tiếng Việt để tránh tự sửa chính tả của macOS (mục 6.1). Số đo ngày 29/10 dùng câu mẫu cũ `tooi yeeu tieengs Vieetj, windows Hasaki carr␣`.
 
-- **Ứng dụng có trong script** (`textedit`, `safari`, `chrome`, `vscode`, `terminal`): chạy lần lượt
+- **Ứng dụng có trong script** (`textedit`, `safari`, `chrome`, `vscode`, `terminal`; từ T6 thêm `edge`, `firefox`, `notes`, `mail`): chạy lần lượt
   `scripts/selftest-typing/run.sh --delay 30 <app>` và `scripts/selftest-typing/run.sh --delay 0 <app>`.
   Script cần quyền Trợ năng cho tiến trình chạy nó (gửi phím qua System Events), tự mở cửa sổ trống, gõ, đọc lại, đóng không lưu, in PASS/FAIL và số đo. `--delay 0` gửi cả chuỗi trong một lệnh (khoảng 1–2 ms/phím): đây là bài thử phím dồn, nhanh hơn người gõ. Có thể thêm `--delay 5`, `--delay 10`, `--delay 20` để tìm ngưỡng.
 - **Ứng dụng khác:** script chưa hỗ trợ. Gõ tay (tốc độ bình thường, rồi gõ nhanh hết sức), hoặc tự gõ qua System Events như cách đã làm với Telegram ngày 30/10. Ghi rõ cách thử vào cột "Cách thử".
@@ -136,13 +136,13 @@ Số đo lấy từ bản Debug, có thêm một lần hỏi chẩn đoán sau m
 | Ứng dụng | Ngày | Cách thử | 30 ms | 0 ms | Gõ tay | Gạch chân / nhảy chữ (K2, K3) | K4–K6 | K7 (D20) | Tự sửa (K8) | `selectedRange` p50 / p99 µs | mismatch / unsupported | Cần gạch chân? | Nguồn |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | TextEdit | 29–30/10/2026 | script + gõ tay | đúng | đúng | đúng | không / không | ĐẠT | chờ T2 | chưa ghi riêng | 327 / 606 | 0 / — | chưa thấy lỗi | PROGRESS "Số đo" 29/10; M2-TESTING mục 2, 4; PROGRESS nhật ký 30/10 (script PASS sau đổi bundle ID) |
-| Safari | 29/10/2026 | script + gõ tay | đúng | đúng | đúng | không / không | — | chờ T2 | — | 622 / 1.057 | 0 / — | chưa thấy lỗi | PROGRESS "Số đo" 29/10; M2-TESTING mục 2 |
-| Chrome | 29/10/2026 | script + gõ tay | đúng | **sai** (mismatch 3–4, thay nhầm vùng ở lần thay đầu của từ); 5 và 10 ms đúng | đúng | không / không ở 30 ms | — | chờ T2 | — | 415 / 694 | 0 / — (ở 30 ms) | chờ T1 | PROGRESS "Số đo" 29/10; M2-TESTING mục 2 |
-| Firefox | chưa thử | | | | | | | | | | | | |
-| Edge | chưa thử | | | | | | | | | | | | |
+| Safari | 29/10/2026; K4 30/10/2026 | script + gõ tay | đúng | đúng | đúng | không / không | K4 ĐẠT ("hò", 30 ms) | chờ T2 | — | 622 / 1.057 | 0 / — | chưa thấy lỗi | PROGRESS "Số đo" 29/10; M2-TESTING mục 2 |
+| Chrome | 29/10/2026; K4 30/10/2026 | script + gõ tay | đúng | **sai** (mismatch 3–4, thay nhầm vùng ở lần thay đầu của từ); 5 và 10 ms đúng | đúng | không / không ở 30 ms | K4 **SAI** ("h", 120 ms, mục 6.4) | chờ T2 | — | 415 / 694 | 0 / — (ở 30 ms) | chờ T1 | PROGRESS "Số đo" 29/10; M2-TESTING mục 2 |
+| Firefox | 30/10/2026 | script (158.0.1, trang thử cục bộ, `spellcheck=false`) | đúng | **sai**, chữ nhảy chỗ ("ar ấki tj, Hangs Vieu tiei yeoindows ca", mismatch 4); 5 ms sai (mismatch 1); 10 ms đúng; 0 ms gạch chân: **đúng** (mark 38) | — | — / **có nhảy chữ ở 0 ms** | K4 ĐẠT ("hò"); K5, K6 chưa thử | ĐẠT ("học", 120 ms) | không (trang thử tắt kiểm tra chính tả) | 265 / 1.174 | 0 / 0 (30 ms) | nên đề xuất (sai ở 0–5 ms, gạch chân sửa được) | T6 30/10/2026 (mục 5.1). `insertText` 752 / 3.365 µs; `handle` phím có thay 1.171 / 4.113 µs; replace 12, pass 33 |
+| Edge | 30/10/2026 | script (155.0, trang thử cục bộ, `spellcheck=false`) | đúng | **sai** ("ưấrndows ca toi yeu tiengs Vietj, Haki", mismatch 4); 5 ms sai (mismatch 1); 10 ms đúng; 0 ms gạch chân: **đúng** | — | không / không ở 30 ms | K4 **SAI** ("h": mất 2 chữ, mục 6.4) ở 30 và 120 ms; gạch chân: ĐẠT. K5, K6 chưa thử | ĐẠT ("học", 120 ms) | không (trang thử tắt kiểm tra chính tả) | 369 / 6.828 | 0 / 0 (30 ms) | có (đã trong danh sách; nay có số đo) | T6 30/10/2026 (mục 5.1). `insertText` 1.184 / 8.661 µs; `handle` phím có thay 1.527 / 15.851 µs (n=12, p99 là một lần chậm); replace 12, pass 33 |
 | Arc | chưa thử | | | | | | | | | | | | |
 | Brave | chưa thử | | | | | | | | | | | | |
-| VS Code | 29/10/2026 | script | đúng | **sai**; 5 và 10 ms cũng sai ("ôoi"); từ 20 ms đúng | — | không / không ở 30 ms | — | chờ T2 | — | 230 / 885 | 0 / — (ở 30 ms) | chờ T1 | PROGRESS "Số đo" 29/10 và nhật ký chẩn đoán 29/10 |
+| VS Code | 29/10/2026; K4 30/10/2026 | script | đúng | **sai**; 5 và 10 ms cũng sai ("ôoi"); từ 20 ms đúng | — | không / không ở 30 ms | K4 **SAI** ("h", 30 ms, mục 6.4) | chờ T2 | — | 230 / 885 | 0 / — (ở 30 ms) | chờ T1 | PROGRESS "Số đo" 29/10 và nhật ký chẩn đoán 29/10 |
 | Cursor | chưa thử | | | | | | | | | | | | |
 | Zed | chưa thử | | | | | | | | | | | | |
 | Sublime Text | 29/10/2026 | gõ tay | — | — | có số đo; kết quả chữ không được ghi | — | — | chờ T2 | — | 334 / 3.718 (gõ tay, n=35, sơ bộ) | — | chưa đủ dữ liệu | PROGRESS "Số đo" 29/10; DECISIONS câu hỏi A/B (selectedRange 17% thời gian phím) |
@@ -169,8 +169,8 @@ Số đo lấy từ bản Debug, có thêm một lần hỏi chẩn đoán sau m
 | Google Sheets | chưa thử | | | | | | | | | | | | |
 | Notion | chưa thử | | | | | | | | | | | | |
 | Obsidian | chưa thử | | | | | | | | | | | | |
-| Ghi chú (Notes) | chưa thử | | | | | | | | | | | | |
-| Mail | chưa thử | | | | | | | | | | | | |
+| Ghi chú (Notes) | 30/10/2026 | script (4.13, ghi chú mới trong iCloud, xoá trắng sau khi đọc) | đúng | đúng (mismatch 0) | — | — / không | K4 ĐẠT ("hò"); K5, K6 chưa thử | ĐẠT ("Học": Notes tự viết hoa chữ đầu) | không: "…Hasaki carr␣" giữ "car" (chữ đầu "Tôi" do Notes viết hoa) | 330 / 1.135 | 0 / 0 | chưa thấy lỗi | T6 30/10/2026 (mục 5.1). `insertText` 3.799 / 10.207 µs; `handle` phím có thay 4.274 / 8.003 µs (cao nhất trong các app đã đo, vẫn đúng ở 0 ms) |
+| Mail | 30/10/2026 | script (16.0, thư mới, gõ vào thân thư, ô Đến để trống, không gửi; đóng "Don’t Save") | đúng ("Windows…": Mail tự viết hoa chữ đầu) | — | — | — / — | chưa thử | chưa thử | chưa thử | 375 / 1.245 | 0 / 0 | chưa đủ dữ liệu (chỉ 30 ms) | T6 30/10/2026 (mục 5.1), dừng theo yêu cầu người dùng sau K1 30 ms. `insertText` 471 / 2.536 µs; `handle` phím có thay 926 / 2.979 µs |
 | Tin nhắn (Messages) | chưa thử | | | | | | | | | | | | |
 | Spotlight | chưa thử | | | | | | | | | | | | |
 | Finder (đổi tên tệp) | chưa thử | | | | | | | | | | | | |
@@ -178,7 +178,15 @@ Số đo lấy từ bản Debug, có thêm một lần hỏi chẩn đoán sau m
 | Raycast | chưa thử | | | | | | | | | | | | |
 | Alfred | chưa thử | | | | | | | | | | | | |
 
-K4–K6 của TextEdit: M2-TESTING mục 4 dòng 1, 4, 5, 6 (30/10/2026, agent tự gõ qua System Events). Các app khác chưa chạy K4–K6.
+K4–K6 của TextEdit: M2-TESTING mục 4 dòng 1, 4, 5, 6 (30/10/2026, agent tự gõ qua System Events); K4 chạy lại bằng script ngày 30/10/2026 (T6, 120 ms): ĐẠT. Các app khác chưa chạy K5, K6.
+
+### 5.1 Lượt T6 ngày 30/10/2026
+
+- Máy: macOS 27.2, Apple M1 Pro; bộ gõ Debug đã cài ở HEAD 60dac6f. Tự gõ bằng `scripts/selftest-typing/run.sh` (thêm `edge`, `firefox`, `notes`, `mail` trong lượt này). Phím chỉ gửi khi app thử đứng trước; không nhấn Return ở đâu; không gửi thư hay tin nhắn.
+- Mỗi app: K1 câu mẫu ở 30 ms và 0 ms; app sai ở 0 ms (hoặc trong danh sách đề xuất) thử thêm 0 ms với `--underline`, 5 và 10 ms. K4: `--keys "hoaf⌫ " --expect "hò "` (30 ms). K7: `--delay 120 --keys "hoc ⌫j " --expect "học "`. K8: `--keys "tooi yeeu tieengs Vieetj, Hasaki carr " --expect "tôi yêu tiếng Việt, Hasaki car "` (30 ms). Số µs lấy từ báo cáo `perf-report.sh` mà script in cho lượt 30 ms (p50 / p99).
+- Trình duyệt thử trên trang cục bộ có `spellcheck="false"`, nên K8 ở đây không nói gì về tự sửa của trình duyệt khi gõ trên web thật.
+- Người dùng dừng lượt thử sau Mail (K1 30 ms). Chưa thử trong lượt này: Mail (phần còn lại), Messages, Pages, Numbers, Zalo, Discord, Ghostty, Zed, Xcode, WebStorm; kiểm chứng lại Terminal không gửi ⌫ cho bộ gõ (mục 6.5) cũng chưa chạy.
+- Dọn dẹp: tab thử đã đóng; ghi chú thử trong Notes đã xoá trắng và Notes bỏ ghi chú trống (đếm 53 ghi chú trước và sau); thư nháp đóng bằng "Don’t Save"; Notes, Mail, Firefox đã thoát; Edge (do lượt thử mở) còn chạy, không cửa sổ. Nguồn nhập liệu và clipboard được script khôi phục; khoá `DauDebugForceUnderline` đã xoá.
 
 ## 6. Giới hạn đã biết
 
@@ -200,8 +208,21 @@ K4–K6 của TextEdit: M2-TESTING mục 4 dòng 1, 4, 5, 6 (30/10/2026, agent t
 
 Ở ô nhập bảo mật (ví dụ ô mật khẩu trong Safari), macOS giữ bàn phím `com.apple.keylayout.US` và Dấu không nhận phím nào. Đây là hành vi của hệ thống, không phải lỗi. Nguồn: `docs/M2-TESTING.md` mục 4 dòng 17.
 
+### 6.4 Backspace thay chữ tại chỗ bị xoá hai lần trong Chromium/Electron (D32) — ghi ngày 30/10/2026
+
+- Hiện tượng: ở Chrome, Edge, VS Code, gõ `hoaf` ("hoà") rồi ⌫ ra "h" thay vì "hò", ở cả 30 và 120 ms/phím. Bộ gõ thay "hoà" bằng "hò" (`insertText` có `replacementRange`, đếm là `replace`) và báo đã xử lý phím, nhưng ứng dụng vẫn chạy lệnh xoá của chính nó, nên mất thêm một chữ (suy luận từ kết quả và số đếm: replace 2, pass 4; chưa đọc mã Chromium).
+- Không gặp: TextEdit, Safari, Firefox, Notes ("hò"). Chế độ gạch chân (D13): Edge ra "hò" đúng.
+- Bằng chứng: lượt T6 mục 5.1 (Chrome và Edge `--delay 120`, VS Code và Edge `--delay 30`, Edge `--underline`).
+- Hệ quả: ở các app này, ⌫ giữa một từ có dấu xoá mất một chữ thừa khi không bật gạch chân. Đây là lý do thứ hai (sau phím dồn, mục 6.2) để đề xuất gạch chân cho app Chromium/Electron. Cần imk-dev xem cách xử lý ⌫ (ví dụ để ⌫ đi thẳng rồi mới đặt lại dấu); đổi cách làm thì đối chiếu D32, N3.
+
+### 6.5 Terminal không gửi ⌫ cho bộ gõ (D32) — ghi ngày 30/10/2026
+
+Phát hiện ở M3 T2 (`docs/PROGRESS.md` nhật ký 30/10/2026): Terminal xử lý ⌫ mà không đưa phím cho bộ gõ, nên D32 không giữ được ở đó (K7 ra "hocj", ARCHITECTURE.md). T6 chưa kiểm chứng lại bằng `hoaf⌫␣` vì lượt thử dừng sớm.
+
 ## 7. Còn mở
 
+- Danh sách đề xuất gạch chân theo số đo T6 (chưa sửa `CompatibilityList.json`, chờ phiên chính): **thêm Firefox** (`org.mozilla.firefox`; sai ở 0 và 5 ms, chữ nhảy chỗ, gạch chân sửa được); Edge giữ, nay có số đo (sai ở 0 và 5 ms, ⌫ xoá hai lần, gạch chân sửa cả hai); Notes không đề xuất (đúng ở 0 ms).
+
 - Tiêu chí đưa một ứng dụng vào danh sách gạch chân (mục 1): sai ở tốc độ nào thì tính; cần quyết định sau T1. Nếu thành quy tắc thì ghi vào `docs/DECISIONS.md` (D13).
-- `scripts/selftest-typing/run.sh` chỉ biết 5 ứng dụng. Thử nhiều ứng dụng ở 0 ms cần thêm ứng dụng vào script (mở ô trống, đọc lại chữ) hoặc chấp nhận gõ tay.
+- `scripts/selftest-typing/run.sh` biết 9 ứng dụng (thêm Edge, Firefox, Notes, Mail ở T6). Thử nhiều ứng dụng ở 0 ms cần thêm ứng dụng vào script (mở ô trống, đọc lại chữ) hoặc chấp nhận gõ tay.
 - Pages có hai bundle ID trên cùng máy (`com.apple.Pages` và `com.apple.iWork.Pages`); Numbers, Keynote bản mới đổi ID (`com.apple.Numbers`, `com.apple.Keynote`). Nếu các app này cần quy tắc, danh sách tương thích phải ghi đủ các ID.

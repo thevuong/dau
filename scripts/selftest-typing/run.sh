@@ -6,7 +6,8 @@
 #
 # Usage:
 #   scripts/selftest-typing/run.sh [options] <app>...
-#     app:  textedit | safari | chrome | vscode | terminal | all
+#     app:  textedit | safari | chrome | vscode | terminal | edge | firefox | notes | mail
+#           | all (= the first five)
 #   --delay MS        pause between keys in ms (default 30). 0 sends the whole string in
 #                     one System Events keystroke (about 1 ms per key): a stress test that
 #                     Chrome, VS Code and Terminal fail with method A (docs/PROGRESS.md);
@@ -33,15 +34,25 @@
 # enabled already; nothing is enabled or disabled, N4), types, reads the text back,
 # closes the window without saving, prints the text, PASS/FAIL and the input method's
 # counts and timings for that app (scripts/perf-report.sh). The input source selected
-# before and the clipboard (read through ⌘C in Safari, Chrome, VS Code) are restored.
+# before and the clipboard (read through ⌘C in browsers, VS Code, Notes, Mail) are
+# restored; the clipboard is emptied before each ⌘C so a failed copy cannot pass. A new
+# document whose first letter the app capitalized by itself counts as PASS (noted).
+#
+# Edge, Firefox: the same local test page as Safari/Chrome, closed with ⌘W.
+# Notes: a new note (⌘N) in the folder shown; it syncs while it exists. The script
+# empties it, and Notes drops an empty new note (checked 30/10/2026: count unchanged
+# after quitting). Mail: a new message (⌘N), keys go to the body focused through
+# Accessibility, the To field stays empty, Send is never pressed; the body is emptied
+# and the window closed with "Don't Save". Apps launched by the script stay running.
 #
 # Terminal: the keys go to the shell prompt of a new window. The script never presses
 # Return; it clears the line with ⌃U before closing the window. Keys must not contain
 # a newline.
 #
 # Safety: keys and shortcuts (⌘A ⌘C ⌘W ⌃U) are only sent while the app under test is
-# frontmost (browsers: with the test page in front; VS Code: an Untitled editor). If
-# another app comes to the front, the script stops sending keys and exits with status 3.
+# frontmost (browsers: with the test page in front; VS Code: an Untitled editor; Mail:
+# the New Message window). If another app comes to the front, the script stops sending
+# keys and exits with status 3.
 #
 # Exit status 0 only if every app gives the expected text.
 set -uo pipefail
@@ -66,13 +77,13 @@ while [[ $# -gt 0 ]]; do
     --keys) KEYS="${2?}"; shift 2 ;;
     --expect) EXPECT="${2?}"; shift 2 ;;
     --underline) UNDERLINE=1; shift ;;
-    -h|--help) sed -n '2,46p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,57p' "$0"; exit 0 ;;
     all) APPS+=(textedit safari chrome vscode terminal); shift ;;
-    textedit|safari|chrome|vscode|terminal) APPS+=("$1"); shift ;;
+    textedit|safari|chrome|vscode|terminal|edge|firefox|notes|mail) APPS+=("$1"); shift ;;
     *) echo "Tham số không hợp lệ: $1" >&2; exit 2 ;;
   esac
 done
-[[ ${#APPS[@]} -gt 0 ]] || { sed -n '2,46p' "$0"; exit 2; }
+[[ ${#APPS[@]} -gt 0 ]] || { sed -n '2,57p' "$0"; exit 2; }
 US_SOURCE=com.apple.keylayout.US
 if [[ "$KEYS" == *$'\n'* || "$KEYS" == *$'\r'* ]]; then
   echo "Phím gõ không được có xuống dòng (không bao giờ nhấn Return trong Terminal)." >&2
@@ -209,6 +220,8 @@ OSA
 # text of the clipboard.
 copy_all() {
   stopped && return 1
+  # Empty the clipboard first so a failed copy cannot return an earlier run's text.
+  printf '' | pbcopy
   guarded "$1" "${2:-}" 'tell application "System Events"
     keystroke "a" using {command down}
     delay 0.2
@@ -261,6 +274,87 @@ run_chrome() {
   close_test_tab "Google Chrome"
 }
 
+run_edge() {
+  open -a "Microsoft Edge" "$PAGE"
+  sleep 3; select_dau; type_keys "Microsoft Edge" "$PAGE_TITLE"
+  copy_all "Microsoft Edge" "$PAGE_TITLE"
+  close_test_tab "Microsoft Edge"
+}
+
+run_firefox() {
+  open -a Firefox "$PAGE"
+  sleep 3; select_dau; type_keys firefox "$PAGE_TITLE"
+  copy_all firefox "$PAGE_TITLE"
+  close_test_tab firefox
+}
+
+# Notes: a new note (⌘N) in the folder shown; read with ⌘A ⌘C, then emptied. Notes
+# discards an empty new note, so no note is kept (the note syncs while it exists).
+run_notes() {
+  open -a Notes; sleep 2.5
+  guarded Notes "" 'tell application "System Events" to keystroke "n" using {command down}' \
+    >/dev/null || return 0
+  sleep 1; select_dau; type_keys Notes
+  copy_all Notes
+  guarded Notes "" 'tell application "System Events"
+    keystroke "a" using {command down}
+    delay 0.1
+    key code 51
+  end tell' >/dev/null
+}
+
+# Mail: a new message (⌘N); the keys go to the body (focused through Accessibility), the
+# To field stays empty and Send is never pressed. Read with ⌘A ⌘C, emptied, closed with
+# ⌘W; if Mail asks to save the draft, "Don't Save"/"Delete" is chosen.
+MAIL_COMPOSE="New Message"
+run_mail() {
+  open -a Mail; sleep 2
+  guarded Mail "" 'tell application "System Events" to keystroke "n" using {command down}' \
+    >/dev/null || return 0
+  sleep 2
+  guarded Mail "$MAIL_COMPOSE" 'tell application "System Events" to tell process "Mail"
+    set value of attribute "AXFocused" of UI element 1 of scroll area 1 of group 1 of group 1 of front window to true
+  end tell' >/dev/null || return 0
+  sleep 0.3; select_dau; type_keys Mail "$MAIL_COMPOSE"
+  copy_all Mail "$MAIL_COMPOSE"
+  discard_front_document Mail "$MAIL_COMPOSE"
+}
+
+# Empties the focused text (⌘A ⌫), closes the front window (⌘W) of process $1 whose
+# title contains $2, and answers a save prompt with the button that discards.
+discard_front_document() {
+  guarded "$1" "$2" 'tell application "System Events"
+    keystroke "a" using {command down}
+    delay 0.1
+    key code 51
+    delay 0.3
+    keystroke "w" using {command down}
+  end tell' >/dev/null || return 0
+  sleep 1
+  osascript - "$1" "$2" <<'OSA' >/dev/null 2>&1 || echo "CẢNH BÁO: còn cửa sổ \"$2\" của $1, đóng tay giúp (không lưu)" >&2
+on run argv
+  set p to item 1 of argv
+  set t to item 2 of argv
+  tell application "System Events" to tell process p
+    repeat with w in windows
+      if name of w contains t then
+        if (count of sheets of w) = 0 then error "window still open"
+        set done to false
+        repeat with b in buttons of sheet 1 of w
+          if name of b is in {"Don't Save", "Don’t Save", "Delete", "Delete Draft", "Revert Changes"} then
+            click b
+            set done to true
+            exit repeat
+          end if
+        end repeat
+        if not done then error "no discard button"
+      end if
+    end repeat
+  end tell
+end run
+OSA
+}
+
 run_vscode() {
   open -a "Visual Studio Code"; sleep 2
   osascript -e 'tell application "Visual Studio Code" to activate' -e 'delay 0.5' \
@@ -311,6 +405,8 @@ bundle_id() {
     textedit) echo com.apple.TextEdit ;; safari) echo com.apple.Safari ;;
     chrome) echo com.google.Chrome ;; vscode) echo com.microsoft.VSCode ;;
     terminal) echo com.apple.Terminal ;;
+    edge) echo com.microsoft.edgemac ;; firefox) echo org.mozilla.firefox ;;
+    notes) echo com.apple.Notes ;; mail) echo com.apple.mail ;;
   esac
 }
 [[ $UNDERLINE == 1 ]] && echo "Chế độ gạch chân (D13) ép bằng $FORCE_KEY cho từng app."
@@ -328,11 +424,12 @@ for app in "${APPS[@]}"; do
     ok=0; [[ "$got_trimmed" == *"$EXPECT_TRIMMED" ]] && ok=1
   else
     ok=0; [[ "$got_trimmed" == "$EXPECT_TRIMMED" ]] && ok=1
-    # TextEdit capitalizes the first word of a new document by itself (macOS "Capitalize
-    # words automatically") when keys come slowly enough: not the input method's doing.
-    if [[ $ok == 0 && "$app" == textedit ]]; then
+    # TextEdit, Notes, Pages… capitalize the first word of a new document by themselves
+    # (macOS "Capitalize words automatically") when keys come slowly enough: not the
+    # input method's doing.
+    if [[ $ok == 0 ]]; then
       capitalized="$(printf '%s' "$EXPECT_TRIMMED" | perl -CS -pe 's/^(.)/\u$1/')"
-      [[ "$got_trimmed" == "$capitalized" ]] && ok=1
+      [[ "$got_trimmed" == "$capitalized" ]] && { ok=1; echo; echo "  (chữ đầu viết hoa do app tự viết hoa, không tính lỗi)"; }
     fi
   fi
   echo
@@ -342,9 +439,10 @@ for app in "${APPS[@]}"; do
   case "$app" in
     textedit) filter=TextEdit ;; safari) filter=Safari ;; chrome) filter=Chrome ;;
     vscode) filter=VSCode ;; terminal) filter=Terminal ;;
+    *) filter="$(bundle_id "$app")" ;;
   esac
   "$ROOT/scripts/perf-report.sh" --input "$WORK/perf.log" --app "$filter" \
-    | grep -E 'count_(replace|mismatch|unsupported|insert|mark|commit)|handle_replace_us|selectedRange_us' || true
+    | grep -E 'count_|handle_replace_us|selectedRange_us|insertText_us|attributedSubstring_us|event_' || true
   if [[ $UNDERLINE == 1 ]]; then
     if "$LOG" show --start "$start" --style compact \
         --predicate "subsystem == \"$IM_ID\" AND category == \"settings\"" 2>/dev/null \
