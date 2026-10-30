@@ -222,6 +222,10 @@ K4–K6 của TextEdit: M2-TESTING mục 4 dòng 1, 4, 5, 6 (30/10/2026, agent t
 
 Phát hiện ở M3 T2 (`docs/PROGRESS.md` nhật ký 30/10/2026): Terminal xử lý ⌫ mà không đưa phím cho bộ gõ, nên D32 không giữ được ở đó (K7 ra "hocj", ARCHITECTURE.md). T6 chưa kiểm chứng lại bằng `hoaf⌫␣` vì lượt thử dừng sớm; làm ở M6 (mục 7).
 
+### 6.6 Biểu tượng nguồn nhập liệu trên máy nhiều màn hình — ghi ngày 30/10/2026
+
+Biểu tượng Dấu là ảnh template (BRAND.md). macOS tô ảnh template của bộ gõ bên ngoài bằng một màu chung; ô "A"/"VI" của Apple thì hệ thống tự vẽ từ nhãn và đổi màu riêng theo từng màn hình. Hệ quả: khi màn hình phụ có thanh menu tối (biểu tượng hệ thống màu trắng), ô V của Dấu vẫn đen; chữ V khoét rỗng vẫn để lộ màu nền. Đã thử (chụp thanh menu cả hai màn hình): bỏ cờ template, bỏ hẳn ảnh (macOS hiện biểu tượng mặc định), dùng `.icns` như Apple: không cách nào để hệ thống tự vẽ nhãn cho bộ gõ bên ngoài. Không có cách sửa phía Dấu.
+
 ## 7. Còn mở
 
 - Phần còn lại của ma trận làm tiếp ở M6 (người dùng chốt 30/10/2026): Zalo, Discord, Messages, Pages, Numbers, Ghostty, Zed, Xcode, WebStorm (và phần còn lại của Mail); kiểm chứng lại Terminal không gửi ⌫ cho bộ gõ (mục 6.5); K5, K6 cho phần lớn app (K6 theo mong đợi mới D4 × D20).

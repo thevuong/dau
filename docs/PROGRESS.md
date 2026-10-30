@@ -145,3 +145,4 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 - 30/10/2026 — kiểm toán M3 lần 2 — auditor — CHƯA ĐẠT (2 việc nhỏ: ghi M7 cho UpdatesSupportView:56, đồng bộ canvas). Đã sửa: ghi nhớ M7, D11 nhắc ngoại lệ D20, M2-TESTING dòng 4, 5, 14, comment test; ghi chú canvas đồng bộ N3, D13 (Firefox), D20 (D4 × D20) — phiên chính
 
 - 30/10/2026 — kiểm toán M3 lần 3 — auditor — ĐẠT. Đóng M3 — phiên chính
+- 30/10/2026 — biểu tượng nguồn nhập liệu theo góp ý người dùng (không giống kiểu hệ thống, cỡ lệch với "A"): vẽ lại thành ô tô đặc 22 × 16 pt, chữ V khoét rỗng 9 × 8,5 pt, đo khớp ô "A" trên thanh menu Retina (36c2771, 8c45ac0). Người dùng cấp quyền Ghi màn hình để phiên chính tự chụp kiểm tra. Ảnh cũ trong bộ đệm của `TextInputMenuAgent` chỉ đổi sau khi khởi động lại tiến trình đó. Giới hạn macOS: ảnh template của bộ gõ bên ngoài chỉ một màu chung trên máy nhiều màn hình (COMPATIBILITY 6.6, BRAND). Ô chỉ báo khi ⌃Space: chờ người dùng kiểm — phiên chính
