@@ -2,7 +2,7 @@
 
 Bộ gõ tiếng Việt cho macOS, dựng trên InputMethodKit.
 
-Dự án đang ở giai đoạn dựng khung: chưa có bản phát hành và chưa gõ được tiếng Việt.
+Dự án đang phát triển, chưa có bản phát hành. Bản Debug đã gõ được Telex/VNI (đã thử TextEdit, Safari, Chrome, VS Code, Terminal, Sublime Text; giới hạn còn lại ghi trong `docs/PROGRESS.md`); cài thử bằng `scripts/install-debug.sh`.
 
 Tài liệu dự án nằm trong `docs/`: bắt đầu từ `docs/DECISIONS.md` (sổ quyết định) và `docs/ROADMAP.md` (lộ trình).
 

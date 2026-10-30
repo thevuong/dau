@@ -38,13 +38,13 @@ dau/
 
 ### DauInputMethod (input method)
 - Lớp con `IMKInputController`, mỗi client một instance và một `VietEngine` riêng (không có trạng thái toàn cục — khác OpenKey).
-- `handle(_:client:)`: đưa phím vào engine; nếu `replace`, gọi `insertText(_:replacementRange:)` đúng một lần (N3). Cách lấy vị trí tuyệt đối: xem câu hỏi mở A/B trong `DECISIONS.md`.
+- `handle(_:client:)`: đưa phím vào engine; nếu `replace`, hỏi `selectedRange` một lần để có vị trí tuyệt đối rồi gọi `insertText(_:replacementRange:)` đúng một lần; phím đi thẳng không hỏi gì (N3, cách A đã chốt trong `DECISIONS.md`). Bản Debug có thêm một lần hỏi sau khi thay để chẩn đoán (`ReplaceDiag.swift`); số đo M2 làm trên Debug có lời gọi thừa này.
 - Reset engine khi: click chuột, `activateServer`/`deactivateServer`, `commitComposition`, phím di chuyển con trỏ, hoặc `selectedRange` khác dự đoán.
 - App trong danh sách tương thích cần gạch chân: dùng `setMarkedText` thay cho thay chữ tại chỗ (D13).
 - Hai input mode "Tiếng Việt" và "Tiếng Anh" khai báo trong Info.plist (`ComponentInputModeDict`); ở chế độ Anh, mọi phím đi thẳng (D2).
 - Đọc cài đặt và danh sách tương thích từ App Group; nghe thay đổi để áp dụng ngay.
-- Entitlements: App Sandbox, App Group, tạm thêm `temporary-exception.mach-register.global-name` cho tên kết nối IMK (theo mẫu IMK có sandbox; M2 kiểm chứng có cần không). **Không** `com.apple.security.network.client`.
-- Khoá Info.plist cần nghiên cứu và xác minh theo tài liệu Apple / mẫu IMK: `InputMethodConnectionName`, `InputMethodServerControllerClass`, `LSBackgroundOnly`, `TISInputSourceID`, `TISIntendedLanguage`, `ComponentInputModeDict`, `tsInputModeListKey`, icon cho từng mode.
+- Entitlements: App Sandbox, App Group, tạm thêm `temporary-exception.mach-register.global-name` cho tên kết nối IMK (theo mẫu IMK có sandbox). Chưa thử bỏ đi để biết có cần không: để M3. **Không** `com.apple.security.network.client`.
+- Khoá Info.plist đang dùng (chạy được trên macOS 27 ở M2): `InputMethodConnectionName`, `InputMethodServerControllerClass`, `LSBackgroundOnly`, `TISInputSourceID`, `TISIntendedLanguage`, `ComponentInputModeDict` (hai mode, mỗi mode một icon template), `tsInputMethodIconFileKey`, `TISIconIsTemplate`; thêm `DauHostAppBundleIdentifier`, `DauAppGroupIdentifier` của riêng Dấu.
 
 ### Dau (app chủ)
 - **Cửa sổ Cài đặt:** scene SwiftUI `Window` (không dùng scene `Settings`), là cửa sổ chính của app. ⌘, mở lại cửa sổ. Cỡ mặc định 820×600, tối thiểu 760×520. Điểm vào là `main.swift`: nó ghim bản địa hoá `vi` trước khi AppKit chạy.

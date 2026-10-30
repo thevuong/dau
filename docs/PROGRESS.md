@@ -3,7 +3,7 @@
 Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị nén) tiếp tục đúng chỗ. Phiên chính cập nhật file này sau mỗi bước.
 
 ## Trạng thái hiện tại
-- Mốc đang làm: M2 — TextEdit, Safari đạt (người dùng gõ thử); còn đo Chrome, Slack, VS Code, Terminal rồi chốt A/B và kiểm toán M2. M4 đang làm song song (app-ui-dev). Phiên fork "Bắt đầu làm (fork)" đã bàn giao lại cho phiên này. M1 đã đóng (kiểm toán lần 2 ĐẠT). Ghi chú cũ về M1: — M1b Telex xong (cf5c2bb, ebfce9a, 50 test xanh); M1c VNI xong; engine 70 test xanh (HEAD a59c44f/ba6a2b8). Kiểm toán M1 lần 1: CHƯA ĐẠT chỉ vì 2 tài liệu lệch — đã sửa (7d28fb2). Siết D31 + test bổ sung (19fd8f1, 48c839c): 72 test xanh. Người dùng đã chốt 3 câu (D28, D31 nới địa danh, D36); engine-dev đang làm D31 + đo ảnh hưởng, sau đó kiểm toán lại. M2 bắt đầu song song (imk-dev).
+- Mốc đang làm: M2 — A/B đã chốt (cách A); kiểm toán M2 lần 1 (30/10) CHƯA ĐẠT chỉ vì tài liệu (DECISIONS D11, tỉ lệ selectedRange, câu hỏi Accessibility, Slack chưa đo), chờ người dùng duyệt sửa DECISIONS; mục 4 của M2-TESTING chưa có kết quả. M4 — App Group chạy với Team ID; đang tự thử M4-TESTING bước 3–10. M0, M1 đã đóng.
 - Việc đang chờ người dùng: Bundle ID (placeholder `com.example.dau`). Team ID: Personal Team miễn phí `M58DANM3ZP` (30/10/2026), ký tự động "Apple Development"; bản phát hành dùng Developer ID ở M7.
 - M1a xong: `docs/OPENKEY-NOTES.md` (commit b0739c7).
 - M0: khung xong (commit b2a331d, 06f0dcb, 6fe660b), phiên chính đã kiểm chứng lại: xcodegen + build Debug 2 target với `-destination 'generic/platform=macOS'` ra `x86_64 arm64`, swift test 2 package xanh, bộ gõ không có network.client. Tên hiển thị "Dấu" cho locale `en` đã sửa (0b188dd). **Kiểm toán M0: ĐẠT.**
@@ -24,9 +24,9 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 |---|---|---|---|
 | M0 Khung dự án | xong | ĐẠT (29/10) | build Debug universal cần `-destination generic/platform=macOS` |
 | M1 Engine | xong | ĐẠT (29/10, lần 2) | Telex, Telex đơn giản, VNI, 75 test; release ~0,15 µs/phím; 0 từ sai / 474 từ, 0 khôi phục nhầm / 15.796 âm tiết, fuzz 800k thao tác không crash |
-| M2 Bộ gõ tối thiểu | đang làm | — | TextEdit + Safari đạt; selectedRange p50 ~0,3 ms ≈ 6–7% thời gian phím có thay (insertText chiếm chủ yếu); còn 4 app |
+| M2 Bộ gõ tối thiểu | đang làm | lần 1 CHƯA ĐẠT (30/10, tài liệu) | cách A; tự gõ 30 ms/phím đúng ở TextEdit, Safari, Chrome, VS Code, Terminal; Sublime gõ tay; Slack chưa đo (máy không cài); selectedRange p50 0,2–0,6 ms (Debug) |
 | M3 Độ tin cậy | chưa | — | |
-| M4 App Cài đặt | đang làm | lần 1 CHƯA ĐẠT (N5 gạch chân/D20 trên UI, menu "Cài đặt Dấu…", mã chết, ngoại lệ màu D9/D25) | DauShared + cửa sổ 4 mục xong (2d6206e, c731c61; 25 test); bộ gõ đọc cài đặt chung + D5 (0aa4872, 30 test IMK); chờ người dùng thử `docs/M4-TESTING.md`; cách hiểu D5 đã chốt. Cần Team ID để App Group chia sẻ thật |
+| M4 App Cài đặt | đang làm | lần 1 CHƯA ĐẠT (N5 gạch chân/D20 trên UI, menu "Cài đặt Dấu…", mã chết, ngoại lệ màu D9/D25) | DauShared + cửa sổ 4 mục xong (2d6206e, c731c61; 22 test sau khi gỡ SettingsExamples); bộ gõ đọc cài đặt chung + D5 (0aa4872, 30 test IMK); cách hiểu D5 đã chốt. App Group chạy với Team ID M58DANM3ZP (958a5a8); M4-TESTING bước 1–2 ĐẠT |
 | M5 Onboarding, cài, gỡ | chưa | — | |
 | M6 Hiệu năng dưới tải | chưa | — | |
 | M7 Phát hành | chưa | — | |
