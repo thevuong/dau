@@ -13,6 +13,16 @@
 #                     120 is close to normal typing.
 #   --keys "…"        keys to type (default: the sample sentence below)
 #   --expect "…"      expected text (default: what the sample sentence must give)
+#   --underline       force underline mode (D13: marked text, committed at the word end)
+#                     for each app tested, without touching the user's Dấu settings.
+#                     Debug input method only: the script writes the bundle ID into the
+#                     global defaults key DauDebugForceUnderline (`defaults write -g`,
+#                     the only domain both a shell can write and the sandboxed input
+#                     method can read) before the app runs, and deletes the key at exit.
+#                     The input method reads it at activation; the report shows
+#                     `underline-on` when it took effect. By hand:
+#                       defaults write -g DauDebugForceUnderline -array com.google.Chrome
+#                       defaults delete -g DauDebugForceUnderline
 #
 # For each app: opens a new, empty window, selects the Dấu input source (which must be
 # enabled already; nothing is enabled or disabled, N4), types, reads the text back,
@@ -23,6 +33,10 @@
 # Terminal: the keys go to the shell prompt of a new window. The script never presses
 # Return; it clears the line with ⌃U before closing the window. Keys must not contain
 # a newline.
+#
+# Safety: keys and shortcuts (⌘A ⌘C ⌘W ⌃U) are only sent while the app under test is
+# frontmost (browsers: with the test page in front; VS Code: an Untitled editor). If
+# another app comes to the front, the script stops sending keys and exits with status 3.
 #
 # Exit status 0 only if every app gives the expected text.
 set -uo pipefail
@@ -38,19 +52,22 @@ LOG=/usr/bin/log
 KEYS='windows carr tooi yeeu tieengs Vieetj, Hasaki '
 EXPECT='windows car tôi yêu tiếng Việt, Hasaki '
 DELAY_MS=30
+UNDERLINE=0
+FORCE_KEY=DauDebugForceUnderline
 APPS=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --delay) DELAY_MS="${2:?--delay cần số ms}"; shift 2 ;;
     --keys) KEYS="${2?}"; shift 2 ;;
     --expect) EXPECT="${2?}"; shift 2 ;;
-    -h|--help) sed -n '2,27p' "$0"; exit 0 ;;
+    --underline) UNDERLINE=1; shift ;;
+    -h|--help) sed -n '2,41p' "$0"; exit 0 ;;
     all) APPS+=(textedit safari chrome vscode terminal); shift ;;
     textedit|safari|chrome|vscode|terminal) APPS+=("$1"); shift ;;
     *) echo "Tham số không hợp lệ: $1" >&2; exit 2 ;;
   esac
 done
-[[ ${#APPS[@]} -gt 0 ]] || { sed -n '2,27p' "$0"; exit 2; }
+[[ ${#APPS[@]} -gt 0 ]] || { sed -n '2,41p' "$0"; exit 2; }
 if [[ "$KEYS" == *$'\n'* || "$KEYS" == *$'\r'* ]]; then
   echo "Phím gõ không được có xuống dòng (không bao giờ nhấn Return trong Terminal)." >&2
   exit 2
@@ -78,6 +95,7 @@ WORK="$(mktemp -d)"
 ORIGINAL_SOURCE="$("$INPUT_SOURCE" current)"
 "$CLIPBOARD" save "$WORK/clipboard.plist" || exit 1
 cleanup() {
+  [[ $UNDERLINE == 1 ]] && defaults delete -g "$FORCE_KEY" >/dev/null 2>&1
   "$CLIPBOARD" restore "$WORK/clipboard.plist" 2>/dev/null || echo "CẢNH BÁO: không khôi phục được clipboard" >&2
   if [[ "$("$INPUT_SOURCE" current)" != "$ORIGINAL_SOURCE" ]]; then
     "$INPUT_SOURCE" select "$ORIGINAL_SOURCE" || true
@@ -98,18 +116,56 @@ HTML
 
 select_dau() { "$INPUT_SOURCE" select "$DAU_SOURCE"; sleep 0.3; }
 
-type_keys() {
+# Every keystroke goes through a check that the app under test is frontmost (and, for
+# browsers, that the test page is the front tab), in the same osascript as the keys: if
+# the user switches app while the script runs, nothing is typed into their window. A
+# failed check stops the whole run (exit 3).
+STOP_FILE=""   # set below, in $WORK
+front_guard() { # process [window-title-substring] → AppleScript that errors if not front
+  cat <<OSA
+  tell application "System Events"
+    set fp to name of first process whose frontmost is true
+    if fp is not "$1" then error "frontmost is " & fp & ", not $1"
+    if "${2:-}" is not "" then
+      if name of front window of process "$1" does not contain "${2:-}" then error "front window of $1 is not the test page"
+    end if
+  end tell
+OSA
+}
+# Runs AppleScript $3 only if the guard for process $1 (title $2) passes.
+guarded() {
+  local out
+  if ! out="$(osascript -e "$(front_guard "$1" "$2")" -e "$3" 2>&1)"; then
+    echo "DỪNG: $out — không gửi phím nào nữa" >&2
+    : > "$STOP_FILE"
+    return 1
+  fi
+  printf '%s' "$out"
+}
+stopped() { [[ -e "$STOP_FILE" ]]; }
+
+type_keys() { # process [window-title-substring]
+  stopped && return 1
   # The delay goes in as whole milliseconds: coercing "0.030" to a real follows the
   # user's locale (Vietnamese uses a decimal comma, so it became 30 seconds).
-  osascript - "$KEYS" "$DELAY_MS" <<'OSA'
+  guarded "$1" "${2:-}" 'return' >/dev/null || return 1
+  osascript - "$KEYS" "$DELAY_MS" "$1" <<'OSA' || { echo "DỪNG: app đổi giữa chừng" >&2; : > "$STOP_FILE"; return 1; }
 on run argv
   set s to item 1 of argv
   set d to ((item 2 of argv) as integer) / 1000
+  set p to item 3 of argv
   tell application "System Events"
+    if name of first process whose frontmost is true is not p then error "frontmost changed"
     if d = 0 then
       keystroke s
     else
+      set i to 0
       repeat with c in characters of s
+        -- Re-check now and then; not every key, so the delay stays close to d.
+        set i to i + 1
+        if i mod 8 = 0 then
+          if name of first process whose frontmost is true is not p then error "frontmost changed"
+        end if
         keystroke (c as text)
         delay d
       end repeat
@@ -120,18 +176,23 @@ OSA
   sleep 0.8   # let asynchronous apps catch up before reading
 }
 
-# ⌘A ⌘C in the focused text field, then the plain text of the clipboard.
+# ⌘A ⌘C in the focused text field of process $1 (front tab title $2), then the plain
+# text of the clipboard.
 copy_all() {
-  osascript -e 'tell application "System Events"' \
-    -e 'keystroke "a" using {command down}' -e 'delay 0.2' \
-    -e 'keystroke "c" using {command down}' -e 'delay 0.3' -e 'end tell' >/dev/null
+  stopped && return 1
+  guarded "$1" "${2:-}" 'tell application "System Events"
+    keystroke "a" using {command down}
+    delay 0.2
+    keystroke "c" using {command down}
+    delay 0.3
+  end tell' >/dev/null || return 1
   "$CLIPBOARD" text
 }
 
 # --- one function per app; each prints the text typed ---------------------------------
 run_textedit() {
   osascript -e 'tell application "TextEdit"' -e 'activate' -e 'make new document' -e 'end tell' >/dev/null
-  sleep 0.8; select_dau; type_keys
+  sleep 0.8; select_dau; type_keys TextEdit
   osascript -e 'tell application "TextEdit"' -e 'set t to text of front document' \
     -e 'close front document saving no' -e 'return t' -e 'end tell'
 }
@@ -148,7 +209,9 @@ window_names() {
 # process $1 still shows it; tries again a few times.
 close_test_tab() {
   for _ in 1 2 3; do
-    osascript -e 'tell application "System Events" to keystroke "w" using {command down}' >/dev/null
+    # Only when the browser is frontmost with the test page in front.
+    guarded "$1" "$PAGE_TITLE" 'tell application "System Events" to keystroke "w" using {command down}' \
+      >/dev/null || break
     sleep 0.6
     [[ "$(window_names "$1")" == *"$PAGE_TITLE"* ]] || return 0
   done
@@ -157,15 +220,15 @@ close_test_tab() {
 
 run_safari() {
   open -a Safari "$PAGE"
-  sleep 2.5; select_dau; type_keys
-  copy_all
+  sleep 2.5; select_dau; type_keys Safari "$PAGE_TITLE"
+  copy_all Safari "$PAGE_TITLE"
   close_test_tab Safari
 }
 
 run_chrome() {
   open -a "Google Chrome" "$PAGE"
-  sleep 2.5; select_dau; type_keys
-  copy_all
+  sleep 2.5; select_dau; type_keys "Google Chrome" "$PAGE_TITLE"
+  copy_all "Google Chrome" "$PAGE_TITLE"
   close_test_tab "Google Chrome"
 }
 
@@ -173,24 +236,39 @@ run_vscode() {
   open -a "Visual Studio Code"; sleep 2
   osascript -e 'tell application "Visual Studio Code" to activate' -e 'delay 0.5' \
     -e 'tell application "System Events" to keystroke "n" using {command down}' >/dev/null
-  sleep 1.2; select_dau; type_keys
-  copy_all
+  sleep 1.2; select_dau; type_keys Code Untitled
+  copy_all Code Untitled
   # Empty the untitled editor so ⌘W closes it without asking to save.
-  osascript -e 'tell application "System Events"' -e 'keystroke "a" using {command down}' \
-    -e 'delay 0.1' -e 'key code 51' -e 'delay 0.2' \
-    -e 'keystroke "w" using {command down}' -e 'end tell' >/dev/null
+  guarded Code Untitled 'tell application "System Events"
+    keystroke "a" using {command down}
+    delay 0.1
+    key code 51
+    delay 0.2
+    keystroke "w" using {command down}
+  end tell' >/dev/null
 }
 
 run_terminal() {
-  osascript -e 'tell application "Terminal"' -e 'activate' -e 'do script ""' -e 'end tell' >/dev/null
-  sleep 1.5; select_dau; type_keys
+  # Remember the window opened here: it is the only one read and closed.
+  local win
+  win="$(osascript -e 'tell application "Terminal"' -e 'activate' -e 'do script ""' \
+    -e 'return id of front window' -e 'end tell')" || return 0
+  # Wait for the shell prompt: keys sent before the shell is ready (a slow zsh theme
+  # takes ~3 s) are lost and never reach the input method.
+  for _ in $(seq 1 30); do
+    osascript -e "tell application \"Terminal\" to get contents of selected tab of window id $win" \
+      2>/dev/null | grep -q '[^[:space:]]' && break
+    sleep 0.2
+  done
+  sleep 0.7; select_dau; type_keys Terminal
   # The keys sit on the prompt's last line after the prompt itself: print that line;
   # the caller compares by suffix.
-  osascript -e 'tell application "Terminal" to get contents of selected tab of front window' \
+  osascript -e "tell application \"Terminal\" to get contents of selected tab of window id $win" \
     | grep -v '^[[:space:]]*$' | tail -1
-  # ⌃U clears the line; never Return. Then close the window (only the shell runs in it).
-  osascript -e 'tell application "System Events" to keystroke "u" using {control down}' \
-    -e 'delay 0.2' -e 'tell application "Terminal" to close front window' >/dev/null 2>&1
+  # ⌃U clears the line; never Return. Then close that window (only the shell runs in it).
+  guarded Terminal "" 'tell application "System Events" to keystroke "u" using {control down}' >/dev/null
+  sleep 0.2
+  osascript -e "tell application \"Terminal\" to close window id $win" >/dev/null 2>&1
 }
 
 # --- run -------------------------------------------------------------------------------
@@ -199,7 +277,20 @@ EXPECT_TRIMMED="$(printf '%s' "$EXPECT" | trim_right)"
 FAILED=0
 echo "Script sẽ mở: ${APPS[*]} (mỗi app một cửa sổ/tab mới, đóng lại sau khi đọc chữ; app nào chưa chạy thì vẫn để chạy)."
 echo "Phím: \"$KEYS\"   mong đợi: \"$EXPECT\"   nghỉ giữa phím: ${DELAY_MS} ms"
+bundle_id() {
+  case "$1" in
+    textedit) echo com.apple.TextEdit ;; safari) echo com.apple.Safari ;;
+    chrome) echo com.google.Chrome ;; vscode) echo com.microsoft.VSCode ;;
+    terminal) echo com.apple.Terminal ;;
+  esac
+}
+[[ $UNDERLINE == 1 ]] && echo "Chế độ gạch chân (D13) ép bằng $FORCE_KEY cho từng app."
+STOP_FILE="$WORK/stop"
 for app in "${APPS[@]}"; do
+  if stopped; then echo "Đã dừng: app đang thử không còn ở trước (người dùng đang dùng máy?)."; FAILED=3; break; fi
+  if [[ $UNDERLINE == 1 ]]; then
+    defaults write -g "$FORCE_KEY" -array "$(bundle_id "$app")"
+  fi
   start="$(date '+%Y-%m-%d %H:%M:%S')"
   got="$("run_$app")"
   sleep 0.3
@@ -224,7 +315,16 @@ for app in "${APPS[@]}"; do
     vscode) filter=VSCode ;; terminal) filter=Terminal ;;
   esac
   "$ROOT/scripts/perf-report.sh" --input "$WORK/perf.log" --app "$filter" \
-    | grep -E 'count_(replace|mismatch|unsupported|insert)|handle_replace_us|selectedRange_us' || true
+    | grep -E 'count_(replace|mismatch|unsupported|insert|mark|commit)|handle_replace_us|selectedRange_us' || true
+  if [[ $UNDERLINE == 1 ]]; then
+    if "$LOG" show --start "$start" --style compact \
+        --predicate "subsystem == \"$IM_ID\" AND category == \"settings\"" 2>/dev/null \
+        | grep -q "event=underline-on app=$(bundle_id "$app")"; then
+      echo "  underline-on"
+    else
+      echo "  CẢNH BÁO: không thấy underline-on (bộ gõ chưa nhận khoá ép?)"
+    fi
+  fi
 done
 echo
 if [[ $FAILED == 0 ]]; then echo "PASS"; else echo "FAIL"; fi
