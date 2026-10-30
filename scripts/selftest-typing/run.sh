@@ -11,7 +11,12 @@
 #                     one System Events keystroke (about 1 ms per key): a stress test that
 #                     Chrome, VS Code and Terminal fail with method A (docs/PROGRESS.md);
 #                     120 is close to normal typing.
-#   --keys "…"        keys to type (default: the sample sentence below)
+#   --keys "…"        keys to type (default: the sample sentence below). Two marks are
+#                     not typed as characters: ⌫ sends the Delete key; ⇄ switches the
+#                     input source to U.S. (com.apple.keylayout.US, must be enabled) and
+#                     back to Dấu with TISSelectInputSource from this script's process,
+#                     which IMK does not report to the input method as a deactivation
+#                     (ROADMAP M3). Example (D20, K7): --keys "hoc ⌫j " --expect "học "
 #   --expect "…"      expected text (default: what the sample sentence must give)
 #   --underline       force underline mode (D13: marked text, committed at the word end)
 #                     for each app tested, without touching the user's Dấu settings.
@@ -61,13 +66,14 @@ while [[ $# -gt 0 ]]; do
     --keys) KEYS="${2?}"; shift 2 ;;
     --expect) EXPECT="${2?}"; shift 2 ;;
     --underline) UNDERLINE=1; shift ;;
-    -h|--help) sed -n '2,41p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,46p' "$0"; exit 0 ;;
     all) APPS+=(textedit safari chrome vscode terminal); shift ;;
     textedit|safari|chrome|vscode|terminal) APPS+=("$1"); shift ;;
     *) echo "Tham số không hợp lệ: $1" >&2; exit 2 ;;
   esac
 done
-[[ ${#APPS[@]} -gt 0 ]] || { sed -n '2,41p' "$0"; exit 2; }
+[[ ${#APPS[@]} -gt 0 ]] || { sed -n '2,46p' "$0"; exit 2; }
+US_SOURCE=com.apple.keylayout.US
 if [[ "$KEYS" == *$'\n'* || "$KEYS" == *$'\r'* ]]; then
   echo "Phím gõ không được có xuống dòng (không bao giờ nhấn Return trong Terminal)." >&2
   exit 2
@@ -90,6 +96,13 @@ IM_PLIST="$HOME/Library/Input Methods/DauInputMethod.app/Contents/Info.plist"
 IM_ID="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$IM_PLIST")"
 DAU_SOURCE="$("$INPUT_SOURCE" enabled "$IM_ID" | grep '\.vi$' | head -1)"
 [[ -n "$DAU_SOURCE" ]] || { echo "Nguồn nhập liệu Dấu – Tiếng Việt chưa được bật." >&2; exit 1; }
+if [[ "$KEYS" == *"⇄"* ]] && ! "$INPUT_SOURCE" enabled "$US_SOURCE" | grep -qx "$US_SOURCE"; then
+  echo "⇄ cần nguồn $US_SOURCE đã bật (script không tự bật, N4)." >&2
+  exit 1
+fi
+# ⇄: U.S., then back to Dấu, from this (unsandboxed) process.
+SWITCH_CMD="$(printf '%q select %q; sleep 0.3; %q select %q; sleep 0.3' \
+  "$BIN/input-source" "$US_SOURCE" "$BIN/input-source" "$DAU_SOURCE")"
 
 WORK="$(mktemp -d)"
 ORIGINAL_SOURCE="$("$INPUT_SOURCE" current)"
@@ -127,14 +140,22 @@ front_guard() { # process [window-title-substring] → AppleScript that errors i
     set fp to name of first process whose frontmost is true
     if fp is not "$1" then error "frontmost is " & fp & ", not $1"
     if "${2:-}" is not "" then
-      if name of front window of process "$1" does not contain "${2:-}" then error "front window of $1 is not the test page"
+      set fw to name of front window of process "$1"
+      if fw does not contain "${2:-}" then error "front window of $1 is " & fw & ", not the test page"
     end if
   end tell
 OSA
 }
 # Runs AppleScript $3 only if the guard for process $1 (title $2) passes.
+# The check alone is retried for a few seconds first: right after `open`, Safari 27 may
+# briefly report an untitled front window (seen 30/10/2026). Keys are still only sent
+# once the check passes.
 guarded() {
-  local out
+  local out _
+  for _ in 1 2 3 4 5 6 7 8; do
+    osascript -e "$(front_guard "$1" "$2")" -e 'return' >/dev/null 2>&1 && break
+    sleep 0.4
+  done
   if ! out="$(osascript -e "$(front_guard "$1" "$2")" -e "$3" 2>&1)"; then
     echo "DỪNG: $out — không gửi phím nào nữa" >&2
     : > "$STOP_FILE"
@@ -149,14 +170,15 @@ type_keys() { # process [window-title-substring]
   # The delay goes in as whole milliseconds: coercing "0.030" to a real follows the
   # user's locale (Vietnamese uses a decimal comma, so it became 30 seconds).
   guarded "$1" "${2:-}" 'return' >/dev/null || return 1
-  osascript - "$KEYS" "$DELAY_MS" "$1" <<'OSA' || { echo "DỪNG: app đổi giữa chừng" >&2; : > "$STOP_FILE"; return 1; }
+  osascript - "$KEYS" "$DELAY_MS" "$1" "$SWITCH_CMD" <<'OSA' || { echo "DỪNG: app đổi giữa chừng" >&2; : > "$STOP_FILE"; return 1; }
 on run argv
   set s to item 1 of argv
   set d to ((item 2 of argv) as integer) / 1000
   set p to item 3 of argv
+  set sw to item 4 of argv
   tell application "System Events"
-    if name of first process whose frontmost is true is not p then error "frontmost changed"
-    if d = 0 then
+    if (name of first process whose frontmost is true) is not p then error "frontmost changed"
+    if d = 0 and s does not contain "⌫" and s does not contain "⇄" then
       keystroke s
     else
       set i to 0
@@ -164,10 +186,17 @@ on run argv
         -- Re-check now and then; not every key, so the delay stays close to d.
         set i to i + 1
         if i mod 8 = 0 then
-          if name of first process whose frontmost is true is not p then error "frontmost changed"
+          if (name of first process whose frontmost is true) is not p then error "frontmost changed"
         end if
-        keystroke (c as text)
-        delay d
+        if (c as text) is "⌫" then
+          key code 51
+        else if (c as text) is "⇄" then
+          tell current application to do shell script sw
+          if (name of first process whose frontmost is true) is not p then error "frontmost changed"
+        else
+          keystroke (c as text)
+        end if
+        if d > 0 then delay d
       end repeat
     end if
   end tell
