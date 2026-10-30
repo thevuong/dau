@@ -130,3 +130,5 @@ Nhật ký điều phối, để phiên sau (hoặc sau khi ngữ cảnh bị n�
 | T6 | Chạy ma trận tương thích trên máy, ghi tự sửa chính tả (D4) | phiên chính + agent GUI | sau T4 |
 | T7 | VoiceOver đọc tên nguồn (D17), biểu tượng V | người dùng | bất kỳ lúc nào |
 | T8 | Kiểm toán M3 | auditor | cuối |
+- 30/10/2026 — M3 T1 chế độ gạch chân D13 (`MarkedComposer`, mỗi phím ≤ 1 lời gọi, không hỏi `selectedRange`) — imk-dev (285b873, 0d3f6f0); test IMK 37. Thử câu mẫu, thay tại chỗ / gạch chân ép (Debug `defaults -g DauDebugForceUnderline`): Chrome 0 ms FAIL / PASS, 5–30 ms PASS / PASS; VS Code 0 ms FAIL / PASS, 5 ms FAIL / PASS, 10–30 ms PASS / PASS; Terminal 0 ms FAIL / FAIL (chữ chốt đúng nhưng Terminal còn vẽ marked text cũ tới phím sau), 5–30 ms PASS / PASS; TextEdit, Safari gạch chân 0 và 30 ms PASS. Sự cố: một lần chạy Chrome, script cũ gõ vào app Claude desktop (người dùng đang dùng máy) → script giờ chỉ gửi phím khi app thử đứng trước — phiên chính ghi
+- 30/10/2026 — M3 T5 `docs/COMPATIBILITY.md` khung ma trận, 42 app (26 có trên máy) — researcher (2d59abf)
