@@ -110,10 +110,11 @@ struct AppRuleRow: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            Picker(selection: binding(\.underline)) {
+            Picker(selection: underlineBinding) {
                 Text("Không gạch chân").tag(false)
                 // N5: underlining (D13) is not in the input method yet; a saved value
-                // is kept and shown, but cannot be chosen.
+                // is kept and shown, but cannot be chosen. `.disabled` on a menu-style
+                // Picker item is not honored on macOS, so the binding refuses it too.
                 Text("Có gạch chân").tag(true).disabled(true)
             } label: {
                 Text("Gạch chân khi gõ trong \(name)")
@@ -131,12 +132,14 @@ struct AppRuleRow: View {
         .accessibilityLabel(Text(verbatim: name))
     }
 
-    private func binding<Value>(_ keyPath: WritableKeyPath<AppRule, Value>) -> Binding<Value> {
+    /// Only "Không gạch chân" can be chosen until M3 (N5).
+    private var underlineBinding: Binding<Bool> {
         Binding {
-            (model.settings.rule(for: rule.bundleID) ?? rule)[keyPath: keyPath]
+            (model.settings.rule(for: rule.bundleID) ?? rule).underline
         } set: { newValue in
+            guard !newValue else { return }
             var updated = model.settings.rule(for: rule.bundleID) ?? rule
-            updated[keyPath: keyPath] = newValue
+            updated.underline = false
             model.settings.upsert(updated)
         }
     }

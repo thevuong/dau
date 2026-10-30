@@ -22,6 +22,8 @@ Mỗi mốc kết thúc khi: test xanh, đã tự rà soát với `DECISIONS.md`
 ## M3 — Độ tin cậy
 - Reset khi lệch ngữ cảnh, phòng thủ đầu vào IMK (D18), fallback marked text theo danh sách tương thích (D13), quy tắc theo ứng dụng (D5), kiểm chứng bằng VoiceOver rằng hệ thống tự đọc tên nguồn nhập liệu khi chuyển (D17).
 - Ma trận tương thích: bảng app × kết quả, lưu trong `docs/COMPATIBILITY.md`.
+- Reset khi nguồn nhập liệu đổi mà bộ gõ không nhận `activateServer` (đo 30/10/2026: chọn lại Dấu bằng `TISSelectInputSource` từ tiến trình khác thì từ đang gõ dở không được reset, `to` → U.S. → Dấu → `o` ra "tô"; chuyển bằng ⌃Space thì đúng).
+- Ghi tự sửa chính tả của macOS (D4, giới hạn đã biết) vào ma trận tương thích.
 
 ## M4 — App Cài đặt
 - Dựng 4 mục theo `docs/UI.md`, App Group chia sẻ cài đặt, bộ gõ áp dụng thay đổi ngay.

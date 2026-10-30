@@ -88,8 +88,8 @@ Kết quả (30/10/2026): agent tự gõ qua System Events. Chưa chạy: 9, 10 
 | 6 | Gõ `tooi`, nhấn ←, gõ `s` | thêm "s" ở vị trí con trỏ, không bỏ dấu vào "tôi" (D4: mũi tên chỉ reset) | ĐẠT. Ghi chú: lần ← đầu sau một từ gõ dở bị macOS/TextEdit nuốt (với U.S. cũng vậy); lần ← thứ hai mới chạy, Dấu ghi log reset |
 | 7 | Chọn một đoạn chữ bằng chuột, gõ `tooi` | đoạn chọn bị thay bằng "tôi" | ĐẠT |
 | 8 | Gõ `tooi`, nhấn ⌘Z | ứng dụng hoàn tác bình thường, không lỗi | ĐẠT (⌘Z hoàn tác bình thường) |
-| 9 | Chuyển sang ABC (hoặc U.S.) bằng phím tắt nguồn nhập liệu của macOS, gõ `tooi` | "tooi" (D2: tiếng Anh dùng nguồn của hệ thống) | Chưa chạy lại sau 9680c68 (đã thử khi Dấu còn chế độ Anh) |
-| 10 | Chuyển lại "Dấu – Tiếng Việt", gõ `tooi` | "tôi"; chữ đang gõ dở trước khi chuyển không bị sửa (D4: đổi nguồn chỉ reset) | Chưa chạy lại sau 9680c68 (đã thử khi Dấu còn chế độ Anh) |
+| 9 | Chuyển sang ABC (hoặc U.S.) bằng phím tắt nguồn nhập liệu của macOS, gõ `tooi` | "tooi" (D2: tiếng Anh dùng nguồn của hệ thống) | ĐẠT (30/10, ⌃Space, 2/2 lần): "tôi" → U.S. → "tooi" giữ nguyên |
+| 10 | Chuyển lại "Dấu – Tiếng Việt", gõ `tooi` | "tôi"; chữ đang gõ dở trước khi chuyển không bị sửa (D4: đổi nguồn chỉ reset) | ĐẠT với ⌃Space: `to`, đổi nguồn đi rồi về, `o` ra "too" (đã reset). Chọn lại Dấu bằng `TISSelectInputSource` từ tiến trình khác thì không reset ("tô") — việc của M3 (ROADMAP) |
 | 11 | Menu nguồn nhập liệu: có nhóm "Kiểu gõ" với Telex ✓ / VNI / Telex đơn giản và mục "Mở cài đặt Bàn phím…" | đúng như mô tả, chữ có dấu, tên "Dấu" | ĐẠT: Kiểu gõ Telex ✓ / VNI / Telex đơn giản, "Cài đặt Dấu…", "Mở cài đặt Bàn phím…"; chữ có dấu đúng |
 | 12 | Chọn VNI trong menu, gõ `to6i` | "tôi"; mở menu lại thấy VNI ✓. Chọn lại Telex sau khi thử | ĐẠT: `to6i` → "tôi", menu VNI ✓, đã chọn lại Telex |
 | 13 | Bấm "Mở cài đặt Bàn phím…" | Cài đặt hệ thống mở đúng mục Bàn phím (N4) | ĐẠT |
